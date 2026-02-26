@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:laundry/config/constants/image_paths.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
@@ -13,9 +14,10 @@ class SplashView extends GetView<SplashController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // App Logo
-            Icon(
-              Icons.flutter_dash,
-              size: 100,
+            Image.asset(
+              ImagePaths.splashImage1,  
+              height: 311,
+              width: 311,
               color: Theme.of(context).primaryColor,
             ),
             const SizedBox(height: 20),

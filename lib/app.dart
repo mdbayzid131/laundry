@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(383, 876),
+      designSize: Size(428, 926),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
             //   backgroundColor: Color(0xffF9FAFB),
             //   scrolledUnderElevation: 0,
             // ),
-            scaffoldBackgroundColor: Color(0xffF9FAFB),
+            scaffoldBackgroundColor: Color(0xffffffff),
           ),
           initialRoute: AppRoutes.SPLASH,
           getPages: pages,  
