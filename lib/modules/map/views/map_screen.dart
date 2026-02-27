@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/settings_controller.dart';
+import '../controllers/map_controller.dart';
 
-class SettingsView extends GetView<SettingsController> {
-  const SettingsView({super.key});
+class MapScreen extends GetView<MapController> {
+  const MapScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('Map'),
         centerTitle: true,
       ),
       body: Center(
@@ -17,13 +17,13 @@ class SettingsView extends GetView<SettingsController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.settings,
+              Icons.search,
               size: 100,
               color: Colors.blue,
             ),
             const SizedBox(height: 20),
             const Text(
-              'Settings View',
+              'Search View',
               style: TextStyle(fontSize: 20),
             ),
           ],

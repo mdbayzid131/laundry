@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-class SearchController extends GetxController {
+class MapController extends GetxController {
   final count = 0.obs;
 
   @override

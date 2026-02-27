@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-class SettingsController extends GetxController {
+class CartController extends GetxController {
   final count = 0.obs;
 
   @override

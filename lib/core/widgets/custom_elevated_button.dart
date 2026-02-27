@@ -1,7 +1,7 @@
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomElevatedButton extends StatelessWidget {
   final String label;
@@ -23,38 +23,34 @@ class CustomElevatedButton extends StatelessWidget {
       height: 50.h,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed, // loading হলে disable করো
-        style: style ??
+        style:
+            style ??
             ElevatedButton.styleFrom(
-              minimumSize: Size(
-                double.infinity,
-                48.h,
-              ),
+              minimumSize: Size(double.infinity, 48.h),
               backgroundColor: AppTheme.primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.r),
               ),
-              padding: EdgeInsets.symmetric(
-                vertical: 10.h,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 10.h),
             ),
         child: isLoading
             ? SizedBox(
-          height: 24.h,
-          width: 24.h,
-          child: CircularProgressIndicator(
-            strokeWidth: 2.5,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-          ),
-        )
+                height: 24.h,
+                width: 24.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                ),
+              )
             : Text(
-          label,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 18.sp,
-            height: 1.4,
-          ),
-        ),
+                label,
+                style: GoogleFonts.manrope(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18.sp,
+                  height: 1.4,
+                ),
+              ),
       ),
     );
   }

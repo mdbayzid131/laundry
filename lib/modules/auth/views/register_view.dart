@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/core/widgets/custom_back_button.dart';
+import 'package:laundry/core/widgets/custom_elevated_button.dart';
+import 'package:laundry/core/widgets/custom_text_field.dart';
 import '../../../core/utils/validators.dart';
-import '../../../core/widgets/custom_button.dart';
-import '../../../core/widgets/custom_textfield.dart';
 import '../controllers/register_controller.dart';
+import '../../../config/themes/app_theme.dart';
 
 class RegisterView extends GetView<RegisterController> {
   const RegisterView({super.key});
@@ -11,106 +15,138 @@ class RegisterView extends GetView<RegisterController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-      ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(leading: CustomBackButton()),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
           child: Form(
             key: controller.formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                
-                const Text(
-                  'Create Account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 40),
+                SizedBox(height: 10.h),
 
-                // Name Field
+                SizedBox(height: 6.h),
                 CustomTextField(
                   controller: controller.nameController,
-                  hintText: 'Full Name',
-                  prefixIcon: const Icon(Icons.person),
+                  hintText: 'Enter your name',
                   validator: (value) => Validators.name(value),
+                  label: 'Name',
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
-                // Email Field
+                SizedBox(height: 6.h),
+                CustomTextField(
+                  // Use dummy controller or proper if implemented
+                  // controller: controller.phoneController,
+                  hintText: 'Enter your number',
+                  keyboardType: TextInputType.phone,
+                  label: 'Phone Number',
+                ),
+                SizedBox(height: 16.h),
+
+                SizedBox(height: 6.h),
                 CustomTextField(
                   controller: controller.emailController,
-                  hintText: 'Email',
+                  hintText: 'Enter your email',
                   keyboardType: TextInputType.emailAddress,
-                  prefixIcon: const Icon(Icons.email),
                   validator: Validators.email,
+                  label: 'Email',
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
-                // Password Field
-                Obx(() => CustomTextField(
-                      controller: controller.passwordController,
-                      hintText: 'Password',
-                      obscureText: !controller.isPasswordVisible.value,
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          controller.isPasswordVisible.value
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: controller.togglePasswordVisibility,
+                Obx(
+                  () => CustomTextField(
+                    controller: controller.passwordController,
+                    hintText: 'Enter your password',
+                    obscureText: !controller.isPasswordVisible.value,
+                    prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.isPasswordVisible.value
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        size: 20,
                       ),
-                      validator: Validators.password, 
-                    )),
-                const SizedBox(height: 16),
+                      onPressed: controller.togglePasswordVisibility,
+                    ),
+                    validator: Validators.password,
+                    label: 'Password',
+                  ),
+                ),
+                SizedBox(height: 16.h),
 
-                // Confirm Password Field
-                Obx(() => CustomTextField(
-                      controller: controller.confirmPasswordController,
-                      hintText: 'Confirm Password',
-                      obscureText: !controller.isConfirmPasswordVisible.value,
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          controller.isConfirmPasswordVisible.value
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: controller.toggleConfirmPasswordVisibility,
+                Obx(
+                  () => CustomTextField(
+                    controller: controller.confirmPasswordController,
+                    hintText: 'Enter your confirm password',
+                    obscureText: !controller.isPasswordVisible.value,
+                    prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.isPasswordVisible.value
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        size: 20,
                       ),
-                      validator: (value) => Validators.confirmPassword(
-                        value,
-                        controller.passwordController.text,
-                      ),
-                    )),
-                const SizedBox(height: 30),
+                      onPressed: controller.togglePasswordVisibility,
+                    ),
+                    validator: Validators.password,
+                    label: 'Confirm Password',
+                  ),
+                ),
+                SizedBox(height: 16.h),
+
+                SizedBox(height: 6.h),
+                CustomTextField(
+                  // Use dummy controller or proper if implemented
+                  // controller: controller.addressController,
+                  hintText: 'Enter your address',
+                  label: 'Address',
+                ),
+                SizedBox(height: 30.h),
 
                 // Register Button
-                Obx(() => CustomButton(
-                      text: 'Register',
-                      onPressed: controller.register,
-                      isLoading: controller.isLoading.value,
-                    )),
-                const SizedBox(height: 20),
+                Obx(
+                  () => CustomElevatedButton(
+                    label: 'Sign Up',
+                    onPressed: controller.register,
+                    isLoading: controller.isLoading.value,
+                  ),
+                ),
+                SizedBox(height: 20.h),
 
                 // Login Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account? '),
+                    Text(
+                      'Already have an account? ',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14.sp,
+                        color: AppTheme.textLightColor,
+                      ),
+                    ),
                     TextButton(
                       onPressed: controller.goToLogin,
-                      child: const Text('Login'),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'Login',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14.sp,
+                          color: AppTheme.textColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
+                SizedBox(height: 20.h),
               ],
             ),
           ),

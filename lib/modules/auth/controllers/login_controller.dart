@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
@@ -48,6 +47,12 @@ class LoginController extends GetxController {
 
   void goToRegister() {
     Get.toNamed(AppRoutes.REGISTER);
+  }
+
+  void goToHome() {
+    // Temporarily set isLoggedIn to true to bypass AuthMiddleware
+    _authService.isLoggedIn.value = true;
+    Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
   }
 
   void goToForgotPassword() {

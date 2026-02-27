@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/config/themes/app_theme.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
@@ -19,8 +20,6 @@ class CustomTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Color? fillColior;
 
-
-
   const CustomTextField({
     super.key,
     required this.hintText,
@@ -34,7 +33,9 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.readOnly = false,
     this.keyboardType = TextInputType.text,
-    this.onTap, this.inputFormatters, this.fillColior,
+    this.onTap,
+    this.inputFormatters,
+    this.fillColior,
   });
 
   @override
@@ -42,17 +43,16 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         /// ================= LABEL =================
         if (isLabelVisible)
           Padding(
             padding: EdgeInsets.only(bottom: 6.h),
             child: Text(
               label,
-              style: GoogleFonts.arimo(
-                fontSize: 14.sp,
+              style: GoogleFonts.manrope(
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xff333333),
+                color: AppTheme.textColor,
               ),
             ),
           ),
@@ -67,16 +67,16 @@ class CustomTextField extends StatelessWidget {
           keyboardType: keyboardType,
           onTap: onTap,
 
-          style: GoogleFonts.arimo(
-            fontSize: 17.sp,
+          style: GoogleFonts.manrope(
+            fontSize: 15.sp,
             fontWeight: FontWeight.w400,
-            color: Color(0xff8E8E93),
+            color: AppTheme.textColor,
           ),
 
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: GoogleFonts.arimo(
-              fontSize: 17.sp,
+            hintStyle: GoogleFonts.manrope(
+              fontSize: 15.sp,
               fontWeight: FontWeight.w400,
               color: Color(0xff8E8E93),
             ),
@@ -113,10 +113,7 @@ class CustomTextField extends StatelessWidget {
               borderSide: BorderSide.none,
             ),
 
-            errorStyle: GoogleFonts.arimo(
-              fontSize: 11.sp,
-              color: Colors.red,
-            ),
+            errorStyle: GoogleFonts.manrope(fontSize: 11.sp, color: Colors.red),
           ),
           inputFormatters: inputFormatters,
         ),

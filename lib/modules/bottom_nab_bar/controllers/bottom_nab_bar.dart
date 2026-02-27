@@ -1,4 +1,3 @@
-
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:get/get.dart';
 import '../../../core/services/auth_service.dart';
