@@ -19,7 +19,7 @@ class BottomNavBarView extends GetView<BottomNavBarController> {
         () => IndexedStack(
           index: controller.currentIndex.value,
           children: [
-            const HomeView(),
+            const LaundryHomeScreen(),
             Container(
               color: Colors.white,
               child: const Center(child: Text('Map View Placeholder')),

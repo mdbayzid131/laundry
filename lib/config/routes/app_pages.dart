@@ -68,7 +68,7 @@ final pages = [
   ),
   GetPage(
     name: AppRoutes.HOME,
-    page: () => const HomeView(),
+    page: () => const LaundryHomeScreen(),
     binding: HomeBinding(),
     middlewares: [AuthMiddleware()],
   ),
@@ -81,13 +81,13 @@ final pages = [
   GetPage(
     name: AppRoutes.MAP,
     page: () => const MapScreen(),
-    binding: MapBinding(), 
+    binding: MapBinding(),
     middlewares: [AuthMiddleware()],
   ),
   GetPage(
     name: AppRoutes.CART,
     page: () => const CartScreen(),
-    binding: CartBinding(), 
+    binding: CartBinding(),
     middlewares: [AuthMiddleware()],
   ),
   GetPage(
