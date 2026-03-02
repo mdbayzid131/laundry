@@ -1,8 +1,12 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/themes/app_theme.dart';
+import 'package:laundry/modules/cart/views/cart_view.dart';
+import 'package:laundry/modules/map/views/map_screen.dart';
 import '../controllers/bottom_nab_bar.dart';
 import '../../home/views/home_view.dart';
 import '../../profile/views/profile_view.dart';
@@ -20,14 +24,8 @@ class BottomNavBarView extends GetView<BottomNavBarController> {
           index: controller.currentIndex.value,
           children: [
             const LaundryHomeScreen(),
-            Container(
-              color: Colors.white,
-              child: const Center(child: Text('Map View Placeholder')),
-            ),
-            Container(
-              color: Colors.white,
-              child: const Center(child: Text('Cart View Placeholder')),
-            ),
+            const MapScreen(),
+            const CartScreen(),
             const ProfileView(),
           ],
         ),
