@@ -14,6 +14,7 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
           'Profile',
@@ -95,7 +96,7 @@ class _ProfileViewState extends State<ProfileView> {
                 height: 80.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: Colors.grey[300],
                   border: Border.all(color: Colors.white, width: 3.w),
                 ),
                 child: ClipOval(
@@ -116,8 +117,8 @@ class _ProfileViewState extends State<ProfileView> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.camera_alt,
-                    size: 14.sp,
+                    Icons.camera_alt_outlined,
+                    size: 20.sp,
                     color: const Color(0xFF4A90E2),
                   ),
                 ),
@@ -130,7 +131,7 @@ class _ProfileViewState extends State<ProfileView> {
             style: GoogleFonts.manrope(
               fontSize: 20.sp,
               fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
           SizedBox(height: 4.h),
@@ -139,7 +140,7 @@ class _ProfileViewState extends State<ProfileView> {
             style: GoogleFonts.manrope(
               fontSize: 14.sp,
               fontWeight: FontWeight.w400,
-              color: Colors.black54,
+              color: Colors.white.withOpacity(0.8),
             ),
           ),
         ],
@@ -155,7 +156,7 @@ class _ProfileViewState extends State<ProfileView> {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8.r,
             offset: Offset(0, 2.h),
           ),
@@ -166,7 +167,7 @@ class _ProfileViewState extends State<ProfileView> {
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(icon, size: 20.sp, color: Colors.black87),
@@ -177,79 +178,102 @@ class _ProfileViewState extends State<ProfileView> {
               title,
               style: GoogleFonts.manrope(
                 fontSize: 15.sp,
+                color: AppTheme.textColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.black54),
+          Icon(Icons.arrow_forward_ios, size: 18.sp, color: Colors.black),
         ],
       ),
     );
   }
 
   Widget _buildPersonalInfoSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Personal Information',
-              style: GoogleFonts.manrope(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'Edit',
+    return Container(
+      padding: EdgeInsets.all(16.w),
+     decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8.r,
+            offset: Offset(0, 2.h),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Personal Information',
                 style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
+                  fontSize: 17.sp,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF4A90E2),
                 ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.h),
-        _buildInfoField('Full Name', 'Sarah Johnson'),
-        SizedBox(height: 16.h),
-        _buildInfoField('Phone Number', '+1 (555) 123-4567'),
-        SizedBox(height: 16.h),
-        _buildInfoField('Email Address', 'sarah.johnson@email.com'),
-      ],
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Edit',
+                  style: GoogleFonts.manrope(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF4A90E2),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          _buildInfoField('Full Name', 'Sarah Johnson'),
+          SizedBox(height: 16.h),
+          _buildInfoField('Phone Number', '+1 (555) 123-4567'),
+          SizedBox(height: 16.h),
+          _buildInfoField('Email Address', 'sarah.johnson@email.com'),
+          SizedBox(height: 16.h),
+  
+        ],
+      ),
     );
   }
 
   Widget _buildInfoField(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8.r,
+            offset: Offset(0, 2.h),
           ),
-        ),
-        SizedBox(height: 8.h),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.grey[300]!, width: 1.w),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          child: Text(
+          SizedBox(height: 16.h),
+          Text(
             value,
             style: GoogleFonts.manrope(fontSize: 15.sp, color: Colors.black87),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -265,9 +289,9 @@ class _ProfileViewState extends State<ProfileView> {
             Text(
               'Payment Methods',
               style: GoogleFonts.manrope(
-                fontSize: 16.sp,
+                fontSize: 17.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Colors.black,
               ),
             ),
             TextButton(
@@ -275,7 +299,7 @@ class _ProfileViewState extends State<ProfileView> {
               child: Text(
                 'Add New',
                 style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF4A90E2),
                 ),
@@ -371,9 +395,9 @@ class _ProfileViewState extends State<ProfileView> {
         Text(
           'Notifications',
           style: GoogleFonts.manrope(
-            fontSize: 16.sp,
+            fontSize: 17.sp,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Colors.black,
           ),
         ),
         SizedBox(height: 12.h),
@@ -382,6 +406,13 @@ class _ProfileViewState extends State<ProfileView> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8.r,
+                offset: Offset(0, 2.h),
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -391,14 +422,28 @@ class _ProfileViewState extends State<ProfileView> {
                 value: pushNotifications,
                 onChanged: (val) => setState(() => pushNotifications = val),
               ),
-              Divider(height: 24.h),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: Divider(
+                  thickness: 1.h,
+                  height: 1.h,
+                  color: Colors.black12,
+                ),
+              ),
               _buildNotificationToggle(
                 title: 'SMS Updates',
                 subtitle: 'Delivery status via text',
                 value: smsUpdates,
                 onChanged: (val) => setState(() => smsUpdates = val),
               ),
-              Divider(height: 24.h),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: Divider(
+                  thickness: 1.h,
+                  height: 1.h,
+                  color: Colors.black12,
+                ),
+              ),
               _buildNotificationToggle(
                 title: 'Email Receipts',
                 subtitle: 'Order confirmations and invoices',
@@ -459,7 +504,7 @@ class _ProfileViewState extends State<ProfileView> {
         Text(
           'Account & Settings',
           style: GoogleFonts.manrope(
-            fontSize: 16.sp,
+            fontSize: 17.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -468,23 +513,46 @@ class _ProfileViewState extends State<ProfileView> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8.r,
+                offset: Offset(0, 2.h),
+              ),
+            ],
           ),
-          child: Column(
-            children: [
+          child: 
               _buildSettingsItem(
                 icon: Icons.lock_outline,
                 title: 'Privacy & Security',
                 subtitle: 'Manage your privacy settings',
-              ),
-              Divider(height: 1.h),
-              _buildSettingsItem(
-                icon: Icons.help_outline,
-                title: 'Help & Support',
-                subtitle: 'Get help or contact us',
+             
+          ),
+        ),
+        SizedBox(height: 16.h),
+      Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8.r,
+                offset: Offset(0, 2.h),
               ),
             ],
           ),
+       
+    
+             child:  _buildSettingsItem(
+                icon: Icons.help_outline,
+                title: 'Help & Support',
+                subtitle: 'Get help or contact us',
+             
+          ),
         ),
+      
+     
       ],
     );
   }
@@ -540,6 +608,10 @@ class _ProfileViewState extends State<ProfileView> {
       decoration: BoxDecoration(
         color: const Color(0xFFFFEBEE),
         borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: const Color(0xFFFEE2E2),
+          width: 1.w,
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
