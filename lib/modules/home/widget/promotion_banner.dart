@@ -89,7 +89,7 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
           imagePath,
           fit: BoxFit.cover,
           width: double.infinity,
-          errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported),
+          errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
         ),
       ),
     );

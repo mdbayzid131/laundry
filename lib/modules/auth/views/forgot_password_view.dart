@@ -7,7 +7,6 @@ import 'package:laundry/core/widgets/custom_back_button.dart';
 import 'package:laundry/core/widgets/custom_elevated_button.dart';
 import 'package:laundry/core/widgets/custom_text_field.dart';
 import '../../../core/utils/validators.dart';
-import '../../../core/widgets/custom_button.dart';
 import '../controllers/forgot_password_controller.dart';
 import '../../../config/themes/app_theme.dart';
 

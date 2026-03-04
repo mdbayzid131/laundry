@@ -440,7 +440,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                           // Using dummy images from constants
                           ImagePaths.product1,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(
+                          errorBuilder: (_, _, _) => Icon(
                             Icons.image_outlined,
                             size: 40.sp,
                             color: Colors.grey[400],
