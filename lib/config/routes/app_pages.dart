@@ -5,6 +5,8 @@ import 'package:laundry/modules/bottom_nab_bar/views/bottom_nab_bar_view.dart';
 import 'package:get/get.dart';
 import 'package:laundry/modules/onboarding/binding/onboarding_binding.dart';
 import 'package:laundry/modules/onboarding/view/onboarding_screen.dart';
+import 'package:laundry/modules/profile/bindings/help_support_binding.dart';
+import 'package:laundry/modules/profile/views/help_support_screen.dart';
 import '../../modules/auth/bindings/auth_binding.dart';
 import '../../modules/auth/views/login_view.dart';
 import '../../modules/auth/views/register_view.dart';
@@ -37,6 +39,7 @@ class AppRoutes {
   static const String ONBOARDING = '/onboarding';
   static const String OTP = '/otp';
   static const String SET_NEW_PASSWORD = '/set-new-password';
+  static const String HELP_SUPPORT = '/help-support';
 }
 
 final pages = [
@@ -109,5 +112,11 @@ final pages = [
     name: AppRoutes.SET_NEW_PASSWORD,
     page: () => const SetNewPasswordScreen(),
     binding: AuthBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.HELP_SUPPORT,
+    page: () => const HelpSupportScreen(),
+    binding: HelpSupportBinding(),
+    // middlewares: [AuthMiddleware()],
   ),
 ];

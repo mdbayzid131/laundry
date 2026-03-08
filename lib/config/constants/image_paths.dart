@@ -8,6 +8,7 @@ class ImagePaths {
   static String banner3 = "assets/dummy_image/div(2).png";
 
   static String product1 = "assets/dummy_image/image_product.png";
+  static String shirtIcon = "assets/icons/shirt_svg.svg";
 
   ///<======================ImageIcon =======================>
   static String onboardingImage1 = "assets/images/onboarding_1.png";

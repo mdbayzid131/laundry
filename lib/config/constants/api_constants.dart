@@ -18,5 +18,6 @@ class ApiConstants {
   static const String resendVerifyEmail = '/auth/resend-verify-email';
   static const String verifyEmail = '/auth/verify-email';
   static const String resetPassword = '/auth/reset-password';
+  
 
 }

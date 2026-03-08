@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 
 class ProfileView extends StatefulWidget {
@@ -192,7 +195,7 @@ class _ProfileViewState extends State<ProfileView> {
   Widget _buildPersonalInfoSection() {
     return Container(
       padding: EdgeInsets.all(16.w),
-     decoration: BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
@@ -236,7 +239,6 @@ class _ProfileViewState extends State<ProfileView> {
           SizedBox(height: 16.h),
           _buildInfoField('Email Address', 'sarah.johnson@email.com'),
           SizedBox(height: 16.h),
-  
         ],
       ),
     );
@@ -521,16 +523,15 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ],
           ),
-          child: 
-              _buildSettingsItem(
-                icon: Icons.lock_outline,
-                title: 'Privacy & Security',
-                subtitle: 'Manage your privacy settings',
-             
+          child: _buildSettingsItem(
+            icon: Icons.lock_outline,
+            title: 'Privacy & Security',
+            subtitle: 'Manage your privacy settings',
+            onTap: () {},
           ),
         ),
         SizedBox(height: 16.h),
-      Container(
+        Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
@@ -542,17 +543,16 @@ class _ProfileViewState extends State<ProfileView> {
               ),
             ],
           ),
-       
-    
-             child:  _buildSettingsItem(
-                icon: Icons.help_outline,
-                title: 'Help & Support',
-                subtitle: 'Get help or contact us',
-             
+
+          child: _buildSettingsItem(
+            icon: Icons.help_outline,
+            title: 'Help & Support',
+            subtitle: 'Get hel  p or contact us',
+            onTap: () {
+              Get.toNamed(AppRoutes.HELP_SUPPORT);
+            },
           ),
         ),
-      
-     
       ],
     );
   }
@@ -561,9 +561,10 @@ class _ProfileViewState extends State<ProfileView> {
     required IconData icon,
     required String title,
     required String subtitle,
+    required VoidCallback onTap,
   }) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Padding(
         padding: EdgeInsets.all(16.w),
         child: Row(
@@ -608,10 +609,7 @@ class _ProfileViewState extends State<ProfileView> {
       decoration: BoxDecoration(
         color: const Color(0xFFFFEBEE),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: const Color(0xFFFEE2E2),
-          width: 1.w,
-        ),
+        border: Border.all(color: const Color(0xFFFEE2E2), width: 1.w),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
