@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'light_theme.dart';
 import 'dark_theme.dart';
 
@@ -14,4 +15,26 @@ class AppTheme {
   static const Color warningColor = Color(0xFFFF9800);
   static const Color textColor = Color(0xFF000000);
   static const Color textLightColor = Color(0xFF666666);
+
+
+
+
+  static final Decoration 
+  customBoxDecoration =  BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow:  [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20.r,
+            offset: Offset(0, 4.h),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 3.r,
+            offset: Offset(0, 1.h),
+          ),
+        ],
+        border:  Border.all(color: Color(0xffE5E7EB)),
+      );
 }

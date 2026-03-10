@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../config/routes/app_pages.dart';
 import '../controllers/cart_controller.dart';
 
 class CartScreen extends GetView<CartController> {
@@ -239,7 +240,9 @@ class CartScreen extends GetView<CartController> {
               width: double.infinity,
               height: 50.h,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.toNamed(AppRoutes.CHECKOUT);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(
                     0xFFADD8E6,

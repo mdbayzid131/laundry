@@ -43,13 +43,26 @@ class _ProfileViewState extends State<ProfileView> {
               _buildMenuItem(
                 Icons.local_shipping_outlined,
                 'Track Active Order',
+                () => Get.toNamed(AppRoutes.ORDER_TRACKING),
               ),
               SizedBox(height: 12.h),
-              _buildMenuItem(Icons.history, 'Order History'),
+              _buildMenuItem(
+                Icons.history,
+                'Order History',
+                () => Get.toNamed(AppRoutes.ORDER_HISTORY),
+              ),
               SizedBox(height: 12.h),
-              _buildMenuItem(Icons.assignment_outlined, 'Order Status'),
+              _buildMenuItem(
+                Icons.assignment_outlined,
+                'Order Status',
+                () => Get.toNamed(AppRoutes.ORDER_STATUS),
+              ),
               SizedBox(height: 12.h),
-              _buildMenuItem(Icons.report_problem_outlined, 'Order Issue'),
+              _buildMenuItem(
+                Icons.report_problem_outlined,
+                'Order Issue',
+                () => Get.toNamed(AppRoutes.ORDER_ISSUE),
+              ),
               SizedBox(height: 24.h),
 
               // Personal Information
@@ -151,43 +164,46 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10.w),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(8.r),
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8.r,
+              offset: Offset(0, 2.h),
             ),
-            child: Icon(icon, size: 20.sp, color: Colors.black87),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Text(
-              title,
-              style: GoogleFonts.manrope(
-                fontSize: 15.sp,
-                color: AppTheme.textColor,
-                fontWeight: FontWeight.w500,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.w),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(icon, size: 20.sp, color: Colors.black87),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.manrope(
+                  fontSize: 15.sp,
+                  color: AppTheme.textColor,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          Icon(Icons.arrow_forward_ios, size: 18.sp, color: Colors.black),
-        ],
+            Icon(Icons.arrow_forward_ios, size: 18.sp, color: Colors.black),
+          ],
+        ),
       ),
     );
   }
@@ -527,7 +543,7 @@ class _ProfileViewState extends State<ProfileView> {
             icon: Icons.lock_outline,
             title: 'Privacy & Security',
             subtitle: 'Manage your privacy settings',
-            onTap: () {},
+            onTap: () => Get.toNamed(AppRoutes.PRIVACY_SECURITY),
           ),
         ),
         SizedBox(height: 16.h),

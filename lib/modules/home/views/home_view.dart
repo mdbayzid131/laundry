@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
 
@@ -85,29 +87,38 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
           SizedBox(width: 4.w),
           Icon(Icons.keyboard_arrow_down, size: 24.sp, color: Colors.black87),
           const Spacer(),
-          _buildIconButton(Icons.favorite),
+          _buildIconButton(
+            Icons.favorite,
+            onTap: () => Get.toNamed(AppRoutes.FAVORITE),
+          ),
           SizedBox(width: 12.w),
-          _buildIconButton(Icons.notifications_none),
+          _buildIconButton(
+            Icons.notifications_none,
+            onTap: () => Get.toNamed(AppRoutes.NOTIFICATIONS),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      padding: EdgeInsets.all(8.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+  Widget _buildIconButton(IconData icon, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(8.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(icon, size: 22.sp, color: Colors.black87),
       ),
-      child: Icon(icon, size: 22.sp, color: Colors.black87),
     );
   }
 
@@ -138,41 +149,50 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   }
 
   Widget _buildCategoryButtons() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildCategoryButton('Wash'),
           _buildCategoryButton('Dry Clean'),
           _buildCategoryButton('Fold'),
+          _buildCategoryButton('Ironing'),
+          _buildCategoryButton('Duvet'),
+          _buildCategoryButton('Shoes'),
+          _buildCategoryButton('Leather'),
         ],
       ),
     );
   }
 
   Widget _buildCategoryButton(String title) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          // TODO: Navigate to new page
-        },
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 4.w),
-          padding: EdgeInsets.symmetric(vertical: 14.h),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            title,
-            style: GoogleFonts.manrope(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
+    return GestureDetector(
+      onTap: () {
+        // TODO: Navigate to new page
+      },
+      child: Container(
+        margin: EdgeInsets.only(right: 12.w),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade100),
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w700,
+            color: Colors.black87,
           ),
         ),
       ),
@@ -423,83 +443,86 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: 3,
             itemBuilder: (context, index) {
-              return Container(
-                width: 200.w,
-                margin: EdgeInsets.only(right: 16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Image Container
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12.r),
-                      child: Container(
-                        height: 140.h,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child: Image.asset(
-                          // Using dummy images from constants
-                          ImagePaths.product1,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Icon(
-                            Icons.image_outlined,
-                            size: 40.sp,
-                            color: Colors.grey[400],
+              return GestureDetector(
+                onTap: () => Get.toNamed(AppRoutes.LAUNDRY_DETAILS),
+                child: Container(
+                  width: 200.w,
+                  margin: EdgeInsets.only(right: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image Container
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Container(
+                          height: 140.h,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: Image.asset(
+                            // Using dummy images from constants
+                            ImagePaths.product1,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Icon(
+                              Icons.image_outlined,
+                              size: 40.sp,
+                              color: Colors.grey[400],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 12.h),
+                      SizedBox(height: 12.h),
 
-                    // Availability & Favorite
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Available Today 9:30 AM',
-                          style: GoogleFonts.manrope(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black54,
+                      // Availability & Favorite
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Available Today 9:30 AM',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54,
+                            ),
                           ),
-                        ),
-                        Icon(
-                          Icons.favorite_border,
-                          size: 18.sp,
-                          color: Colors.black45,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4.h),
-
-                    // Title
-                    Text(
-                      'Iron & Steam',
-                      style: GoogleFonts.manrope(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                          Icon(
+                            Icons.favorite_border,
+                            size: 18.sp,
+                            color: Colors.black45,
+                          ),
+                        ],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
+                      SizedBox(height: 4.h),
 
-                    // Rating & Distance/Time
-                    Row(
-                      children: [
-                        Icon(Icons.star, size: 14.sp, color: Colors.black87),
-                        SizedBox(width: 4.w),
-                        Text(
-                          '4.6 (5k+) . 2.2 mi. 30 min',
-                          style: GoogleFonts.manrope(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
+                      // Title
+                      Text(
+                        'Iron & Steam',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
                         ),
-                      ],
-                    ),
-                  ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+
+                      // Rating & Distance/Time
+                      Row(
+                        children: [
+                          Icon(Icons.star, size: 14.sp, color: Colors.black87),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '4.6 (5k+) . 2.2 mi. 30 min',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
