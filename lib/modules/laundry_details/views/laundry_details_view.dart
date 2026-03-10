@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/config/routes/app_pages.dart';
+import 'package:laundry/core/widgets/custom_back_button.dart';
 import '../controllers/laundry_details_controller.dart';
 
 class LaundryDetailsView extends GetView<LaundryDetailsController> {
@@ -43,26 +45,29 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
         Container(
           height: 280.h,
           width: double.infinity,
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: const Color(0xffE2E8F0),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(32.r),
-              bottomRight: Radius.circular(32.r),
-            ),
+            // borderRadius: BorderRadius.only(
+            //   bottomLeft: Radius.circular(32.r),
+            //   bottomRight: Radius.circular(32.r),
+            // ),
           ),
-          child: Container(
-            alignment: Alignment.center,
-            child: Icon(
-              Icons.store_mall_directory_outlined,
-              size: 80.sp,
-              color: Colors.black12,
-            ),
+          child: Image.asset(
+            ImagePaths.op1,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
           ),
         ),
         Container(
           height: 280.h,
           width: double.infinity,
           decoration: BoxDecoration(
+            // borderRadius: BorderRadius.only(
+            //   bottomLeft: Radius.circular(32.r),
+            //   bottomRight: Radius.circular(32.r),
+            // ),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -76,24 +81,8 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
         ),
         Positioned(
           top: 50.h,
-          left: 20.w,
-          child: Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: Icon(
-                Icons.arrow_back_ios_new,
-                size: 20.sp,
-                color: const Color(0xff1A2530),
-              ),
-              onPressed: () => Get.back(),
-            ),
-          ),
+          left: 5.w,
+          child: CustomBackButton(containerSize: 40.w, iconSize: 25.sp),
         ),
         Positioned(
           bottom: 20.h,
@@ -111,7 +100,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                 child: Icon(
                   Icons.dry_cleaning,
                   color: const Color(0xff1A2530),
-                  size: 24.sp,
+                  size: 25.sp,
                 ),
               ),
               SizedBox(height: 12.h),
@@ -365,7 +354,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
       children: [
         _buildPromotedCard(
           'Dry Clean',
-          ImagePaths.product1,
+          ImagePaths.op2,
           '4.6 (5k+)',
           '2.2 mi, 30 min',
           '\$12.14/piece',
@@ -373,7 +362,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
         ),
         _buildPromotedCard(
           'Dry Clean',
-          ImagePaths.product1,
+          ImagePaths.op3,
           '4.6 (5k+)',
           '2.2 mi, 30 min',
           '\$12.14/piece',
@@ -391,108 +380,90 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String price,
     String delivery,
   ) {
-    return Container(
-      margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xffF1F5F9)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                child: Container(
-                  height: 180.h,
-                  width: double.infinity,
-                  color: const Color(0xffF1F5F9),
-                  child: Icon(
-                    Icons.dry_cleaning_outlined,
-                    size: 50.sp,
-                    color: Colors.black12,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 12.h,
-                right: 12.w,
-                child: Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.add, size: 20.sp, color: Colors.black),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS),
+      child: Container(
+        margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: const Color(0xffF1F5F9)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.manrope(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: Colors.black87,
-                    ),
-                  ],
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.r),
+                  ),
+                  child: Image.asset(
+                    image,
+                    height: 180.h,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                SizedBox(height: 8.h),
-                Row(
-                  children: [
-                    Icon(Icons.star, size: 14.sp, color: Colors.amber),
-                    SizedBox(width: 4.w),
-                    Text(
-                      rating,
-                      style: GoogleFonts.manrope(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+                Positioned(
+                  top: 12.h,
+                  right: 12.w,
+                  child: Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
                     ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      '•',
-                      style: TextStyle(color: Colors.black26, fontSize: 12.sp),
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      info,
-                      style: GoogleFonts.manrope(
-                        fontSize: 12.sp,
-                        color: Colors.black45,
-                      ),
-                    ),
-                  ],
+                    child: Icon(Icons.add, size: 20.sp, color: Colors.black),
+                  ),
                 ),
-                SizedBox(height: 8.h),
-                RichText(
-                  text: TextSpan(
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextSpan(
-                        text: price,
+                      Text(
+                        title,
                         style: GoogleFonts.manrope(
-                          fontSize: 14.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w800,
-                          color: Colors.black87,
                         ),
                       ),
-                      TextSpan(
-                        text: ' • $delivery',
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 14,
+                        color: Colors.black87,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(Icons.star, size: 14.sp, color: Colors.amber),
+                      SizedBox(width: 4.w),
+                      Text(
+                        rating,
+                        style: GoogleFonts.manrope(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        '•',
+                        style: TextStyle(
+                          color: Colors.black26,
+                          fontSize: 12.sp,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        info,
                         style: GoogleFonts.manrope(
                           fontSize: 12.sp,
                           color: Colors.black45,
@@ -500,11 +471,33 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                       ),
                     ],
                   ),
-                ),
-              ],
+                  SizedBox(height: 8.h),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: price,
+                          style: GoogleFonts.manrope(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' • $delivery',
+                          style: GoogleFonts.manrope(
+                            fontSize: 12.sp,
+                            color: Colors.black45,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -560,91 +553,82 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
       mainAxisSpacing: 16.h,
       crossAxisSpacing: 16.w,
       children: [
-        _buildGridItem(
-          'Wash',
-          ImagePaths.product1,
-        ),
-        _buildGridItem(
-          'Wash',
-          ImagePaths.product1,
-        ),
-        _buildGridItem(
-          'Wash',
-          ImagePaths.product1,
-        ),
-        _buildGridItem(
-          'Wash',
-          ImagePaths.product1,
-        ),
+        _buildGridItem('Wash', ImagePaths.op4),
+        _buildGridItem('Wash', ImagePaths.op5),
+        _buildGridItem('Wash', ImagePaths.op6),
+        _buildGridItem('Wash', ImagePaths.op7),
       ],
     );
   }
 
   Widget _buildGridItem(String title, String image) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
-              child: Container(
-                height: 140.h,
-                width: double.infinity,
-                color: const Color(0xffF8FAFC),
-                child: Icon(
-                  Icons.local_laundry_service_outlined,
-                  size: 40.sp,
-                  color: Colors.black12,
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12.r),
+                child: Image.asset(
+                  image,
+                  height: 140.h,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            Positioned(
-              top: 8.h,
-              right: 8.w,
-              child: Container(
-                padding: EdgeInsets.all(6.w),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+              Positioned(
+                top: 8.h,
+                right: 8.w,
+                child: Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.shopping_cart_outlined, size: 16.sp),
                 ),
-                child: Icon(Icons.shopping_cart_outlined, size: 16.sp),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: GoogleFonts.manrope(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w800,
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.manrope(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
-            ),
-            const Icon(Icons.favorite_border, size: 18, color: Colors.black26),
-          ],
-        ),
-        SizedBox(height: 4.h),
-        Row(
-          children: [
-            Icon(Icons.star, size: 12.sp, color: Colors.amber),
-            Text(
-              ' 4.6 (5k+)',
-              style: GoogleFonts.manrope(
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w600,
+              const Icon(
+                Icons.favorite_border,
+                size: 18,
+                color: Colors.black26,
               ),
-            ),
-          ],
-        ),
-        Text(
-          '\$12.14/piece • \$2.00 fee',
-          style: GoogleFonts.manrope(fontSize: 10.sp, color: Colors.black45),
-        ),
-      ],
+            ],
+          ),
+          SizedBox(height: 4.h),
+          Row(
+            children: [
+              Icon(Icons.star, size: 12.sp, color: Colors.amber),
+              Text(
+                ' 4.6 (5k+)',
+                style: GoogleFonts.manrope(
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            '\$12.14/piece • \$2.00 fee',
+            style: GoogleFonts.manrope(fontSize: 10.sp, color: Colors.black45),
+          ),
+        ],
+      ),
     );
   }
 
@@ -664,12 +648,12 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
         _buildBundleItem(
           'The Signature',
           'Full garment care. Dry clean plus press. Premium standard.',
-          ImagePaths.product1,
+          ImagePaths.op8,
         ),
         _buildBundleItem(
           'The Executive',
           'Dress shirts, slacks, blazers. Ready for work without thinking about it.',
-          ImagePaths.product1,
+          ImagePaths.op9,
         ),
       ],
     );
@@ -712,15 +696,11 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           SizedBox(width: 16.w),
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r),
-            child: Container(
+            child: Image.asset(
+              image,
               width: 80.w,
               height: 80.h,
-              color: const Color(0xffEDF2F7),
-              child: Icon(
-                Icons.inventory_2_outlined,
-                size: 30.sp,
-                color: Colors.black12,
-              ),
+              fit: BoxFit.cover,
             ),
           ),
           SizedBox(width: 12.w),

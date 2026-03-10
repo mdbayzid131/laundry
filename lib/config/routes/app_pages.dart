@@ -43,6 +43,8 @@ import '../../modules/auth/views/otp_verify_screen.dart';
 import '../../modules/auth/views/set_net_passwqord.dart';
 import 'package:laundry/modules/laundry_details/views/laundry_details_view.dart';
 import 'package:laundry/modules/laundry_details/bindings/laundry_details_binding.dart';
+import 'package:laundry/modules/product_details/bindings/product_details_binding.dart';
+import 'package:laundry/modules/product_details/views/product_details_view.dart';
 
 import '../../modules/home/bindings/home_binding.dart';
 import '../../modules/home/views/home_view.dart';
@@ -90,6 +92,7 @@ class AppRoutes {
   static const String TERMS_CONDITIONS = '/terms-conditions';
   static const String NOTIFICATIONS = '/notifications';
   static const String LAUNDRY_DETAILS = '/laundry-details';
+  static const String PRODUCT_DETAILS = '/product-details';
 }
 
 final pages = [
@@ -275,6 +278,12 @@ final pages = [
     name: AppRoutes.LAUNDRY_DETAILS,
     page: () => const LaundryDetailsView(),
     binding: LaundryDetailsBinding(),
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.PRODUCT_DETAILS,
+    page: () => const ProductDetailsView(),
+    binding: ProductDetailsBinding(),
     middlewares: [AuthMiddleware()],
   ),
 ];
