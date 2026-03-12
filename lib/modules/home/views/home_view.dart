@@ -14,11 +14,75 @@ class LaundryHomeScreen extends StatefulWidget {
 }
 
 class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
+  final List<Map<String, String>> _pastOrders = [
+    {
+      'title': 'Wash & Fold',
+      'image': ImagePaths.op4,
+      'info': 'Available Today 9:30 AM',
+      'rating': '4.8 (2k+) . 1.5 mi. 20 min',
+    },
+    {
+      'title': 'Dry Cleaning',
+      'image': ImagePaths.op5,
+      'info': 'Pickup tomorrow 10:00 AM',
+      'rating': '4.7 (1.2k+) . 3.0 mi. 45 min',
+    },
+    {
+      'title': 'Premium Ironing',
+      'image': ImagePaths.op6,
+      'info': 'Available now',
+      'rating': '4.9 (500+) . 0.8 mi. 15 min',
+    },
+  ];
+
+  final List<Map<String, String>> _stealsAndDeals = [
+    {
+      'title': '30% Off Dry Clean',
+      'image': ImagePaths.op4,
+      'info': 'Limited Time Offer',
+      'rating': '4.5 (800+) . 2.5 mi. 30 min',
+    },
+    {
+      'title': 'Buy 1 Get 1 Wash',
+      'image': ImagePaths.op5,
+      'info': 'Weekly Special',
+      'rating': '4.6 (1k+) . 1.2 mi. 25 min',
+    },
+    {
+      'title': 'Free Pick-up',
+      'image': ImagePaths.op6,
+      'info': 'New Users Only',
+      'rating': '4.8 (300+) . 4.0 mi. 50 min',
+    },
+  ];
+
+  final List<Map<String, String>> _seasideCleaners = [
+    {
+      'title': 'Ocean Breeze Laundry',
+      'image': ImagePaths.op4,
+      'info': 'Beachfront Delivery',
+      'rating': '4.7 (3k+) . 0.5 mi. 10 min',
+    },
+    {
+      'title': 'Coastal Dry Clean',
+      'image': ImagePaths.op5,
+      'info': 'Same Day Service',
+      'rating': '4.6 (1.5k+) . 1.1 mi. 20 min',
+    },
+    {
+      'title': 'Seaside Ironing Co.',
+      'image': ImagePaths.op6,
+      'info': 'Premium Care',
+      'rating': '4.9 (900+) . 2.3 mi. 35 min',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // Top Address Bar
@@ -46,17 +110,17 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                     SizedBox(height: 24.h),
 
                     // Our Past Orders Section
-                    _buildHorizontalListSection('Your Past Orders'),
+                    _buildHorizontalListSection('Your Past Orders', _pastOrders),
 
                     SizedBox(height: 24.h),
 
                     // Steals & Deals Section
-                    _buildHorizontalListSection('Steals & Deals'),
+                    _buildHorizontalListSection('Steals & Deals', _stealsAndDeals, isLarge: true),
 
                     SizedBox(height: 24.h),
 
                     // Seaside Cleaners Section
-                    _buildHorizontalListSection('Seaside Cleaners'),
+                    _buildHorizontalListSection('Seaside Cleaners', _seasideCleaners),
 
                     SizedBox(height: 80.h),
                   ],
@@ -176,7 +240,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: Colors.grey.shade100),
+          border: Border.all(color: Color(0xffD3D3D3)),
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -199,222 +263,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     );
   }
 
-  Widget _buildPromotionalBanner() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dry Clean 30%',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'OFF',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'Enjoy discounts on\nevery order',
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 8.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20.r),
-                  ),
-                  child: Text(
-                    'Schedule now',
-                    style: GoogleFonts.manrope(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF4A90E2),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 16.w),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Container(
-              width: 100.w,
-              height: 100.h,
-              color: Colors.white.withOpacity(0.2),
-              child: Icon(
-                Icons.local_laundry_service,
-                size: 50.sp,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLongCleaningSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Long Cleaning satisfied',
-                    style: GoogleFonts.manrope(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  Text(
-                    'Enjoy 20% off! validity for 3',
-                    style: GoogleFonts.manrope(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black54,
-                    ),
-                  ),
-                  Text(
-                    'months',
-                    style: GoogleFonts.manrope(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4A90E2),
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  'Join Now',
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 12.h),
-        SizedBox(
-          height: 150.h,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 120.w,
-                margin: EdgeInsets.only(right: 12.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10.r,
-                      offset: Offset(0, 2.h),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 90.h,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(12.r),
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.image_outlined,
-                          size: 40.sp,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Ironing',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            'Starts from \$1.00/pc',
-                            style: GoogleFonts.manrope(
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHorizontalListSection(String title) {
+  Widget _buildHorizontalListSection(String title, List<Map<String, String>> dataList, {bool isLarge = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -437,16 +286,17 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 230.h,
+          height: isLarge ? 280.h : 230.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemCount: 3,
+            itemCount: dataList.length,
             itemBuilder: (context, index) {
+              final item = dataList[index];
               return GestureDetector(
                 onTap: () => Get.toNamed(AppRoutes.LAUNDRY_DETAILS),
                 child: Container(
-                  width: 200.w,
+                  width: isLarge ? 300.w : 200.w,
                   margin: EdgeInsets.only(right: 16.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,12 +305,12 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12.r),
                         child: Container(
-                          height: 140.h,
+                          height: isLarge ? 170.h : 140.h,
                           width: double.infinity,
                           color: Colors.grey[200],
                           child: Image.asset(
                             // Using dummy images from constants
-                            ImagePaths.product1,
+                            item['image'] ?? ImagePaths.product1,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) => Icon(
                               Icons.image_outlined,
@@ -477,7 +327,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Available Today 9:30 AM',
+                            item['info'] ?? '',
                             style: GoogleFonts.manrope(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w500,
@@ -495,7 +345,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
 
                       // Title
                       Text(
-                        'Iron & Steam',
+                        item['title'] ?? '',
                         style: GoogleFonts.manrope(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
@@ -512,7 +362,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                           Icon(Icons.star, size: 14.sp, color: Colors.black87),
                           SizedBox(width: 4.w),
                           Text(
-                            '4.6 (5k+) . 2.2 mi. 30 min',
+                            item['rating'] ?? '',
                             style: GoogleFonts.manrope(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w500,

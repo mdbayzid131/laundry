@@ -16,6 +16,7 @@ class ImagePaths {
   static String onboardingImage1 = "assets/images/onboarding_1.png";
   static String onboardingImage2 = "assets/images/onboarding_2.png";
   static String onboardingImage3 = "assets/images/onboarding_3.png";
+  static String stripeIcon = "assets/icons/stripe.svg";
 
   static String op1 = "assets/dummy_image/op1.png";
   static String op2 = "assets/dummy_image/op2.png";
@@ -27,5 +28,13 @@ class ImagePaths {
   static String op8 = "assets/dummy_image/op8.png";
   static String op9 = "assets/dummy_image/op9.png";
   static String shirtPhoto = "assets/dummy_image/shirt_photo.png";
+  static String splash1 = "assets/dummy_image/splash1.png";
+  static String splash2 = "assets/dummy_image/splash2.png";
+  static String splash3 = "assets/dummy_image/splash3.png";
+
+
+///<=====================video =======================>
+  static String splashVideo = "assets/dummy_image/splash_video.gif";
+  static String splashVideo1 = "assets/dummy_image/laundry_splash_video.mp4";
   
 }

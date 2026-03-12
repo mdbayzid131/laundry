@@ -52,6 +52,8 @@ import '../../modules/profile/bindings/profile_binding.dart';
 import '../../modules/profile/views/profile_view.dart';
 import '../../modules/splash/bindings/splash_binding.dart';
 import '../../modules/splash/views/splash_view.dart';
+import '../../modules/splash/views/intro_screens_view.dart';
+import '../../modules/splash/bindings/intro_screens_binding.dart';
 import '../../modules/map/bindings/map_binding.dart';
 import '../../modules/map/views/map_screen.dart';
 import '../../modules/cart/bindings/cart_binding.dart';
@@ -93,6 +95,7 @@ class AppRoutes {
   static const String NOTIFICATIONS = '/notifications';
   static const String LAUNDRY_DETAILS = '/laundry-details';
   static const String PRODUCT_DETAILS = '/product-details';
+  static const String INTRO_SCREENS = '/intro-screens';
 }
 
 final pages = [
@@ -284,6 +287,10 @@ final pages = [
     name: AppRoutes.PRODUCT_DETAILS,
     page: () => const ProductDetailsView(),
     binding: ProductDetailsBinding(),
-    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.INTRO_SCREENS,
+    page: () => const IntroScreensView(),
+    binding: IntroScreensBinding(),
   ),
 ];

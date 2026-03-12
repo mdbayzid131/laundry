@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:laundry/config/constants/image_paths.dart';
+import 'package:video_player/video_player.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
@@ -11,33 +10,25 @@ class SplashView extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffABD4E7),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // App Logo
-            Image.asset(
-              ImagePaths.splashImage1,
-              height: 311.h,
-              width: 311.w,
-              color: Theme.of(context).primaryColor,
-            ),
-            SizedBox(height: 20.h),
-
-            // App Name
-            Text(
-              'Flutter App',
-              style: GoogleFonts.manrope(
-                fontSize: 28.sp,
-                fontWeight: FontWeight.bold,
+        child: Obx(() {
+          if (controller.isVideoInitialized.value) {
+            return SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: 428.w,
+                  height: 350.h,
+                  child: VideoPlayer(controller.videoController),
+                ),
               ),
-            ),
-            SizedBox(height: 40.h),
-
-            // Loading Indicator
-            CircularProgressIndicator(color: Theme.of(context).primaryColor),
-          ],
-        ),
+            );
+          } else {
+            // Fallback while video is initializing (empty screen with background color)
+            return const SizedBox.shrink();
+          }
+        }),
       ),
     );
   }

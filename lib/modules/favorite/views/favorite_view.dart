@@ -188,7 +188,7 @@ class FavoriteView extends GetView<FavoriteController> {
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Icon(
-                        Icons.add_shopping_cart_outlined,
+                        Icons.shopping_cart_outlined,
                         size: 18.sp,
                         color: const Color(0xff1A2530),
                       ),

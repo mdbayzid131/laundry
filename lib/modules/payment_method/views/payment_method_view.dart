@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import '../controllers/payment_method_controller.dart';
 
@@ -68,7 +70,10 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                   SizedBox(height: 20.h),
                   _buildPaymentCard(
                     id: 'card',
-                    icon: Icons.credit_card,
+                    icon: Icon(
+                      Icons.credit_card,
+                      size: 24.sp,
+                    ),
                     title: 'Credit / Debit Card',
                     subtitle: 'Visa, Mastercard, Amex',
                     iconBgColor: const Color(0xffB5DEEF).withOpacity(0.6),
@@ -76,7 +81,11 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                   SizedBox(height: 16.h),
                   _buildPaymentCard(
                     id: 'apple',
-                    icon: Icons.apple,
+                    icon: Icon(
+                      Icons.apple,
+                      size: 24.sp,
+                      color: Colors.white,
+                    ),
                     title: 'Apple Pay',
                     subtitle: 'Fast & secure',
                     iconBgColor: Colors.black,
@@ -85,7 +94,11 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                   SizedBox(height: 16.h),
                   _buildPaymentCard(
                     id: 'google',
-                    icon: Icons.g_mobiledata_rounded,
+                    icon: SvgPicture.asset(
+                      ImagePaths.googleIcon,
+                      width: 24.sp,
+                      height: 24.sp,
+                    ),
                     title: 'Google Pay',
                     subtitle: 'Quick checkout',
                     iconBgColor: Colors.white,
@@ -94,7 +107,19 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                   SizedBox(height: 16.h),
                   _buildPaymentCard(
                     id: 'stripe',
-                    icon: Icons.payments_outlined,
+                    icon: Container(
+                      
+                      padding: EdgeInsets.all(8.sp),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff6366f1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: SvgPicture.asset(
+                        ImagePaths.stripeIcon,
+                        width: 24.sp,
+                        height: 24.sp,
+                      ),
+                    ),
                     title: 'Stripe',
                     subtitle: 'Secure payment',
                     iconBgColor: const Color(0xff6366f1),
@@ -192,7 +217,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
 
   Widget _buildPaymentCard({
     required String id,
-    required IconData icon,
+    required Widget icon,
     required String title,
     required String subtitle,
     required Color iconBgColor,
@@ -230,7 +255,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                   borderRadius: BorderRadius.circular(12.r),
                   border: border,
                 ),
-                child: Icon(icon, color: iconColor, size: 28.sp),
+                child:icon,
               ),
               SizedBox(width: 16.w),
               Expanded(

@@ -1,4 +1,4 @@
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -30,55 +30,71 @@ class BottomNavBarView extends GetView<BottomNavBarController> {
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding: EdgeInsets.only(left: 24.w, right: 24.w, bottom: 24.h, top: 0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black.withOpacity(0.0), Colors.black.withOpacity(0.7)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 30.h, top: 10.h),
         child: Obx(
-          () => Container(
-            height: 70.h,
-            padding: EdgeInsets.symmetric(horizontal: 8.w),
-            decoration: BoxDecoration(
-              color: const Color(0xffF5F5F5),
-              borderRadius: BorderRadius.circular(40.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+          () => ClipRRect(
+            borderRadius: BorderRadius.circular(35.r),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                height: 70.h,
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(35.r),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(
-                  icon: Icons.home_outlined,
-                  activeIcon: Icons.home_outlined,
-                  label: 'Home',
-                  index: 0,
-                  currentIndex: controller.currentIndex.value,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(
+                      icon: Icons.home_outlined,
+                      activeIcon: Icons.home,
+                      label: 'Home',
+                      index: 0,
+                      currentIndex: controller.currentIndex.value,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.location_on_outlined,
+                      activeIcon: Icons.location_on,
+                      label: 'Map',
+                      index: 1,
+                      currentIndex: controller.currentIndex.value,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.shopping_cart_outlined,
+                      activeIcon: Icons.shopping_cart,
+                      label: 'Cart',
+                      index: 2,
+                      currentIndex: controller.currentIndex.value,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.person_outline,
+                      activeIcon: Icons.person,
+                      label: 'Profile',
+                      index: 3,
+                      currentIndex: controller.currentIndex.value,
+                    ),
+                  ],
                 ),
-                _buildNavItem(
-                  icon: Icons.location_on_outlined,
-                  activeIcon: Icons.location_on_outlined,
-                  label: 'Map',
-                  index: 1,
-                  currentIndex: controller.currentIndex.value,
-                ),
-                _buildNavItem(
-                  icon: Icons.shopping_cart_outlined,
-                  activeIcon: Icons.shopping_cart_outlined,
-                  label: 'Cart',
-                  index: 2,
-                  currentIndex: controller.currentIndex.value,
-                ),
-                _buildNavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person_outline,
-                  label: 'Profile',
-                  index: 3,
-                  currentIndex: controller.currentIndex.value,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -103,7 +119,7 @@ class BottomNavBarView extends GetView<BottomNavBarController> {
         children: [
           Icon(
             isSelected ? activeIcon : icon,
-            color: isSelected ? AppTheme.textColor : const Color(0xffB8B8B8),
+            color: isSelected ? AppTheme.textColor : const Color.fromARGB(255, 121, 118, 118),
             size: 30.sp,
           ),
           SizedBox(height: 4.h),
@@ -112,7 +128,7 @@ class BottomNavBarView extends GetView<BottomNavBarController> {
             style: GoogleFonts.manrope(
               fontSize: 12.sp,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? AppTheme.textColor : const Color(0xffB8B8B8),
+              color: isSelected ? AppTheme.textColor : const Color.fromARGB(255, 121, 118, 118),
             ),
           ),
         ],

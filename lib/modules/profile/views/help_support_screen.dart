@@ -130,7 +130,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                 SizedBox(height: 12.h),
 
                 _buildSupportCard(
-                  onTap: () => Get.toNamed(AppRoutes.CONTACT_SUPPORT),
+                  onTap: () => Get.toNamed(AppRoutes.ORDER_ISSUE),
                   icon: Icons.report_problem_outlined,
                   title: 'Order Issue',
                   subtitle: '',

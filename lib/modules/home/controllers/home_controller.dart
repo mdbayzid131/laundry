@@ -38,7 +38,7 @@ class BannerController extends GetxController {
   List<BannerModel> banners = [
     BannerModel(
       id: '1',
-      image: ImagePaths.banner3,
+      image: ImagePaths.banner1,
       title: 'Banner 1',
       description: 'Description 1',
       createdAt: DateTime.now(),
@@ -46,7 +46,7 @@ class BannerController extends GetxController {
     ),
     BannerModel(
       id: '2',
-      image: ImagePaths.banner3,
+      image: ImagePaths.banner2,
       title: 'Banner 2',
       description: 'Description 2',
       createdAt: DateTime.now(),

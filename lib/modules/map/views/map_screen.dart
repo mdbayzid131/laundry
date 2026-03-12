@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -28,6 +29,8 @@ class _MapScreenState extends State<MapScreen> {
       reviews: 256,
       deliveryTime: '2-4 hours',
       distance: '0.8 km',
+      logoUrl: 'assets/icons/dry_clean.svg',
+      photoUrl: 'assets/dummy_image/op1.png',
     ),
     VendorModel(
       id: '2',
@@ -37,6 +40,8 @@ class _MapScreenState extends State<MapScreen> {
       reviews: 182,
       deliveryTime: '3-5 hours',
       distance: '1.2 km',
+      logoUrl: 'assets/icons/iron_and_press.svg',
+      photoUrl: 'assets/dummy_image/op2.png',
     ),
     VendorModel(
       id: '3',
@@ -46,6 +51,8 @@ class _MapScreenState extends State<MapScreen> {
       reviews: 412,
       deliveryTime: '1-3 hours',
       distance: '0.5 km',
+      logoUrl: 'assets/icons/shirt_svg.svg',
+      photoUrl: 'assets/dummy_image/op3.png',
     ),
     VendorModel(
       id: '4',
@@ -55,6 +62,8 @@ class _MapScreenState extends State<MapScreen> {
       reviews: 298,
       deliveryTime: '2-4 hours',
       distance: '1.5 km',
+      logoUrl: 'assets/icons/dry_clean.svg',
+      photoUrl: 'assets/dummy_image/op4.jpg',
     ),
   ];
 
@@ -76,7 +85,7 @@ class _MapScreenState extends State<MapScreen> {
             });
             _showVendorBottomSheet(vendor);
           },
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          icon: BitmapDescriptor.defaultMarkerWithHue(210), // Light Blue theme
         ),
       );
     }
@@ -94,7 +103,7 @@ class _MapScreenState extends State<MapScreen> {
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -113,42 +122,89 @@ class _MapScreenState extends State<MapScreen> {
             ),
             SizedBox(height: 20.h),
 
-            // Vendor Name
-            Text(
-              vendor.name,
-              style: GoogleFonts.manrope(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 8.h),
-
-            // Rating & Reviews
+            // Operator Card (Photo and Logo)
             Row(
               children: [
-                Icon(Icons.star, color: Colors.amber, size: 18.sp),
-                SizedBox(width: 4.w),
-                Text(
-                  vendor.rating.toString(),
-                  style: GoogleFonts.manrope(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                // Vendor Photo
+                Container(
+                  width: 60.w,
+                  height: 60.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    image: DecorationImage(
+                      image: AssetImage(vendor.photoUrl),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                SizedBox(width: 8.w),
-                Text(
-                  '(${vendor.reviews} reviews)',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black54,
+                SizedBox(width: 12.w),
+                // Vendor Name & Logo
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              vendor.name,
+                              style: GoogleFonts.manrope(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          // Logo
+                          Container(
+                            padding: EdgeInsets.all(6.w),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE3F2FD),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: SvgPicture.asset(
+                              vendor.logoUrl,
+                              width: 20.w,
+                              height: 20.w,
+                              colorFilter: const ColorFilter.mode(
+                                Color(0xFF4A90E2),
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+                      // Rating & Reviews
+                      Row(
+                        children: [
+                          Icon(Icons.star, color: Colors.amber, size: 16.sp),
+                          SizedBox(width: 4.w),
+                          Text(
+                            vendor.rating.toString(),
+                            style: GoogleFonts.manrope(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            '(${vendor.reviews} reviews)',
+                            style: GoogleFonts.manrope(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 12.h),
+            SizedBox(height: 16.h),
 
             // Delivery Info
             Row(
@@ -164,7 +220,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 24.h),
 
             // Action Buttons
             Row(
@@ -177,7 +233,7 @@ class _MapScreenState extends State<MapScreen> {
                     },
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 14.h),
-                      side: BorderSide(color: const Color(0xFF4A90E2)),
+                      side: const BorderSide(color: Color(0xFF4A90E2)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
@@ -200,6 +256,7 @@ class _MapScreenState extends State<MapScreen> {
                       // Select vendor
                     },
                     style: ElevatedButton.styleFrom(
+                      elevation: 0,
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       backgroundColor: const Color(0xFF4A90E2),
                       shape: RoundedRectangleBorder(
@@ -414,6 +471,8 @@ class VendorModel {
   final int reviews;
   final String deliveryTime;
   final String distance;
+  final String logoUrl;
+  final String photoUrl;
 
   VendorModel({
     required this.id,
@@ -423,5 +482,7 @@ class VendorModel {
     required this.reviews,
     required this.deliveryTime,
     required this.distance,
+    required this.logoUrl,
+    required this.photoUrl,
   });
 }

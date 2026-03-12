@@ -276,9 +276,10 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           children: [
             Container(
               padding: EdgeInsets.all(10.w),
-              decoration: const BoxDecoration(
-                color: Color(0xffB5DEEF),
-                shape: BoxShape.circle,
+              decoration: BoxDecoration(
+                color: const Color(0xffB5DEEF),
+        
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(Icons.star, color: Colors.white, size: 20.sp),
             ),

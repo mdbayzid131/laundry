@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
@@ -101,7 +102,7 @@ class CheckoutView extends GetView<CheckoutController> {
     bool isLast = false,
   }) {
     final themeColor = isCompleted
-        ? const Color(0xffD3D3D3)
+        ? const Color(0xffB5DEEF)
         : const Color(0xffE5E7EB);
     final iconColor = isCompleted ? Colors.white : Colors.grey.shade400;
 
@@ -119,7 +120,7 @@ class CheckoutView extends GetView<CheckoutController> {
                     style: GoogleFonts.manrope(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: isCompleted ? Colors.white : Colors.grey.shade400,
                     ),
                   ),
           ),
@@ -132,7 +133,7 @@ class CheckoutView extends GetView<CheckoutController> {
             fontWeight: isCompleted || label == 'Payment'
                 ? FontWeight.w500
                 : FontWeight.w400,
-            color: isCompleted ? Colors.grey.shade400 : Colors.grey.shade300,
+            color: isCompleted ? const Color(0xffB5DEEF) : Colors.grey.shade300,
           ),
         ),
       ],
@@ -374,112 +375,232 @@ class CheckoutView extends GetView<CheckoutController> {
             ],
           ),
           SizedBox(height: 24.h),
-          _buildInfoRow(Icons.calendar_month, 'Tomorrow', 'March 15, 2024'),
+          Obx(() => _buildInfoRow(
+                Icons.calendar_month,
+                controller.formattedDay,
+                controller.formattedDate,
+              )),
           SizedBox(height: 20.h),
-          _buildInfoRow(
-            Icons.access_time_filled,
-            '9:00 AM - 12:00 PM',
-            'Pickup window',
-          ),
+          Obx(() => _buildInfoRow(
+                Icons.access_time_filled,
+                controller.selectedTimeSlot.value,
+                'Pickup window',
+              )),
           SizedBox(height: 20.h),
-          _buildInfoRow(
-            Icons.location_on,
-            '425 Park Avenue',
-            'Apt 12B, New York, NY 10022',
-          ),
+          Obx(() => _buildInfoRow(
+                Icons.location_on,
+                controller.address.value,
+                controller.fullAddress,
+              )),
         ],
       ),
     );
   }
 
   void _showPickupEditDialog(BuildContext context) {
+    final dateController = TextEditingController(text: controller.formattedDate);
+    final addressController = TextEditingController(text: controller.address.value);
+    final aptController = TextEditingController(text: controller.aptSuite.value);
+    final cityController = TextEditingController(text: controller.city.value);
+    final zipController = TextEditingController(text: controller.zipCode.value);
+    var selectedDate = controller.selectedDate.value;
+    var selectedTime = controller.selectedTimeSlot.value;
+
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(24.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          backgroundColor: Colors.white,
+          insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.r),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(24.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Edit Pickup Details',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xff1A2530),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Icon(Icons.close, size: 24.sp, color: Colors.black),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+
+                  // Date Picker Field
                   Text(
-                    'Pickup',
+                    'Pickup Date',
                     style: GoogleFonts.manrope(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
                       color: const Color(0xff1A2530),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => Get.back(),
-                    child: Icon(Icons.close, size: 24.sp, color: Colors.black),
+                  SizedBox(height: 8.h),
+                  InkWell(
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 30)),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.light(
+                                primary: Color(0xffB5DEEF),
+                                onPrimary: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (picked != null) {
+                        setDialogState(() {
+                          selectedDate = picked;
+                          dateController.text = DateFormat('MMMM dd, yyyy').format(picked);
+                        });
+                      }
+                    },
+                    child: IgnorePointer(
+                      child: _buildDialogField('Date', 'Select Date', controller: dateController, icon: Icons.calendar_today),
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+
+                  // Time Slot Field (Dropdown)
+                  Text(
+                    'Pickup Time Slot',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xff1A2530),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffF9F9F9),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: controller.storeHours.contains(selectedTime) ? selectedTime : controller.storeHours.first,
+                        isExpanded: true,
+                        icon: const Icon(Icons.access_time),
+                        items: controller.storeHours.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value, style: GoogleFonts.manrope(fontSize: 14.sp)),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          if (newValue != null) {
+                            setDialogState(() => selectedTime = newValue);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+
+                  // Address Fields
+                  _buildDialogField('Street Address', 'Enter street address', controller: addressController),
+                  SizedBox(height: 16.h),
+                  Row(
+                    children: [
+                      Expanded(child: _buildDialogField('Apt/Suite', 'Apt 12B', controller: aptController)),
+                      SizedBox(width: 12.w),
+                      Expanded(child: _buildDialogField('City', 'New York', controller: cityController)),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  _buildDialogField('Zip Code', '10022', controller: zipController, keyboardType: TextInputType.number),
+
+                  SizedBox(height: 32.h),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52.h,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        controller.updatePickupDetails(
+                          date: selectedDate,
+                          time: selectedTime,
+                          addr: addressController.text,
+                          apt: aptController.text,
+                          cty: cityController.text,
+                          zip: zipController.text,
+                        );
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffB5DEEF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Update Details',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 24.h),
-              _buildDialogField('Date', 'enter your address'),
-              SizedBox(height: 20.h),
-              _buildDialogField('Time', 'enter your address'),
-              SizedBox(height: 20.h),
-              _buildDialogField('Address', 'enter your address'),
-              SizedBox(height: 32.h),
-              SizedBox(
-                width: 120.w,
-                height: 48.h,
-                child: ElevatedButton(
-                  onPressed: () => Get.back(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffB5DEEF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    elevation: 5,
-                    shadowColor: const Color(0xffB5DEEF).withOpacity(0.5),
-                  ),
-                  child: Text(
-                    'Save',
-                    style: GoogleFonts.manrope(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDialogField(String label, String hint) {
+  Widget _buildDialogField(String label, String hint, {TextEditingController? controller, IconData? icon, TextInputType? keyboardType}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xff1A2530),
+        if (label != 'Date' && label != 'Time') ...[
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xff1A2530),
+            ),
           ),
-        ),
-        SizedBox(height: 8.h),
+          SizedBox(height: 8.h),
+        ],
         TextField(
+          controller: controller,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.manrope(
               fontSize: 14.sp,
               color: Colors.black26,
             ),
+            prefixIcon: icon != null ? Icon(icon, size: 20.sp, color: Colors.black45) : null,
             filled: true,
             fillColor: const Color(0xffF9F9F9),
             contentPadding: EdgeInsets.symmetric(

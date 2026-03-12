@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
 
@@ -29,7 +30,7 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
       if (bannerController.isLoading.value &&
           bannerController.banners.isEmpty) {
         return SizedBox(
-          height: 140.h,
+          height: 180.h,
           child: const Center(child: CircularProgressIndicator()),
         );
       }
@@ -55,7 +56,8 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
               },
             ),
             itemBuilder: (context, index, realIndex) {
-              return _buildBannerItem(_bannerController.banners[index].image);
+              // return _buildBannerItem(_bannerController.banners[index].image);
+              return buildPromotionalBanner();
             },
           ),
 
@@ -115,3 +117,69 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
     );
   }
 }
+
+  Widget buildPromotionalBanner() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dry Clean 30% OFF',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'DEMO BANNER',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w700,
+                    color:  Colors.red,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  'Enjoy discounts on\nevery order',
+                  style: GoogleFonts.manrope(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+              ],
+            ),
+          ),
+          SizedBox(width: 16.w),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Container(
+              width: 100.w,
+              height: 100.h,
+              color: Colors.white.withOpacity(0.2),
+              child: Icon(
+                Icons.local_laundry_service,
+                size: 50.sp,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
