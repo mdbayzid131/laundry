@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:laundry/config/themes/app_theme.dart';
+import 'package:laundry/core/utils/lib/utils/custom_map_marker.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -28,7 +30,7 @@ class _MapScreenState extends State<MapScreen> {
       rating: 4.8,
       reviews: 256,
       deliveryTime: '2-4 hours',
-      distance: '0.8 km',
+      distance: '0.5 miles',
       logoUrl: 'assets/icons/dry_clean.svg',
       photoUrl: 'assets/dummy_image/op1.png',
     ),
@@ -39,7 +41,7 @@ class _MapScreenState extends State<MapScreen> {
       rating: 4.5,
       reviews: 182,
       deliveryTime: '3-5 hours',
-      distance: '1.2 km',
+      distance: '0.7 miles',
       logoUrl: 'assets/icons/iron_and_press.svg',
       photoUrl: 'assets/dummy_image/op2.png',
     ),
@@ -50,7 +52,7 @@ class _MapScreenState extends State<MapScreen> {
       rating: 4.9,
       reviews: 412,
       deliveryTime: '1-3 hours',
-      distance: '0.5 km',
+      distance: '0.3 miles',
       logoUrl: 'assets/icons/shirt_svg.svg',
       photoUrl: 'assets/dummy_image/op3.png',
     ),
@@ -61,7 +63,7 @@ class _MapScreenState extends State<MapScreen> {
       rating: 4.6,
       reviews: 298,
       deliveryTime: '2-4 hours',
-      distance: '1.5 km',
+      distance: '0.9 miles',
       logoUrl: 'assets/icons/dry_clean.svg',
       photoUrl: 'assets/dummy_image/op4.jpg',
     ),
@@ -73,7 +75,7 @@ class _MapScreenState extends State<MapScreen> {
     _createMarkers();
   }
 
-  void _createMarkers() {
+  Future<void> _createMarkers() async {
     for (var vendor in vendors) {
       markers.add(
         Marker(
@@ -85,7 +87,9 @@ class _MapScreenState extends State<MapScreen> {
             });
             _showVendorBottomSheet(vendor);
           },
-          icon: BitmapDescriptor.defaultMarkerWithHue(210), // Light Blue theme
+          icon: await CustomMapMarker.createCustomMarker(
+            size: 80,
+          ), // Matching primaryColor (0xFFA6D4E9)
         ),
       );
     }
@@ -155,23 +159,8 @@ class _MapScreenState extends State<MapScreen> {
                               ),
                             ),
                           ),
+
                           // Logo
-                          Container(
-                            padding: EdgeInsets.all(6.w),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE3F2FD),
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: SvgPicture.asset(
-                              vendor.logoUrl,
-                              width: 20.w,
-                              height: 20.w,
-                              colorFilter: const ColorFilter.mode(
-                                Color(0xFF4A90E2),
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                       SizedBox(height: 4.h),
@@ -214,10 +203,7 @@ class _MapScreenState extends State<MapScreen> {
                   label: vendor.deliveryTime,
                 ),
                 SizedBox(width: 12.w),
-                _buildInfoChip(
-                  icon: Icons.location_on,
-                  label: vendor.distance,
-                ),
+                _buildInfoChip(icon: Icons.location_on, label: vendor.distance),
               ],
             ),
             SizedBox(height: 24.h),
@@ -233,7 +219,7 @@ class _MapScreenState extends State<MapScreen> {
                     },
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 14.h),
-                      side: const BorderSide(color: Color(0xFF4A90E2)),
+                      side: BorderSide(color: AppTheme.primaryColor),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
@@ -243,7 +229,7 @@ class _MapScreenState extends State<MapScreen> {
                       style: GoogleFonts.manrope(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF4A90E2),
+                        color: AppTheme.primaryColor,
                       ),
                     ),
                   ),
@@ -258,7 +244,7 @@ class _MapScreenState extends State<MapScreen> {
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       padding: EdgeInsets.symmetric(vertical: 14.h),
-                      backgroundColor: const Color(0xFF4A90E2),
+                      backgroundColor: AppTheme.primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
@@ -315,10 +301,7 @@ class _MapScreenState extends State<MapScreen> {
           // Google Map
           GoogleMap(
             onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: _center,
-              zoom: 13.0,
-            ),
+            initialCameraPosition: CameraPosition(target: _center, zoom: 13.0),
             markers: markers,
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
@@ -421,7 +404,6 @@ class _MapScreenState extends State<MapScreen> {
 
           // Bottom Navigation Bar
 
-
           // My Location Button
           Positioned(
             bottom: 100.h,
@@ -447,9 +429,7 @@ class _MapScreenState extends State<MapScreen> {
                   color: const Color(0xFF4A90E2),
                 ),
                 onPressed: () {
-                  mapController.animateCamera(
-                    CameraUpdate.newLatLng(_center),
-                  );
+                  mapController.animateCamera(CameraUpdate.newLatLng(_center));
                 },
               ),
             ),
@@ -458,9 +438,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-
 }
-
 
 // Vendor Model
 class VendorModel {

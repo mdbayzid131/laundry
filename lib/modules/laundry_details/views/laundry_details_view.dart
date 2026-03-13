@@ -14,27 +14,93 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            SizedBox(height: 16.h),
-            _buildServiceToggle(),
-            SizedBox(height: 16.h),
-            _buildLocationAndTime(),
-            _buildSectionHeader('Deals & Benefits'),
-            _buildPromotionCard(),
-            SizedBox(height: 24.h),
-            _buildCategoryFilters(),
-            SizedBox(height: 24.h),
-            _buildPromotedServices(),
-            _buildTabBar(),
-            _buildServiceGrid(),
-            _buildBundlesSection(),
-            SizedBox(height: 40.h),
-          ],
-        ),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(),
+                    SizedBox(height: 16.h),
+                    _buildServiceToggle(),
+                    SizedBox(height: 16.h),
+                    _buildLocationAndTime(),
+                    _buildSectionHeader('Deals & Benefits'),
+                    _buildPromotionCard(),
+                    SizedBox(height: 24.h),
+                    _buildCategoryFilters(),
+                    SizedBox(height: 24.h),
+                    _buildPromotedServices(),
+                  ],
+                ),
+              ),
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                toolbarHeight: 0,
+                automaticallyImplyLeading: false,
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(70.h),
+                  child: _buildTabBar(),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildServiceGrid(),
+                    _buildBundlesSection(),
+                    SizedBox(height: 100.h), // Space for fixed button
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            bottom: 30.h,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                onTap: () => Get.toNamed(AppRoutes.CART),
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffB5DEEF),
+                    borderRadius: BorderRadius.circular(30.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xffB5DEEF).withOpacity(0.4),
+                        blurRadius: 15.r,
+                        offset: Offset(0, 8.h),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.shopping_cart_outlined,
+                          color: Colors.white, size: 22.sp),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'View cart (1)',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -264,88 +330,97 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
   }
 
   Widget _buildPromotionCard() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Container(
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: const Color(0xffF1F5FF),
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(10.w),
-              decoration: BoxDecoration(
-                color: const Color(0xffB5DEEF),
-        
-                borderRadius: BorderRadius.circular(8.r),
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.MEMBERSHIP),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: const Color(0xffF1F5FF),
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: const Color(0xffB5DEEF),
+          
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(Icons.star, color: Colors.white, size: 20.sp),
               ),
-              child: Icon(Icons.star, color: Colors.white, size: 20.sp),
-            ),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'LaundryLink Plus',
-                    style: GoogleFonts.manrope(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w800,
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'LaundryLink Plus',
+                      style: GoogleFonts.manrope(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Exclusive member benefits',
-                    style: GoogleFonts.manrope(
-                      fontSize: 12.sp,
-                      color: Colors.black45,
+                    Text(
+                      'Exclusive member benefits',
+                      style: GoogleFonts.manrope(
+                        fontSize: 12.sp,
+                        color: Colors.black45,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCategoryFilters() {
-    return Obx(
-      () => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: controller.categories
-            .map(
-              (cat) => GestureDetector(
-                onTap: () => controller.selectCategory(cat),
-                child: Container(
-                  width: 110.w,
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: controller.selectedCategory.value == cat
-                          ? const Color(0xffB5DEEF)
-                          : const Color(0xffF1F5F9),
-                    ),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    cat,
-                    style: GoogleFonts.manrope(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                      color: controller.selectedCategory.value == cat
-                          ? const Color(0xff1A2530)
-                          : Colors.black38,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Obx(
+        () => Row(
+          children: controller.categories
+              .map(
+                (cat) => Padding(
+                  padding: EdgeInsets.only(right: 12.w),
+                  child: GestureDetector(
+                    onTap: () => controller.selectCategory(cat),
+                    child: Container(
+                      width: 110.w,
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: controller.selectedCategory.value == cat
+                              ? const Color(0xffB5DEEF)
+                              : const Color(0xffF1F5F9),
+                        ),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        cat,
+                        style: GoogleFonts.manrope(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: controller.selectedCategory.value == cat
+                              ? const Color(0xff1A2530)
+                              : Colors.black38,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
-            .toList(),
+              )
+              .toList(),
+        ),
       ),
     );
   }
@@ -445,7 +520,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                   SizedBox(height: 8.h),
                   Row(
                     children: [
-                      Icon(Icons.star, size: 14.sp, color: Colors.amber),
+                      Icon(Icons.star, size: 14.sp, color: Colors.black),
                       SizedBox(width: 4.w),
                       Text(
                         rating,
@@ -505,7 +580,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
 
   Widget _buildTabBar() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 24.h),
+      padding: EdgeInsets.symmetric(vertical: 16.h),
       child: Obx(
         () => Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -558,6 +633,10 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
         _buildGridItem('Wash', ImagePaths.op5),
         _buildGridItem('Wash', ImagePaths.op6),
         _buildGridItem('Wash', ImagePaths.op7),
+                _buildGridItem('Wash1', ImagePaths.op4),
+        _buildGridItem('Wash1', ImagePaths.op5),
+        _buildGridItem('Wash1', ImagePaths.op6),
+        _buildGridItem('Wash1', ImagePaths.op7),
       ],
     );
   }
@@ -614,7 +693,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           SizedBox(height: 4.h),
           Row(
             children: [
-              Icon(Icons.star, size: 12.sp, color: Colors.amber),
+              Icon(Icons.star, size: 12.sp, color: Colors.black),
               Text(
                 ' 4.6 (5k+)',
                 style: GoogleFonts.manrope(

@@ -6,7 +6,7 @@ class LaundryDetailsController extends GetxController {
 
   // Category Filtering
   final selectedCategory = 'Wash'.obs;
-  final categories = ['Wash', 'Dry Clean', 'Fold'];
+  final categories = ['Wash', 'Dry Clean', 'Fold','Wash1', 'Dry Clean1', 'Fold1'];
 
   // Tab Selection
   final activeTab = 'Most Ordered'.obs;

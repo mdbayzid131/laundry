@@ -60,6 +60,8 @@ import '../../modules/cart/bindings/cart_binding.dart';
 import '../../modules/cart/views/cart_view.dart';
 import '../../modules/checkout/bindings/checkout_binding.dart';
 import '../../modules/checkout/views/checkout_view.dart';
+import '../../modules/membership/bindings/membership_binding.dart';
+import '../../modules/membership/views/membership_view.dart';
 
 class AppRoutes {
   static const String SPLASH = '/splash';
@@ -96,6 +98,7 @@ class AppRoutes {
   static const String LAUNDRY_DETAILS = '/laundry-details';
   static const String PRODUCT_DETAILS = '/product-details';
   static const String INTRO_SCREENS = '/intro-screens';
+  static const String MEMBERSHIP = '/membership';
 }
 
 final pages = [
@@ -292,5 +295,10 @@ final pages = [
     name: AppRoutes.INTRO_SCREENS,
     page: () => const IntroScreensView(),
     binding: IntroScreensBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.MEMBERSHIP,
+    page: () => const MembershipView(),
+    binding: MembershipBinding(),
   ),
 ];

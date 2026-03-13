@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
@@ -82,9 +83,13 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        top: false,
         bottom: false,
         child: Column(
           children: [
+            // Ongoing Order Banner
+            _buildOngoingOrderStatusBanner(),
+
             // Top Address Bar
             _buildAddressBar(),
 
@@ -110,23 +115,76 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                     SizedBox(height: 24.h),
 
                     // Our Past Orders Section
-                    _buildHorizontalListSection('Your Past Orders', _pastOrders),
+                    _buildHorizontalListSection(
+                      'Your Past Orders',
+                      _pastOrders,
+                    ),
 
                     SizedBox(height: 24.h),
 
                     // Steals & Deals Section
-                    _buildHorizontalListSection('Steals & Deals', _stealsAndDeals, isLarge: true),
+                    _buildHorizontalListSection(
+                      'Steals & Deals',
+                      _stealsAndDeals,
+                      isLarge: true,
+                    ),
 
                     SizedBox(height: 24.h),
 
                     // Seaside Cleaners Section
-                    _buildHorizontalListSection('Seaside Cleaners', _seasideCleaners),
+                    _buildHorizontalListSection(
+                      'Seaside Cleaners',
+                      _seasideCleaners,
+                    ),
 
                     SizedBox(height: 80.h),
                   ],
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOngoingOrderStatusBanner() {
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(AppRoutes.ORDER_TRACKING);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(20.w, 48.h, 20.w, 20.h),
+        color: AppTheme.primaryColor,
+        child: Row(
+          children: [
+            Icon(Icons.blur_on, color: Colors.white, size: 36.sp),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '7:20 - 7:30 PM estimated arrival',
+                    style: GoogleFonts.manrope(
+                      fontSize: 15.sp,
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Your items are being cleaned',
+                    style: GoogleFonts.manrope(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.white, size: 20.sp),
           ],
         ),
       ),
@@ -240,7 +298,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          border: Border.all(color: Color(0xffD3D3D3)),
+          border: Border.all(color: AppTheme.primaryColor),
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -263,7 +321,11 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     );
   }
 
-  Widget _buildHorizontalListSection(String title, List<Map<String, String>> dataList, {bool isLarge = false}) {
+  Widget _buildHorizontalListSection(
+    String title,
+    List<Map<String, String>> dataList, {
+    bool isLarge = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

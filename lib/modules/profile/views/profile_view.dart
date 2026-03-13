@@ -507,7 +507,10 @@ class _ProfileViewState extends State<ProfileView> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: const Color(0xFF4A90E2),
+          activeColor: Colors.white,
+          activeTrackColor: AppTheme.primaryColor,
+          inactiveThumbColor: Colors.white,
+          inactiveTrackColor: Colors.grey.shade300,
         ),
       ],
     );

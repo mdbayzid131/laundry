@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laundry/config/routes/app_pages.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class OrderTrackingView extends StatelessWidget {
   const OrderTrackingView({super.key});
@@ -10,410 +10,358 @@ class OrderTrackingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF9F9F9),
-      appBar: AppBar(
-        backgroundColor: const Color(0xffF9F9F9),
-        elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.only(left: 16.w),
-          child: Center(
-            child: Container(
-              height: 40.w,
-              width: 40.w,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
+      body: Column(
+        children: [
+          // Map Section
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.45,
+            child: Stack(
+              children: [
+                // Google Map
+                GoogleMap(
+                  initialCameraPosition: const CameraPosition(
+                    target: LatLng(45.5152, -122.6784),
+                    zoom: 14,
                   ),
-                ],
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  Icons.arrow_back_ios_new,
-                  size: 18.sp,
-                  color: Colors.black87,
+                  zoomControlsEnabled: false,
+                  myLocationButtonEnabled: false,
+                  mapToolbarEnabled: false,
                 ),
-                onPressed: () => Get.back(),
+                // Map center marker (car)
+                Center(
+                  child: Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.directions_car,
+                      color: Colors.white,
+                      size: 20.sp,
+                    ),
+                  ),
+                ),
+                // Top Action Buttons
+                SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildCircleButton(
+                          Icons.close,
+                          onTap: () => Get.back(),
+                        ),
+                        Column(
+                          children: [
+                            _buildCircleButton(Icons.question_mark),
+                            SizedBox(height: 12.h),
+                            _buildCircleButton(Icons.location_on),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Overlay Progress Bar on Map
+                Positioned(
+                  bottom: 40.h,
+                  left: 30.w,
+                  right: 30.w,
+                  child: _buildMapOverlayProgressBar(),
+                ),
+              ],
+            ),
+          ),
+          // Details Section
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Your order is ready for pickup!',
+                    style: GoogleFonts.manrope(
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xff1A2530),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    'Now arriving by: 8:11 PM – 8:17 PM',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  SizedBox(height: 32.h),
+                  // Timeline
+                  _buildTimeline(),
+                  SizedBox(height: 32.h),
+                  // Driver Info
+                  _buildDriverInfo(),
+                  const Spacer(),
+                  // Show Order Details Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52.h,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffA6D4E9),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                      child: Text(
+                        'Show order details',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                ],
               ),
             ),
           ),
-        ),
-        title: Text(
-          'Track Order',
-          style: GoogleFonts.manrope(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xff1A2530),
-          ),
-        ),
-        centerTitle: true,
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          children: [
-            _buildOrderInfoCard(),
-            SizedBox(height: 24.h),
-            _buildOrderProgress(),
-            SizedBox(height: 24.h),
-            _buildCurrentStatusCard(),
-            SizedBox(height: 24.h),
-            _buildNeedHelpCard(),
-            SizedBox(height: 40.h),
+    );
+  }
+
+  Widget _buildCircleButton(IconData icon, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(10.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
+        child: Icon(icon, size: 20.sp, color: Colors.black87),
       ),
     );
   }
 
-  Widget _buildOrderInfoCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+  Widget _buildMapOverlayProgressBar() {
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        // Background line
+        Container(
+          height: 6.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xff57606F),
+            borderRadius: BorderRadius.circular(3.r),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Order #LN2024001',
-                style: GoogleFonts.manrope(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
+        ),
+        // Active line
+        Positioned(
+          left: 0,
+          child: Container(
+            height: 6.h,
+            width: 120.w,
+            decoration: BoxDecoration(
+              color: const Color(0xff15803D), // Darker green
+              borderRadius: BorderRadius.circular(3.r),
+            ),
+          ),
+        ),
+        // Store Icon
+        Positioned(
+          left: 60.w,
+          child: Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: const Color(0xff15803D), // Darker green
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xffEAF5FB),
-                  borderRadius: BorderRadius.circular(12.r),
+              ],
+            ),
+            child: Icon(Icons.storefront, color: Colors.white, size: 24.sp),
+          ),
+        ),
+        // Home Icon
+        Positioned(
+          right: 30.w,
+          child: Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: const Color(0xff4B5563),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
-                child: Text(
-                  'In Process',
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff4A90E2),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
+            child: Icon(Icons.home, color: Colors.white, size: 24.sp),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            'Placed on Jan 15, 2024',
-            style: GoogleFonts.manrope(fontSize: 13.sp, color: Colors.black54),
-          ),
-          SizedBox(height: 20.h),
-          _buildInfoRow('Service Type', 'Wash & Fold'),
-          SizedBox(height: 12.h),
-          _buildInfoRow('Items', '12 pieces'),
-          SizedBox(height: 12.h),
-          _buildInfoRow(
-            'Estimated Delivery',
-            'Today, 6:00 PM',
-            valueColor: const Color(0xff4A90E2),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
+  Widget _buildTimeline() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.manrope(fontSize: 14.sp, color: Colors.black54),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.manrope(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: valueColor ?? const Color(0xff1A2530),
-          ),
-        ),
+        _buildTimelineNode(Icons.storefront, isActive: true),
+        _buildTimelineLine(isActive: true),
+        _buildTimelineNode(Icons.person, isActive: true),
+        _buildTimelineLine(isActive: false),
+        _buildTimelineNode(Icons.directions_car, isActive: false),
+        _buildTimelineLine(isActive: false),
+        _buildTimelineNode(Icons.home, isActive: false),
       ],
     );
   }
 
-  Widget _buildOrderProgress() {
+  Widget _buildTimelineNode(IconData icon, {required bool isActive}) {
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isActive ? const Color(0xffA6D4E9) : Colors.grey[300],
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: Colors.white, size: 16.sp),
+    );
+  }
+
+  Widget _buildTimelineLine({required bool isActive}) {
+    return Expanded(
+      child: Container(
+        height: 2.h,
+        color: isActive ? const Color(0xffA6D4E9) : Colors.grey[300],
+      ),
+    );
+  }
+
+  Widget _buildDriverInfo() {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: const Color(0xffF9F9F9),
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Container(
+                width: 44.w,
+                height: 44.w,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/dummy_image/op1.png',
+                    ), // placeholder
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Michael',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xff1A2530),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.star, size: 14.sp, color: Colors.black87),
+                      SizedBox(width: 4.w),
+                      Text(
+                        '4.9',
+                        style: GoogleFonts.manrope(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Order Progress',
-                style: GoogleFonts.manrope(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.PICKUP_ADDRESS),
-                child: Text(
-                  'Add Pickup Address',
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    color: Colors.black45,
-                  ),
-                ),
-              ),
+              _buildActionPill('Add tip', icon: null),
+              _buildActionPill('Call', icon: Icons.call),
+              _buildActionPill('Chat', icon: Icons.chat_bubble_outline),
             ],
-          ),
-          SizedBox(height: 24.h),
-          _buildTimelineStep(
-            'Order Confirmed',
-            'Jan 15, 10:30 AM',
-            Icons.check,
-            isCompleted: true,
-            isLast: false,
-          ),
-          _buildTimelineStep(
-            'Picked Up',
-            'Jan 15, 2:15 PM',
-            Icons.local_shipping,
-            isCompleted: true,
-            isLast: false,
-          ),
-          _buildTimelineStep(
-            'In Process',
-            'Your items are being cleaned',
-            Icons.local_laundry_service,
-            isCurrent: true,
-            isLast: false,
-          ),
-          _buildTimelineStep(
-            'Schedule pick up & delivery',
-            '',
-            Icons.access_time,
-            isLast: false,
-          ),
-          _buildTimelineStep(
-            'Out for Delivery',
-            'Pending',
-            Icons.delivery_dining,
-            isLast: false,
-          ),
-          _buildTimelineStep('Delivered', 'Pending', Icons.home, isLast: true),
-          SizedBox(height: 16.h),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 14.h),
-            decoration: BoxDecoration(
-              color: const Color(0xffB5DEEF).withOpacity(0.6),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.access_time, size: 18.sp, color: Colors.white),
-                SizedBox(width: 8.w),
-                Text(
-                  'Schedule pick up & delivery',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTimelineStep(
-    String title,
-    String subtitle,
-    IconData icon, {
-    bool isCompleted = false,
-    bool isCurrent = false,
-    bool isLast = false,
-  }) {
-    final color = isCompleted || isCurrent
-        ? const Color(0xffB5DEEF)
-        : Colors.grey[300]!;
-    final iconColor = isCompleted || isCurrent
-        ? Colors.white
-        : Colors.grey[400]!;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            Container(
-              width: 32.w,
-              height: 32.w,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              child: Icon(icon, size: 16.sp, color: iconColor),
-            ),
-            if (!isLast)
-              Container(
-                width: 2.w,
-                height: 40.h,
-                color: color.withOpacity(0.5),
-              ),
-          ],
-        ),
-        SizedBox(width: 16.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.manrope(
-                  fontSize: 15.sp,
-                  fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                  color: isCurrent || isCompleted
-                      ? const Color(0xff1A2530)
-                      : Colors.grey[400],
-                ),
-              ),
-              if (subtitle.isNotEmpty) ...[
-                SizedBox(height: 4.h),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
-              SizedBox(height: 20.h),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCurrentStatusCard() {
+  Widget _buildActionPill(String text, {IconData? icon}) {
     return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xffEAF5FB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.access_time_filled, size: 16.sp, color: Colors.black),
-              SizedBox(width: 8.w),
-              Text(
-                'Current Status',
-                style: GoogleFonts.manrope(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'Your laundry is currently being processed at our facility. Our team is carefully washing and treating your items according to your preferences. Estimated completion time is 2:00 PM.',
-            style: GoogleFonts.manrope(
-              fontSize: 13.sp,
-              color: Colors.black54,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNeedHelpCard() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: Colors.grey[200]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.01),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Need Help?',
-                style: GoogleFonts.manrope(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                'Contact our support team',
-                style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
-                  color: Colors.black54,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.all(10.w),
-            decoration: BoxDecoration(
-              color: const Color(0xffF5F5F5),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.headset_mic_outlined,
-              size: 24.sp,
+          if (icon != null) ...[
+            Icon(icon, size: 16.sp, color: Colors.black87),
+            SizedBox(width: 6.w),
+          ],
+          Text(
+            text,
+            style: GoogleFonts.manrope(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),

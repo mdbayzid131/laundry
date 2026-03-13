@@ -8,21 +8,22 @@ class IntroScreensView extends GetView<IntroScreensController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() {
-        final color = controller.bgColors[controller.currentPage.value];
-        final image = controller.images[controller.currentPage.value];
-        
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          color: color,
-          child: Center(
-            child: Image.asset(
-              image,
+      backgroundColor: controller.bgColor,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              controller.image,
               fit: BoxFit.contain,
             ),
-          ),
-        );
-      }),
+            const SizedBox(height: 40),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

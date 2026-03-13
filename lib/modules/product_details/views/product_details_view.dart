@@ -118,8 +118,8 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                 (index) => Icon(
                   Icons.star_rounded,
                   color: index < 4
-                      ? Colors.amber
-                      : Colors.amber.withOpacity(0.3),
+                      ? Colors.black
+                      : Colors.black.withOpacity(0.3),
                   size: 18.sp,
                 ),
               ),
@@ -579,7 +579,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           SizedBox(height: 4.h),
           Row(
             children: [
-              Icon(Icons.star, size: 10.sp, color: Colors.amber),
+              Icon(Icons.star, size: 10.sp, color: Colors.black),
               Text(
                 ' 4.6 (5k+)',
                 style: GoogleFonts.manrope(
@@ -709,7 +709,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                         5,
                         (index) => Icon(
                           Icons.star_rounded,
-                          color: Colors.amber,
+                          color: Colors.black,
                           size: 14.sp,
                         ),
                       ),

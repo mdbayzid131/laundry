@@ -42,7 +42,24 @@ class OnboardingPage3 extends StatelessWidget {
         const Spacer(),
 
         ///<================= MAIN ILLUSTRATION =========================>///
-        Image.asset(ImagePaths.onboardingImage3, height: 350.h),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 16.w),
+   
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+         
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: Image.asset(
+              ImagePaths.onboardingImage3,
+              height: 245.w,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
         const Spacer(),
       ],
     );

@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
             ),
             scaffoldBackgroundColor: Color(0xffffffff),
           ),
-          initialRoute: AppRoutes.SPLASH,
+          initialRoute: AppRoutes.INTRO_SCREENS,
           getPages: pages,
           initialBinding: InitialBinding(),
         );
