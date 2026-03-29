@@ -7,12 +7,12 @@ import '../../../core/utils/helpers.dart';
 class RegisterController extends GetxController {
   final AuthService _authService = Get.find();
 
+  final addressController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
-  final countryController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   final isLoading = false.obs;
@@ -21,10 +21,13 @@ class RegisterController extends GetxController {
 
   @override
   void onClose() {
+    addressController.dispose();
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    phoneController.dispose();
+    addressController.dispose();  
     super.onClose();
   }
 
@@ -47,7 +50,7 @@ class RegisterController extends GetxController {
         email: emailController.text,
         password: passwordController.text,
         phone: phoneController.text,
-        country: countryController.text,
+        address: addressController.text,
       );
 
       Helpers.showCustomSnackBar(

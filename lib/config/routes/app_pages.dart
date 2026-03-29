@@ -99,6 +99,7 @@ class AppRoutes {
   static const String PRODUCT_DETAILS = '/product-details';
   static const String INTRO_SCREENS = '/intro-screens';
   static const String MEMBERSHIP = '/membership';
+  static const String OTP_FORM_REGISTER = '/otp-form-register';
 }
 
 final pages = [
