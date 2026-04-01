@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
+import '../controllers/profile_controller.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -622,28 +622,64 @@ class _ProfileViewState extends State<ProfileView> {
   // Sign Out Button:
 
   Widget _buildSignOutButton() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 16.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFEBEE),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFFEE2E2), width: 1.w),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.logout, color: const Color(0xFFE53935), size: 20.sp),
-          SizedBox(width: 8.w),
-          Text(
-            'Sign Out',
-            style: GoogleFonts.manrope(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFFE53935),
+    final ProfileController controller = Get.find();
+    return GestureDetector(
+      onTap: () {
+        Get.dialog(
+          AlertDialog(
+            title: Text(
+              'Logout',
+              style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
             ),
+            content: Text(
+              'Are you sure you want to logout?',
+              style: GoogleFonts.manrope(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'No',
+                  style: GoogleFonts.manrope(color: Colors.grey),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                  controller.logout();
+                },
+                child: Text(
+                  'Yes',
+                  style: GoogleFonts.manrope(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-        ],
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFEBEE),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: const Color(0xFFFEE2E2), width: 1.w),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.logout, color: const Color(0xFFE53935), size: 20.sp),
+            SizedBox(width: 8.w),
+            Text(
+              'Sign Out',
+              style: GoogleFonts.manrope(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFE53935),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

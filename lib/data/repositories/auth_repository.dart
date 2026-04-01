@@ -75,11 +75,11 @@ class AuthRepo {
   /// ===================== OTP VERIFY =====================
   Future<Response> otpVerify({
     required String email,
-    required int oneTimeCode,
+    required int otp,
   }) async {
     return await apiClient.postData(ApiConstants.verifyUser, {
       "email": email,
-      "oneTimeCode": oneTimeCode,
+      "otp": otp,
     });
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
+import 'package:laundry/core/services/api_checker.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
 
@@ -27,7 +28,6 @@ class RegisterController extends GetxController {
     passwordController.dispose();
     confirmPasswordController.dispose();
     phoneController.dispose();
-    addressController.dispose();  
     super.onClose();
   }
 
@@ -45,21 +45,23 @@ class RegisterController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _authService.signup(
+     var response = await _authService.signup(
         name: nameController.text,
         email: emailController.text,
         password: passwordController.text,
         phone: phoneController.text,
         address: addressController.text,
       );
-
-      Helpers.showCustomSnackBar(
-        'Registration successful',
+      ApiChecker.checkWriteApi(response);
+if(response.statusCode == 201){
+  Helpers.showCustomSnackBar(
+        'Registration successful, please verify your email',isError: false
 
       );
-      Get.offAllNamed(AppRoutes.LOGIN);
+      Get.toNamed(AppRoutes.OTP_FORM_REGISTER, arguments: emailController.text);
+}
     } catch (e) {
-      Helpers.showCustomSnackBar(
+      Helpers.showDebugLog(
         e.toString(),
 
       );

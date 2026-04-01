@@ -62,7 +62,7 @@ class AuthService extends GetxService {
   }) async {
     try {
       final response = await _authRepo.login(email: email, password: password);
-      await _handleAuthResponse(response);
+      await handleAuthResponse(response);
       return response;
     } catch (e) {
       rethrow;
@@ -72,12 +72,10 @@ class AuthService extends GetxService {
   /// ===================== LOGOUT =====================
   Future<void> logout() async {
     try {
-      // final response = await _authRepo.logout(deviceToken);
+      await _authRepo.logout();
       await _clearLocalAuth();
-      // return response;
     } catch (e) {
       await _clearLocalAuth();
-      rethrow;
     }
   }
 
@@ -96,10 +94,10 @@ class AuthService extends GetxService {
     try {
       final response = await _authRepo.otpVerify(
         email: email,
-        oneTimeCode: otp,
+        otp: otp,
       );
       // If OTP verification logs the user in directly:
-      // await _handleAuthResponse(response);
+      await handleAuthResponse(response);
       return response;
     } catch (e) {
       rethrow;
@@ -177,7 +175,7 @@ class AuthService extends GetxService {
   /// ===================== HELPER METHODS =====================
 
   /// Handles successful auth response (Login/Signup)
-  Future<void> _handleAuthResponse(Response response) async {
+  Future<void> handleAuthResponse(Response response) async {
     // Adjust these keys based on your actual API response structure
     // Example: { "data": { "accessToken": "...", "refreshToken": "..." } }
     final data = response.data;

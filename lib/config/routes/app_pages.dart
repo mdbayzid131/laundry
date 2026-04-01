@@ -52,8 +52,6 @@ import '../../modules/profile/bindings/profile_binding.dart';
 import '../../modules/profile/views/profile_view.dart';
 import '../../modules/splash/bindings/splash_binding.dart';
 import '../../modules/splash/views/splash_view.dart';
-import '../../modules/splash/views/intro_screens_view.dart';
-import '../../modules/splash/bindings/intro_screens_binding.dart';
 import '../../modules/map/bindings/map_binding.dart';
 import '../../modules/map/views/map_screen.dart';
 import '../../modules/cart/bindings/cart_binding.dart';
@@ -97,7 +95,6 @@ class AppRoutes {
   static const String NOTIFICATIONS = '/notifications';
   static const String LAUNDRY_DETAILS = '/laundry-details';
   static const String PRODUCT_DETAILS = '/product-details';
-  static const String INTRO_SCREENS = '/intro-screens';
   static const String MEMBERSHIP = '/membership';
   static const String OTP_FORM_REGISTER = '/otp-form-register';
 }
@@ -293,13 +290,13 @@ final pages = [
     binding: ProductDetailsBinding(),
   ),
   GetPage(
-    name: AppRoutes.INTRO_SCREENS,
-    page: () => const IntroScreensView(),
-    binding: IntroScreensBinding(),
-  ),
-  GetPage(
     name: AppRoutes.MEMBERSHIP,
     page: () => const MembershipView(),
     binding: MembershipBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.OTP_FORM_REGISTER,
+    page: () => const OtpVerifyScreen(),
+    binding: AuthBinding(),
   ),
 ];

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
+import 'package:dio/dio.dart';
+import 'package:laundry/core/services/api_checker.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
 
@@ -31,15 +33,36 @@ class LoginController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _authService.login(
+      final response = await _authService.login(
         email: emailController.text,
         password: passwordController.text,
       );
-
-      Helpers.showCustomSnackBar('Login successful');
-      Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
+      ApiChecker.checkWriteApi(response);
+      if (response.statusCode == 200) {
+        Helpers.showCustomSnackBar('Login successful', isError: false);
+        _authService.handleAuthResponse(response);
+        Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
+      }
+      if (response.statusCode == 403 &&
+          response.data['message'] == 'Verify account first') {
+        try {
+          await _authService.resendOtp(emailController.text);
+          Helpers.showCustomSnackBar(
+            'Verification needed. OTP sent to your email.',
+            isError: false,
+          );
+          Get.toNamed(
+            AppRoutes.OTP_FORM_REGISTER,
+            arguments: emailController.text,
+          );
+          return;
+        } catch (resendError) {
+          Helpers.showDebugLog(resendError.toString());
+          return;
+        }
+      }
     } catch (e) {
-      Helpers.showCustomSnackBar(e.toString());
+      Helpers.showDebugLog(e.toString());
     } finally {
       isLoading.value = false;
     }

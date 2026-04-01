@@ -63,14 +63,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ///<================= BUTTON SECTION =========================>///
                   CustomElevatedButton(
                     label: _currentPage == 1 ? "Continue" : "Get Started",
-                    onPressed: () {
+                    onPressed: () async {
                       if (_currentPage < 2) {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.ease,
                         );
                       } else {
-                        StorageService.setBool(
+                        await StorageService.setBool(
                           StorageConstants.onboardingSeen,
                           true,
                         );

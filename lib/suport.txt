@@ -1,0 +1,18 @@
+{
+    "success": true,
+    "message": "User verified successfully",
+    "data": {
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5MDE4ODRmLTNkM2EtNDczZC04NjQ0LWQ0NTc0OTM4ODk2MCIsIm5hbWUiOiJNZCBCYXl6aWQiLCJlbWFpbCI6Im1kYmF5YXppZDEzMUBnbWFpbC5jb20iLCJwaG9uZSI6IjAxOTkwMyIsInJvbGUiOiJVU0VSIiwic3RhdHVzIjoiQUNUSVZFIiwiaXNWZXJpZmllZCI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAyNi0wMy0yOFQxOToyNToyMS4zODJaIiwiaWF0IjoxNzc0NzI1OTY3LCJleHAiOjE3NzUzMzA3Njd9._s_BSUoDbvjNduXDlcgj0JHqTCHw8zuM_tGXFwc32aY",
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5MDE4ODRmLTNkM2EtNDczZC04NjQ0LWQ0NTc0OTM4ODk2MCIsIm5hbWUiOiJNZCBCYXl6aWQiLCJlbWFpbCI6Im1kYmF5YXppZDEzMUBnbWFpbC5jb20iLCJwaG9uZSI6IjAxOTkwMyIsInJvbGUiOiJVU0VSIiwic3RhdHVzIjoiQUNUSVZFIiwiaXNWZXJpZmllZCI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAyNi0wMy0yOFQxOToyNToyMS4zODJaIiwiaWF0IjoxNzc0NzI1OTY3LCJleHAiOjE3NzczMTc5Njd9.diwrxiHDI9vemb1AqrdpSlO7p2wKSu00soQEFVoZU_E",
+        "user": {
+            "id": "3901884f-3d3a-473d-8644-d45749388960",
+            "name": "Md Bayzid",
+            "email": "mdbayazid131@gmail.com",
+            "phone": "019903",
+            "role": "USER",
+            "status": "ACTIVE",
+            "isVerified": true,
+            "createdAt": "2026-03-28T19:25:21.382Z"
+        }
+    }
+}
