@@ -1,64 +1,74 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/banner_model.dart';
+import 'package:laundry/data/models/category_model.dart';
+import 'package:laundry/data/repositories/category_repository.dart';
+import 'package:laundry/data/repositories/banner_repository.dart';
 
-class HomeController extends GetxController {}
+class HomeController extends GetxController {
+  final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
+  final BannerRepository _bannerRepository = Get.find<BannerRepository>();
 
-class BannerController extends GetxController {
-  RxBool isLoading = false.obs;
-  // final RxList<BannerModel> _banners = <BannerModel>[].obs;
-  // List<BannerModel> get banners => _banners;
-  // // final UserProfileManageRepo _userProfileManageRepo =
-  // //     Get.find<UserProfileManageRepo>();
+  RxBool isLoadingCategories = false.obs;
+  RxList<CategoryData> categories = <CategoryData>[].obs;
+  
+  RxBool isLoadingBanners = false.obs;
+  RxList<BannerData> banners = <BannerData>[].obs;
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   getBanners();
-  // }
-  // /// ===================== GET BANNERS =====================
-  // Future<void> getBanners() async {
-  //   isLoading.value = true;
+  @override
+  void onInit() {
+    super.onInit();
+    // Wait for first frame to avoid "visitChildElements called during build" error
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadInitialData();
+    });
+  }
 
-  //   try {
-  //     final Response<dynamic> response = await _userProfileManageRepo
-  //         .getBanners();
-  //     if (response.statusCode == 200) {
-  //       BannerResponseModel bannerResponseModel = BannerResponseModel.fromJson(response.data);
-  //       _banners.value = bannerResponseModel.data.banners;
-  //     }
+  Future<void> loadInitialData({bool showDialog = true}) async {
+    try {
+      if (showDialog) Helpers.showLoadingDialog();
+      // Run both parallelly
+      await Future.wait([
+        getCategories(),
+        getBanners(),
+      ]);
+    } catch (e) {
+      Helpers.showDebugLog('Error loading initial data: $e');
+    } finally {
+      if (showDialog) Helpers.hideLoadingDialog();
+    }
+  }
 
-  //   } catch (e) {
-  //     print(e.toString());
-  //     Helpers.showErrorSnackbar(e.toString());
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-  List<BannerModel> banners = [
-    BannerModel(
-      id: '1',
-      image: ImagePaths.banner1,
-      title: 'Banner 1',
-      description: 'Description 1',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    BannerModel(
-      id: '2',
-      image: ImagePaths.banner2,
-      title: 'Banner 2',
-      description: 'Description 2',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    BannerModel(
-      id: '3',
-      image: ImagePaths.banner3,
-      title: 'Banner 3',
-      description: 'Description 3',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
+  Future<void> getCategories() async {
+    isLoadingCategories.value = true;
+    try {
+      final response = await _categoryRepository.getCategories();
+      if (response.statusCode == 200) {
+        final categoryResponse = CategoriesResponseModel.fromJson(
+          response.data,
+        );
+        categories.value = categoryResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog(e.toString());
+    } finally {
+      isLoadingCategories.value = false;
+    }
+  }
+
+  Future<void> getBanners() async {
+    isLoadingBanners.value = true;
+    try {
+      final response = await _bannerRepository.getBanners();
+      if (response.statusCode == 200) {
+        final bannerResponse = BannerResponseModel.fromJson(response.data);
+        banners.value = bannerResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching banners: $e');
+    } finally {
+      isLoadingBanners.value = false;
+    }
+  }
 }

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:laundry/config/themes/app_theme.dart';
-import 'package:laundry/core/utils/lib/utils/custom_map_marker.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -87,9 +85,12 @@ class _MapScreenState extends State<MapScreen> {
             });
             _showVendorBottomSheet(vendor);
           },
-          icon: await CustomMapMarker.createCustomMarker(
-            size: 80,
-          ), // Matching primaryColor (0xFFA6D4E9)
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueBlue.sign,
+          ),
+          // icon: await CustomMapMarker.createCustomMarker(
+          //   size: 80,
+          // ), // Matching primaryColor (0xFFA6D4E9)
         ),
       );
     }

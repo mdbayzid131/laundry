@@ -16,6 +16,7 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
+    final ProfileController controller = Get.find<ProfileController>();
     return Scaffold(
       backgroundColor: Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -29,59 +30,64 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Card
-              _buildProfileCard(),
-              SizedBox(height: 20.h),
+      body: RefreshIndicator(
+        color: AppTheme.primaryColor,
+        onRefresh: () => controller.getProfile(showDialog: true),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Card
+                _buildProfileCard(),
+                SizedBox(height: 20.h),
 
-              // Menu Items
-              _buildMenuItem(
-                Icons.local_shipping_outlined,
-                'Track Active Order',
-                () => Get.toNamed(AppRoutes.ORDER_TRACKING),
-              ),
-              SizedBox(height: 12.h),
-              _buildMenuItem(
-                Icons.history,
-                'Order History',
-                () => Get.toNamed(AppRoutes.ORDER_HISTORY),
-              ),
-              SizedBox(height: 12.h),
-              _buildMenuItem(
-                Icons.assignment_outlined,
-                'Order Status',
-                () => Get.toNamed(AppRoutes.ORDER_STATUS),
-              ),
-              SizedBox(height: 12.h),
-              _buildMenuItem(
-                Icons.report_problem_outlined,
-                'Order Issue',
-                () => Get.toNamed(AppRoutes.ORDER_ISSUE),
-              ),
-              SizedBox(height: 24.h),
+                // Menu Items
+                _buildMenuItem(
+                  Icons.local_shipping_outlined,
+                  'Track Active Order',
+                  () => Get.toNamed(AppRoutes.ORDER_TRACKING),
+                ),
+                SizedBox(height: 12.h),
+                _buildMenuItem(
+                  Icons.history,
+                  'Order History',
+                  () => Get.toNamed(AppRoutes.ORDER_HISTORY),
+                ),
+                SizedBox(height: 12.h),
+                _buildMenuItem(
+                  Icons.assignment_outlined,
+                  'Order Status',
+                  () => Get.toNamed(AppRoutes.ORDER_STATUS),
+                ),
+                SizedBox(height: 12.h),
+                _buildMenuItem(
+                  Icons.report_problem_outlined,
+                  'Order Issue',
+                  () => Get.toNamed(AppRoutes.ORDER_ISSUE),
+                ),
+                SizedBox(height: 24.h),
 
-              // Personal Information
-              _buildPersonalInfoSection(),
+                // Personal Information
+                _buildPersonalInfoSection(),
 
-              SizedBox(height: 24.h),
-              _buildPaymentMethodsSection(),
+                SizedBox(height: 24.h),
+                _buildPaymentMethodsSection(),
 
-              SizedBox(height: 24.h),
-              _buildNotificationsSection(),
+                SizedBox(height: 24.h),
+                _buildNotificationsSection(),
 
-              SizedBox(height: 24.h),
-              _buildAccountSettingsSection(),
+                SizedBox(height: 24.h),
+                _buildAccountSettingsSection(),
 
-              SizedBox(height: 24.h),
-              _buildSignOutButton(),
+                SizedBox(height: 24.h),
+                _buildSignOutButton(),
 
-              SizedBox(height: 100.h),
-            ],
+                SizedBox(height: 100.h),
+              ],
+            ),
           ),
         ),
       ),
@@ -89,79 +95,86 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _buildProfileCard() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 16.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                width: 80.w,
-                height: 80.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[300],
-                  border: Border.all(color: Colors.white, width: 3.w),
-                ),
-                child: ClipOval(
-                  child: Icon(
-                    Icons.person,
-                    size: 40.sp,
-                    color: Colors.grey[400],
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: EdgeInsets.all(6.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+    final ProfileController controller = Get.find<ProfileController>();
+    return Obx(() {
+      final user = controller.userData.value;
+      if (controller.isLoading.value && controller.userData.value == null) {
+        return SizedBox(height: 150.h);
+      }
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(24.w),
+        decoration: BoxDecoration(
+          color: AppTheme.primaryColor,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 16.r,
+              offset: Offset(0, 4.h),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 90.w,
+                  height: 90.w,
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
+                    color: Colors.grey[300],
+                    border: Border.all(color: Colors.white, width: 3.w),
                   ),
-                  child: Icon(
-                    Icons.camera_alt_outlined,
-                    size: 20.sp,
-                    color: const Color(0xFF4A90E2),
+                  child: ClipOval(
+                    child: (user?.avatar != null && user!.avatar!.isNotEmpty)
+                        ? Image.network(user.avatar!, fit: BoxFit.cover)
+                        : Icon(Icons.person, size: 50.sp, color: Colors.white),
                   ),
                 ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(6.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.camera_alt_outlined,
+                      size: 20.sp,
+                      color: const Color(0xFF4A90E2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              user?.name ?? 'Guest User',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.manrope(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
               ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Text(
-            'Sarah Johnson',
-            style: GoogleFonts.manrope(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            'sarah.johnson@email.com',
-            style: GoogleFonts.manrope(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w400,
-              color: Colors.white.withOpacity(0.8),
+            SizedBox(height: 4.h),
+            Text(
+              user?.email ?? 'No email available',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withOpacity(0.9),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {

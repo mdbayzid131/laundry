@@ -6,6 +6,7 @@ import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
+import 'package:laundry/modules/home/controllers/home_controller.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
   const LaundryHomeScreen({super.key});
@@ -80,6 +81,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final HomeController controller = Get.find<HomeController>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -98,47 +100,51 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
 
             // Scrollable Content
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Category Buttons
-                    _buildCategoryButtons(),
+              child: RefreshIndicator(
+                onRefresh: () => controller.loadInitialData(showDialog: false),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      // Category Buttons
+                      _buildCategoryButtons(),
 
-                    // Promotional Banner
-                    SizedBox(height: 16.h),
-                    PromotionalBannerCarousel(),
+                      // Promotional Banner
+                      SizedBox(height: 16.h),
+                      PromotionalBannerCarousel(),
 
-                    // SizedBox(height: 24.h),
+                      // SizedBox(height: 24.h),
 
-                    // // Long Cleaning Satisfied Section
-                    // _buildLongCleaningSection(),
-                    SizedBox(height: 24.h),
+                      // // Long Cleaning Satisfied Section
+                      // _buildLongCleaningSection(),
+                      SizedBox(height: 24.h),
 
-                    // Our Past Orders Section
-                    _buildHorizontalListSection(
-                      'Your Past Orders',
-                      _pastOrders,
-                    ),
+                      // Our Past Orders Section
+                      _buildHorizontalListSection(
+                        'Your Past Orders',
+                        _pastOrders,
+                      ),
 
-                    SizedBox(height: 24.h),
+                      SizedBox(height: 24.h),
 
-                    // Steals & Deals Section
-                    _buildHorizontalListSection(
-                      'Steals & Deals',
-                      _stealsAndDeals,
-                      isLarge: true,
-                    ),
+                      // Steals & Deals Section
+                      _buildHorizontalListSection(
+                        'Steals & Deals',
+                        _stealsAndDeals,
+                        isLarge: true,
+                      ),
 
-                    SizedBox(height: 24.h),
+                      SizedBox(height: 24.h),
 
-                    // Seaside Cleaners Section
-                    _buildHorizontalListSection(
-                      'Seaside Cleaners',
-                      _seasideCleaners,
-                    ),
+                      // Seaside Cleaners Section
+                      _buildHorizontalListSection(
+                        'Seaside Cleaners',
+                        _seasideCleaners,
+                      ),
 
-                    SizedBox(height: 80.h),
-                  ],
+                      SizedBox(height: 80.h),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -271,21 +277,24 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   }
 
   Widget _buildCategoryButtons() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      child: Row(
-        children: [
-          _buildCategoryButton('Wash'),
-          _buildCategoryButton('Dry Clean'),
-          _buildCategoryButton('Fold'),
-          _buildCategoryButton('Ironing'),
-          _buildCategoryButton('Duvet'),
-          _buildCategoryButton('Shoes'),
-          _buildCategoryButton('Leather'),
-        ],
-      ),
-    );
+    final HomeController controller = Get.find<HomeController>();
+    return Obx(() {
+      if (controller.isLoadingCategories.value) {
+        return SizedBox(height: 65.h);
+      }
+      if (controller.categories.isEmpty) {
+        return const SizedBox();
+      }
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: controller.categories
+              .map((category) => _buildCategoryButton(category.name ?? ''))
+              .toList(),
+        ),
+      );
+    });
   }
 
   Widget _buildCategoryButton(String title) {

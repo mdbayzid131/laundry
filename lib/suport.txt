@@ -1,18 +1,58 @@
 {
     "success": true,
-    "message": "User verified successfully",
-    "data": {
-        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5MDE4ODRmLTNkM2EtNDczZC04NjQ0LWQ0NTc0OTM4ODk2MCIsIm5hbWUiOiJNZCBCYXl6aWQiLCJlbWFpbCI6Im1kYmF5YXppZDEzMUBnbWFpbC5jb20iLCJwaG9uZSI6IjAxOTkwMyIsInJvbGUiOiJVU0VSIiwic3RhdHVzIjoiQUNUSVZFIiwiaXNWZXJpZmllZCI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAyNi0wMy0yOFQxOToyNToyMS4zODJaIiwiaWF0IjoxNzc0NzI1OTY3LCJleHAiOjE3NzUzMzA3Njd9._s_BSUoDbvjNduXDlcgj0JHqTCHw8zuM_tGXFwc32aY",
-        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5MDE4ODRmLTNkM2EtNDczZC04NjQ0LWQ0NTc0OTM4ODk2MCIsIm5hbWUiOiJNZCBCYXl6aWQiLCJlbWFpbCI6Im1kYmF5YXppZDEzMUBnbWFpbC5jb20iLCJwaG9uZSI6IjAxOTkwMyIsInJvbGUiOiJVU0VSIiwic3RhdHVzIjoiQUNUSVZFIiwiaXNWZXJpZmllZCI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAyNi0wMy0yOFQxOToyNToyMS4zODJaIiwiaWF0IjoxNzc0NzI1OTY3LCJleHAiOjE3NzczMTc5Njd9.diwrxiHDI9vemb1AqrdpSlO7p2wKSu00soQEFVoZU_E",
-        "user": {
-            "id": "3901884f-3d3a-473d-8644-d45749388960",
-            "name": "Md Bayzid",
-            "email": "mdbayazid131@gmail.com",
-            "phone": "019903",
-            "role": "USER",
-            "status": "ACTIVE",
-            "isVerified": true,
-            "createdAt": "2026-03-28T19:25:21.382Z"
+    "message": "Banners retrieved successfully",
+    "data": [
+        {
+            "id": "f5356b37-d2ab-46e7-8bcc-b62a97f341d5",
+            "title": "25% Off",
+            "description": "Experience our premium laundry service with an exclusive discount for first-time users.",
+            "buttonText": "Learn More",
+            "bannerType": "OFFER",
+            "backgroundColor": "linear-gradient(to top left,#40E0D0,#FF8C00,#FF0080)",
+            "textColor": "#ffffff",
+            "isActive": true,
+            "image": "http://10.10.7.111:5000/image/1308151-1775080567347.jpeg",
+            "createdAt": "2026-04-01T21:56:07.374Z",
+            "updatedAt": "2026-04-01T21:56:07.374Z"
+        },
+        {
+            "id": "a16f33c0-9771-42d6-8172-247955c034d4",
+            "title": "Spring Cleaning Simplified",
+            "description": "Enjoy 20% Off delivery for a limited time\n\n",
+            "buttonText": "Find A Cleaner",
+            "bannerType": "SEASONAL",
+            "backgroundColor": "linear-gradient(to top left,#ff75c3,#ffa647,#ffe83f,#9fff5b,#70e2ff,#cd93ff)",
+            "textColor": "#ffffff",
+            "isActive": true,
+            "image": "http://10.10.7.111:5000/image/blog-covers-1280-ã-720-px-3840-ã-2160-px-4-1775080542345.png",
+            "createdAt": "2026-04-01T21:55:42.355Z",
+            "updatedAt": "2026-04-01T21:55:42.355Z"
+        },
+        {
+            "id": "ad10e3ae-1202-4c16-ab62-3e675b846aa6",
+            "title": "Join Membership",
+            "description": "Unlimited care for your clothes at just $14.99/month\n\n",
+            "buttonText": "Join Now",
+            "bannerType": "MEMBERSHIP",
+            "backgroundColor": "linear-gradient(135deg, #1e40af 0%, #0891b2 100%)",
+            "textColor": "#ffffff",
+            "isActive": true,
+            "image": "http://10.10.7.111:5000/image/gemini_generated_image_dy4q2xdy4q2xdy4q-1775080506985.png",
+            "createdAt": "2026-04-01T21:55:06.997Z",
+            "updatedAt": "2026-04-01T21:55:06.997Z"
+        },
+        {
+            "id": "dd0e93d4-8dbb-49e0-b33c-69906928e45d",
+            "title": "Dry Clean 30& Off",
+            "description": "Free Delivery Included",
+            "buttonText": "Learn More",
+            "bannerType": "PROMOTION",
+            "backgroundColor": "linear-gradient(135deg, #1e40af 0%, #0891b2 100%)",
+            "textColor": "#ffffff",
+            "isActive": true,
+            "image": "http://10.10.7.111:5000/image/images-1775080452968.jpg",
+            "createdAt": "2026-04-01T21:54:12.976Z",
+            "updatedAt": "2026-04-01T21:54:20.698Z"
         }
-    }
+    ]
 }
