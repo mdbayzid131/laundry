@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
+import '../../../config/routes/app_pages.dart';
 
 class ForgotPasswordController extends GetxController {
   final AuthService _authService = Get.find();
@@ -23,12 +24,15 @@ class ForgotPasswordController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _authService.forgotPassword(emailController.text);
+     var response = await _authService.forgotPassword(emailController.text);
 
-      Helpers.showCustomSnackBar(
-        'Reset link sent to your email',
-      );
-      Get.back();
+     if(response.statusCode == 200){
+      Helpers.showCustomSnackBar('Reset link sent to your email', isError: false);
+      Get.toNamed(AppRoutes.OTP, arguments: {
+        'email': emailController.text,
+        'isForgotPassword': true,
+      });
+     }
     } catch (e) { 
       Helpers.showCustomSnackBar(
         e.toString(),

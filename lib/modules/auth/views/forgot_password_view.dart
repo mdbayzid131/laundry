@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/core/widgets/custom_back_button.dart';
 import 'package:laundry/core/widgets/custom_elevated_button.dart';
 import 'package:laundry/core/widgets/custom_text_field.dart';
@@ -78,10 +77,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 Obx(
                   () => CustomElevatedButton(
                     label: 'Send',
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.OTP);
-                    },
-                    // onPressed: controller.sendResetLink,
+                    onPressed: controller.sendResetLink,
                     isLoading: controller.isLoading.value,
                   ),
                 ),

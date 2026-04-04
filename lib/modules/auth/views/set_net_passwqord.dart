@@ -45,21 +45,40 @@ class SetNewPasswordScreen extends GetView<SetNewPassController> {
               ),
               SizedBox(height: 40.h),
 
-              CustomTextField(
-                // controller: controller.newPasswordController,
+              Obx(() => CustomTextField(
+                controller: controller.newPasswordController,
                 hintText: 'Enter your password',
-                obscureText: true,
+                onChanged: controller.validatePasswordRules,
+                obscureText: !controller.isPasswordVisible.value,
                 prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                suffixIcon: GestureDetector(
+                  onTap: controller.togglePasswordVisibility,
+                  child: Icon(
+                    controller.isPasswordVisible.value 
+                      ? Icons.visibility_outlined 
+                      : Icons.visibility_off_outlined,
+                    size: 20,
+                  ),
+                ),
                 label: 'New Password',
-              ),
+              )),
               SizedBox(height: 16.h),
-              CustomTextField(
-                // controller: controller.confirmPasswordController,
+              Obx(() => CustomTextField(
+                controller: controller.confirmPasswordController,
                 hintText: 'Enter your password',
-                obscureText: true,
+                obscureText: !controller.isConfirmPasswordVisible.value,
                 prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                suffixIcon: GestureDetector(
+                  onTap: controller.toggleConfirmPasswordVisibility,
+                  child: Icon(
+                    controller.isConfirmPasswordVisible.value 
+                      ? Icons.visibility_outlined 
+                      : Icons.visibility_off_outlined,
+                    size: 20,
+                  ),
+                ),
                 label: 'Confirm Password',
-              ),
+              )),
               SizedBox(height: 30.h),
 
               // Password Requirements Area
@@ -70,7 +89,7 @@ class SetNewPasswordScreen extends GetView<SetNewPassController> {
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(color: Colors.grey.shade100),
                 ),
-                child: Column(
+                child: Obx(() => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -81,25 +100,26 @@ class SetNewPasswordScreen extends GetView<SetNewPassController> {
                       ),
                     ),
                     SizedBox(height: 10.h),
-                    _buildRequirementRow(true, 'At least 8 characters'),
+                    _buildRequirementRow(controller.hasMinLength.value, 'At least 8 characters'),
                     SizedBox(height: 6.h),
-                    _buildRequirementRow(false, 'One uppercase letter'),
+                    _buildRequirementRow(controller.hasUppercase.value, 'One uppercase letter'),
                     SizedBox(height: 6.h),
                     _buildRequirementRow(
-                      false,
+                      controller.hasNumberOrSpecial.value,
                       'One number or special character',
                     ),
                   ],
-                ),
+                )),
               ),
               SizedBox(height: 40.h),
 
               // Verify Code (or Save Password) Button
-              CustomElevatedButton(
-                label: 'Verify Code', // Text from the design
-                onPressed: () {
-                  // TODO: save new password logic
-                },
+              Obx(
+                () => CustomElevatedButton(
+                  label: 'Save Password',
+                  onPressed: controller.submitNewPassword,
+                  isLoading: controller.isLoading.value,
+                ),
               ),
               SizedBox(height: 20.h),
             ],

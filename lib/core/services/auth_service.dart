@@ -90,14 +90,16 @@ class AuthService extends GetxService {
   }
 
   /// ===================== OTP VERIFY =====================
-  Future<Response> verifyOtp({required String email, required int otp}) async {
+  Future<Response> verifyOtp({required String email, required int otp, bool isForgotPassword = false}) async {
     try {
       final response = await _authRepo.otpVerify(
         email: email,
         otp: otp,
       );
-      // If OTP verification logs the user in directly:
-      await handleAuthResponse(response);
+      // If OTP verification logs the user in directly (but not for forgot password):
+      if (!isForgotPassword) {
+        await handleAuthResponse(response);
+      }
       return response;
     } catch (e) {
       rethrow;
@@ -115,14 +117,13 @@ class AuthService extends GetxService {
 
   /// ===================== RESET PASSWORD =====================
   Future<Response> resetPassword({
-    required String token,
-    required String newPassword,
-    required String confirmPassword,
+    required String resetToken,
+    required String password,
   }) async {
     try {
       final response = await _authRepo.resetPassword(
-        newPassword: newPassword,
-        confirmPassword: confirmPassword,
+        password: password,
+        resetToken: resetToken,
       );
       return response;
     } catch (e) {

@@ -8,7 +8,7 @@ class ApiConstants {
   static const String signup = '/auth/register';
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh';
-  static const String forgotPassword = '/auth/forget-password';
+  static const String forgotPassword = '/auth/forget-password-otp';
   static const String resendOtp = '/auth/resend-otp';
   static const String verifyUser = '/auth/verify-user';
   static const String resetPassword = '/auth/reset-password';
@@ -20,5 +20,8 @@ class ApiConstants {
   static const String category = '/category';
   // Banner Endpoints
   static const String banner = '/banner';
+
+  // Service Endpoints
+  static const String service = '/service';
 
 }

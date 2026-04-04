@@ -85,13 +85,16 @@ class AuthRepo {
 
   /// ===================== RESET PASSWORD =====================
   Future<Response> resetPassword({
-    required String newPassword,
-    required String confirmPassword,
+    required String password,
+    required String resetToken,
   }) async {
-    return await apiClient.postData(ApiConstants.resetPassword, {
-      "newPassword": newPassword,
-      "confirmPassword": confirmPassword,
-    });
+    return await apiClient.postData(
+      ApiConstants.resetPassword, 
+      {
+        "password": password,
+      },
+      resetToken: 'Bearer $resetToken',
+    );
   }
 
   /// ===================== LOGOUT =====================

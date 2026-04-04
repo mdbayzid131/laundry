@@ -1,0 +1,96 @@
+{
+    "success": true,
+    "message": "Service details retrieved successfully",
+    "data": {
+        "id": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
+        "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
+        "categoryId": "0a7e84e3-72bf-43a0-a3c6-a16d00585f04",
+        "name": "Premium Cotton Dry Wash",
+        "basePrice": "19.99",
+        "image": "http://10.10.7.111:5000/image/1308151-1775156304747.jpeg",
+        "isActive": true,
+        "createdAt": "2026-04-02T18:58:24.784Z",
+        "updatedAt": "2026-04-02T19:05:52.910Z",
+        "addons": [
+            {
+                "id": "0fdf7303-0695-480e-8570-bd6262984ee8",
+                "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
+                "addonId": "aa5803ea-1370-41ce-b828-da49ea61ea3a",
+                "createdAt": "2026-04-02T19:05:52.910Z",
+                "updatedAt": "2026-04-02T19:05:52.910Z",
+                "addon": {
+                    "id": "aa5803ea-1370-41ce-b828-da49ea61ea3a",
+                    "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
+                    "name": "Urgent Service",
+                    "description": "Urgent Service",
+                    "isActive": true,
+                    "price": "16",
+                    "createdAt": "2026-04-02T18:46:01.155Z",
+                    "updatedAt": "2026-04-02T18:46:01.155Z"
+                }
+            },
+            {
+                "id": "6b8a1cbd-6872-4c06-822f-ea1e213070d4",
+                "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
+                "addonId": "efc3acce-7b64-446b-a1be-7b8f1ee16452",
+                "createdAt": "2026-04-02T19:05:52.910Z",
+                "updatedAt": "2026-04-02T19:05:52.910Z",
+                "addon": {
+                    "id": "efc3acce-7b64-446b-a1be-7b8f1ee16452",
+                    "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
+                    "name": "Fabric Softener",
+                    "description": "Fabric Softener",
+                    "isActive": true,
+                    "price": "10",
+                    "createdAt": "2026-04-02T18:45:03.104Z",
+                    "updatedAt": "2026-04-02T18:45:03.104Z"
+                }
+            },
+            {
+                "id": "797a63ec-0838-4c92-8a92-5363da52dcf9",
+                "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
+                "addonId": "b0a099d5-87e2-4b73-87b7-b8d14b72684c",
+                "createdAt": "2026-04-02T19:05:52.910Z",
+                "updatedAt": "2026-04-02T19:05:52.910Z",
+                "addon": {
+                    "id": "b0a099d5-87e2-4b73-87b7-b8d14b72684c",
+                    "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
+                    "name": "Stain Removal",
+                    "description": "Stain Removal",
+                    "isActive": true,
+                    "price": "12",
+                    "createdAt": "2026-04-02T18:45:52.646Z",
+                    "updatedAt": "2026-04-02T18:45:52.646Z"
+                }
+            }
+        ],
+        "category": {
+            "id": "0a7e84e3-72bf-43a0-a3c6-a16d00585f04",
+            "name": "Dry Wash",
+            "description": "Premium Dry Wash",
+            "isActive": true,
+            "createdAt": "2026-04-02T15:53:57.919Z",
+            "updatedAt": "2026-04-02T15:58:40.751Z"
+        },
+        "operator": {
+            "id": "af898671-abdb-40c7-a75c-7aa39ad244ca",
+            "userId": "091068d9-6c31-4ead-961f-f9a3be66477c",
+            "storeName": "Digital Store",
+            "address": "Dhaka Bangladesh",
+            "latitude": null,
+            "longitude": null,
+            "platformFee": null,
+            "stripeConnectId": "acct_1THnXeIBPnko0FdI",
+            "onboardingComplete": false,
+            "chargesEnabled": false,
+            "payoutsEnabled": false,
+            "createdAt": "2026-04-02T15:52:21.129Z",
+            "updatedAt": "2026-04-02T15:52:21.129Z",
+            "user": {
+                "name": "Anarul Islam",
+                "email": "ai.anarul4232@gmail.com",
+                "phone": "string1"
+            }
+        }
+    }
+}

@@ -7,6 +7,7 @@ import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
+import 'package:laundry/data/models/services_model.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
   const LaundryHomeScreen({super.key});
@@ -58,26 +59,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     },
   ];
 
-  final List<Map<String, String>> _seasideCleaners = [
-    {
-      'title': 'Ocean Breeze Laundry',
-      'image': ImagePaths.op4,
-      'info': 'Beachfront Delivery',
-      'rating': '4.7 (3k+) . 0.5 mi. 10 min',
-    },
-    {
-      'title': 'Coastal Dry Clean',
-      'image': ImagePaths.op5,
-      'info': 'Same Day Service',
-      'rating': '4.6 (1.5k+) . 1.1 mi. 20 min',
-    },
-    {
-      'title': 'Seaside Ironing Co.',
-      'image': ImagePaths.op6,
-      'info': 'Premium Care',
-      'rating': '4.9 (900+) . 2.3 mi. 35 min',
-    },
-  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,11 +118,37 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
 
                       SizedBox(height: 24.h),
 
-                      // Seaside Cleaners Section
-                      _buildHorizontalListSection(
-                        'Seaside Cleaners',
-                        _seasideCleaners,
-                      ),
+                      // Dynamic Operator Services
+                      Obx(() {
+                        if (controller.isLoadingServices.value) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (controller.services.isEmpty) {
+                          return const SizedBox();
+                        }
+
+                        // Group services by operator
+                        final Map<String, List<ServiceData>> groupedServices = {};
+                        for (var service in controller.services) {
+                          final operatorName = service.operator?.storeName ?? 'Laundry Service';
+                          if (!groupedServices.containsKey(operatorName)) {
+                            groupedServices[operatorName] = [];
+                          }
+                          groupedServices[operatorName]!.add(service);
+                        }
+
+                        return Column(
+                          children: groupedServices.entries.map((entry) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 24.h),
+                              child: _buildDynamicServicesSection(
+                                entry.key,
+                                entry.value,
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }),
 
                       SizedBox(height: 80.h),
                     ],
@@ -365,7 +373,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             itemBuilder: (context, index) {
               final item = dataList[index];
               return GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.LAUNDRY_DETAILS),
+                onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS), // TODO: pass actual routes?
                 child: Container(
                   width: isLarge ? 300.w : 200.w,
                   margin: EdgeInsets.only(right: 16.w),
@@ -452,6 +460,135 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
       ],
     );
   }
+
+  Widget _buildDynamicServicesSection(
+    String title,
+    List<ServiceData> dataList, {
+    bool isLarge = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.manrope(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.black87),
+            ],
+          ),
+        ),
+        SizedBox(height: 16.h),
+        SizedBox(
+          height: isLarge ? 280.h : 230.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: dataList.length,
+            itemBuilder: (context, index) {
+              final item = dataList[index];
+              return GestureDetector(
+                onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS, arguments: {'serviceId': item.id}),
+                child: Container(
+                  width: isLarge ? 300.w : 200.w,
+                  margin: EdgeInsets.only(right: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image Container
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Container(
+                          height: isLarge ? 170.h : 140.h,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: item.image != null
+                              ? Image.network(
+                                  item.image!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Icon(
+                                    Icons.image_outlined,
+                                    size: 40.sp,
+                                    color: Colors.grey[400],
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.image_outlined,
+                                  size: 40.sp,
+                                  color: Colors.grey[400],
+                                ),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+
+                      // Availability & Favorite
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            item.category?.name ?? 'Service',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Icon(
+                            Icons.favorite_border,
+                            size: 18.sp,
+                            color: Colors.black45,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+
+                      // Title
+                      Text(
+                        item.name ?? 'Service Name',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+
+                      // Rating & Distance/Time
+                      Row(
+                        children: [
+                          Icon(Icons.star, size: 14.sp, color: Colors.black87),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '4.7 (1.2k+) . 3.0 mi. 45 min', // Static as requested
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
 
   /// We removed _buildMobileCleanersSection as it was unused and replaced.
 }

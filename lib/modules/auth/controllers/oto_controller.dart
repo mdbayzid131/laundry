@@ -9,7 +9,8 @@ import 'package:laundry/core/utils/helpers.dart';
 class OtpController extends GetxController {
   final AuthService _authService = Get.find();
   final otpController = TextEditingController();
-  final String email = Get.arguments ?? '';
+  late final String email;
+  late final bool isForgotPassword;
   final isLoading = false.obs;
 
   Timer? _timer;
@@ -19,6 +20,13 @@ class OtpController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    if (Get.arguments is Map) {
+      email = Get.arguments['email'] ?? '';
+      isForgotPassword = Get.arguments['isForgotPassword'] == true;
+    } else {
+      email = Get.arguments ?? '';
+      isForgotPassword = false;
+    }
     startTimer();
   }
 
@@ -54,12 +62,20 @@ class OtpController extends GetxController {
       var response = await _authService.verifyOtp(
         email: email,
         otp: int.parse(otpController.text),
+        isForgotPassword: isForgotPassword,
       );
       ApiChecker.checkWriteApi(response);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Helpers.showCustomSnackBar('Verification successful', isError: false);
-        _authService.handleAuthResponse(response);
-        Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
+        
+        if (isForgotPassword) {
+          final resetToken = response.data['data']['resetToken'];
+          // Ensure we have AppRoutes imported if we use SET_NEW_PASSWORD.
+          Get.toNamed(AppRoutes.SET_NEW_PASSWORD, arguments: {'resetToken': resetToken, 'email': email});
+        } else {
+          _authService.handleAuthResponse(response);
+          Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
+        }
       }
     } catch (e) {
       Helpers.showDebugLog(e.toString());
@@ -71,7 +87,13 @@ class OtpController extends GetxController {
   Future<void> resendOtp() async {
     try {
       isLoading.value = true;
-      await _authService.resendOtp(email);
+      
+      if (isForgotPassword) {
+        await _authService.forgotPassword(email);
+      } else {
+        await _authService.resendOtp(email);
+      }
+      
       Helpers.showCustomSnackBar('OTP resent successfully', isError: false);
       startTimer();
     } catch (e) {
