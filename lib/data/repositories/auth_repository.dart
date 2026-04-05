@@ -34,16 +34,14 @@ class AuthRepo {
     required String email,
     required String password,
     required String phone,
-    required String country,
-    String role = "PARENT",
+    required String address,
   }) async {
     return await apiClient.postData(ApiConstants.signup, {
       "name": name,
       "email": email,
       "password": password,
       "phone": phone,
-      "country": country,
-      "role": role,
+      "address": address,
     });
   }
 
@@ -77,7 +75,7 @@ class AuthRepo {
     required String email,
     required int oneTimeCode,
   }) async {
-    return await apiClient.postData(ApiConstants.verifyEmail, {
+    return await apiClient.postData(ApiConstants.verifyUser, {
       "email": email,
       "oneTimeCode": oneTimeCode,
     });

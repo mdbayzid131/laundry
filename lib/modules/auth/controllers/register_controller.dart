@@ -12,7 +12,7 @@ class RegisterController extends GetxController {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
-  final countryController = TextEditingController();
+  final addressController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   final isLoading = false.obs;
@@ -22,6 +22,8 @@ class RegisterController extends GetxController {
   @override
   void onClose() {
     nameController.dispose();
+    addressController.dispose();
+    phoneController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -42,24 +44,24 @@ class RegisterController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _authService.signup(
+      final response = await _authService.signup(
         name: nameController.text,
         email: emailController.text,
         password: passwordController.text,
         phone: phoneController.text,
-        country: countryController.text,
+        address: addressController.text,
       );
+      if (response.statusCode == 201) {
+        Helpers.showCustomSnackBar('Registration successful', isError: false);
+        Get.offAllNamed(AppRoutes.OTP_FORM_REGISTER, arguments: {
+          'email': emailController.text,
+          'isRegister': true,
+        });
 
-      Helpers.showCustomSnackBar(
-        'Registration successful',
 
-      );
-      Get.offAllNamed(AppRoutes.LOGIN);
+      }
     } catch (e) {
-      Helpers.showCustomSnackBar(
-        e.toString(),
-
-      );
+      Helpers.showDebugLog(e.toString());
     } finally {
       isLoading.value = false;
     }

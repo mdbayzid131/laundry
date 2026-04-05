@@ -10,7 +10,8 @@ import '../controllers/register_controller.dart';
 import '../../../config/themes/app_theme.dart';
 
 class RegisterView extends GetView<RegisterController> {
-  const RegisterView({super.key});
+ RegisterView({super.key});
+  final RegisterController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {

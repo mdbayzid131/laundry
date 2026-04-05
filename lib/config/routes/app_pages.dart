@@ -77,6 +77,7 @@ class AppRoutes {
   static const String NO_INTERNET = '/no-internet';
   static const String ONBOARDING = '/onboarding';
   static const String OTP = '/otp';
+  static const String OTP_FORM_REGISTER = '/otp-form-register';
   static const String SET_NEW_PASSWORD = '/set-new-password';
   static const String HELP_SUPPORT = '/help-support';
   static const String CONTACT_SUPPORT = '/contact-support';
@@ -114,7 +115,7 @@ final pages = [
   ),
   GetPage(
     name: AppRoutes.REGISTER,
-    page: () => const RegisterView(),
+    page: () => RegisterView(),
     binding: AuthBinding(),
   ),
   GetPage(
@@ -170,6 +171,11 @@ final pages = [
   ),
   GetPage(
     name: AppRoutes.OTP,
+    page: () => const OtpVerifyScreen(),
+    binding: AuthBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.OTP_FORM_REGISTER,
     page: () => const OtpVerifyScreen(),
     binding: AuthBinding(),
   ),

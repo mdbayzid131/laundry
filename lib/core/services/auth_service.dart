@@ -39,7 +39,7 @@ class AuthService extends GetxService {
     required String email,
     required String password,
     required String phone,
-    required String country,
+    required String address,
   }) async {
     try {
       final response = await _authRepo.signup(
@@ -47,7 +47,7 @@ class AuthService extends GetxService {
         email: email,
         password: password,
         phone: phone,
-        country: country,
+        address: address,
       );
       return response;
     } catch (e) {
