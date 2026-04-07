@@ -21,13 +21,15 @@ class ProfileController extends GetxController {
     });
   }
 
-  Future<void> getProfile({bool showDialog = true}) async {
+  Future<void> getProfile({bool showDialog = false}) async {
     isLoading.value = true;
     try {
       if (showDialog) Helpers.showLoadingDialog();
       final response = await _userRepository.getProfile();
       if (response.statusCode == 200) {
-        final profileResponse = UserProfileResponseModel.fromJson(response.data);
+        final profileResponse = UserProfileResponseModel.fromJson(
+          response.data,
+        );
         userData.value = profileResponse.data;
       }
     } catch (e) {

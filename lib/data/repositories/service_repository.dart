@@ -6,11 +6,28 @@ import '../../config/constants/api_constants.dart';
 class ServiceRepository {
   final ApiClient _apiClient = Get.find();
 
-  Future<Response> getServices() async {
-    return await _apiClient.getData(ApiConstants.service);
+  Future<Response> getStoreServiceDetails(String storeServiceId) async {
+    return await _apiClient.getData(ApiConstants.getStoreServiceDetails.replaceAll(':storeServiceId', storeServiceId));
   }
 
-  Future<Response> getServiceDetails(String id) async {
-    return await _apiClient.getData('${ApiConstants.service}/$id');
+  Future<Response> getStoreServices(
+    double lat,
+    double lng,
+    String categoryId,
+    String searchTerm, {
+    int page = 1,
+    int limit = 10,
+  }) async {
+    return await _apiClient.getData(
+      ApiConstants.getStoreService,
+      query: {
+        'userLat': lat,
+        'userLng': lng,
+        'categoryId': categoryId,
+        'searchTerm': searchTerm,
+        'page': page,
+        'limit': limit,
+      },
+    );
   }
 }

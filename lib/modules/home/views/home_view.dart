@@ -7,7 +7,9 @@ import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
-import 'package:laundry/data/models/services_model.dart';
+import 'package:laundry/data/models/storage_services_model.dart';
+import 'package:laundry/data/models/category_model.dart';
+import 'package:shimmer/shimmer.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
   const LaundryHomeScreen({super.key});
@@ -59,8 +61,6 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     },
   ];
 
-
-
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
@@ -83,7 +83,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             // Scrollable Content
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () => controller.loadInitialData(showDialog: false),
+                onRefresh: () => controller.loadInitialData(),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
@@ -121,20 +121,22 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       // Dynamic Operator Services
                       Obx(() {
                         if (controller.isLoadingServices.value) {
-                          return const Center(child: CircularProgressIndicator());
+                          return _buildServiceShimmer();
                         }
                         if (controller.services.isEmpty) {
                           return const SizedBox();
                         }
 
                         // Group services by operator
-                        final Map<String, List<ServiceData>> groupedServices = {};
+                        final Map<String, List<StoreServiceData>>
+                        groupedServices = {};
                         for (var service in controller.services) {
-                          final operatorName = service.operator?.storeName ?? 'Laundry Service';
-                          if (!groupedServices.containsKey(operatorName)) {
-                            groupedServices[operatorName] = [];
+                          final storeName =
+                              service.store?.name ?? 'Nearest Store';
+                          if (!groupedServices.containsKey(storeName)) {
+                            groupedServices[storeName] = [];
                           }
-                          groupedServices[operatorName]!.add(service);
+                          groupedServices[storeName]!.add(service);
                         }
 
                         return Column(
@@ -206,22 +208,42 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   }
 
   Widget _buildAddressBar() {
+    final HomeController controller = Get.find<HomeController>();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
         children: [
           Icon(Icons.location_on, color: Colors.black87, size: 24.sp),
           SizedBox(width: 8.w),
-          Text(
-            '11465 Woodside Avenue',
-            style: GoogleFonts.manrope(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
+          Obx(
+            () => Expanded(
+              child: GestureDetector(
+                onTap: () => _showLocationSelectionBottomSheet(context),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        controller.currentAddress.value,
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 24.sp,
+                      color: Colors.black87,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          SizedBox(width: 4.w),
-          Icon(Icons.keyboard_arrow_down, size: 24.sp, color: Colors.black87),
           const Spacer(),
           _buildIconButton(
             Icons.favorite,
@@ -259,6 +281,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   }
 
   Widget _buildSearchBar() {
+    final HomeController controller = Get.find<HomeController>();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Container(
@@ -271,11 +294,23 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
           children: [
             Icon(Icons.search, color: const Color(0xffB8B8B8), size: 24.sp),
             SizedBox(width: 8.w),
-            Text(
-              'Search LaundryLink....',
-              style: GoogleFonts.manrope(
-                fontSize: 14.sp,
-                color: const Color(0xffB8B8B8),
+            Expanded(
+              child: TextField(
+                onChanged: (value) => controller.onSearch(value),
+                decoration: InputDecoration(
+                  hintText: 'Search LaundryLink....',
+                  hintStyle: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    color: const Color(0xffB8B8B8),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                ),
+                style: GoogleFonts.manrope(
+                  fontSize: 14.sp,
+                  color: Colors.black87,
+                ),
               ),
             ),
           ],
@@ -288,7 +323,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     final HomeController controller = Get.find<HomeController>();
     return Obx(() {
       if (controller.isLoadingCategories.value) {
-        return SizedBox(height: 65.h);
+        return _buildCategoryShimmer();
       }
       if (controller.categories.isEmpty) {
         return const SizedBox();
@@ -298,45 +333,259 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         child: Row(
           children: controller.categories
-              .map((category) => _buildCategoryButton(category.name ?? ''))
+              .map((category) => _buildCategoryButton(category))
               .toList(),
         ),
       );
     });
   }
 
-  Widget _buildCategoryButton(String title) {
-    return GestureDetector(
-      onTap: () {
-        // TODO: Navigate to new page
-      },
-      child: Container(
-        margin: EdgeInsets.only(right: 12.w),
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppTheme.primaryColor),
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+  Widget _buildCategoryShimmer() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Row(
+        children: List.generate(
+          5,
+          (index) => Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              margin: EdgeInsets.only(right: 12.w),
+              width: 100.w,
+              height: 48.h,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
             ),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          title,
-          style: GoogleFonts.manrope(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
           ),
         ),
       ),
     );
   }
+
+  Widget _buildServiceShimmer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(width: 150.w, height: 24.h, color: Colors.white),
+          ),
+        ),
+        SizedBox(height: 16.h),
+        SizedBox(
+          height: 230.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: 3,
+            itemBuilder: (context, index) {
+              return Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 200.w,
+                  margin: EdgeInsets.only(right: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 140.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Container(
+                        width: 100.w,
+                        height: 12.h,
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 8.h),
+                      Container(
+                        width: 150.w,
+                        height: 16.h,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryButton(CategoryData category) {
+    final HomeController controller = Get.find<HomeController>();
+    return Obx(() {
+      final isSelected = controller.selectedCategoryId.value == category.id;
+      return GestureDetector(
+        onTap: () => controller.onCategorySelected(category.id ?? ''),
+        child: Container(
+          margin: EdgeInsets.only(right: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.primaryColor : Colors.white,
+            border: Border.all(
+              color: isSelected ? Colors.transparent : AppTheme.primaryColor,
+            ),
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            category.name ?? '',
+            style: GoogleFonts.manrope(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w700,
+              color: isSelected ? Colors.white : Colors.black87,
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  void _showLocationSelectionBottomSheet(BuildContext context) {
+    final HomeController controller = Get.find<HomeController>();
+    Get.bottomSheet(
+      Obx(() => Container(
+            padding: EdgeInsets.all(20.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 50.w,
+                    height: 5.h,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Text(
+                  'Select Location',
+                  style: GoogleFonts.manrope(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                
+                // Current Location Option
+                RadioListTile<LocationSelectionType>(
+                  value: LocationSelectionType.current,
+                  groupValue: controller.locationType.value,
+                  onChanged: (val) {
+                    controller.getCurrentLocation();
+                  },
+                  activeColor: AppTheme.primaryColor,
+                  contentPadding: EdgeInsets.zero,
+                  title: Row(
+                    children: [
+                      Icon(Icons.my_location, color: AppTheme.primaryColor, size: 20.sp),
+
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Current Location',
+                        style: GoogleFonts.manrope(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                  subtitle: Padding(
+                    padding: EdgeInsets.only(left: 32.w),
+                    child: Text('Use GPS for accurate location'),
+                  ),
+                ),
+                
+                Divider(height: 32.h),
+
+                // Manual Selection Option
+                RadioListTile<LocationSelectionType>(
+                  value: LocationSelectionType.manual,
+                  groupValue: controller.locationType.value,
+                  onChanged: (val) {
+                    Get.back(); // Close bottom sheet
+                    Get.toNamed(AppRoutes.MAP);
+                  },
+                  activeColor: AppTheme.primaryColor,
+                  contentPadding: EdgeInsets.zero,
+                  title: Row(
+                    children: [
+                      Icon(Icons.map, color: Colors.black54, size: 20.sp),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Choose from Map',
+                        style: GoogleFonts.manrope(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                  subtitle: Padding(
+                    padding: EdgeInsets.only(left: 32.w),
+                    child: Text('Select manually from map'),
+                  ),
+                ),
+                
+                SizedBox(height: 20.h),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      padding: EdgeInsets.all(16.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                    ),
+                    child: Text(
+                      'Confirm',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+              ],
+            ),
+          )),
+    );
+  }
+
+
 
   Widget _buildHorizontalListSection(
     String title,
@@ -373,7 +622,9 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             itemBuilder: (context, index) {
               final item = dataList[index];
               return GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS), // TODO: pass actual routes?
+                onTap: () => Get.toNamed(
+                  AppRoutes.PRODUCT_DETAILS,
+                ), // TODO: pass actual routes?
                 child: Container(
                   width: isLarge ? 300.w : 200.w,
                   margin: EdgeInsets.only(right: 16.w),
@@ -463,7 +714,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
 
   Widget _buildDynamicServicesSection(
     String title,
-    List<ServiceData> dataList, {
+    List<StoreServiceData> dataList, {
     bool isLarge = false,
   }) {
     return Column(
@@ -488,7 +739,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: isLarge ? 280.h : 230.h,
+          height: isLarge ? 320.h : 280.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -496,7 +747,10 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             itemBuilder: (context, index) {
               final item = dataList[index];
               return GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS, arguments: {'serviceId': item.id}),
+                onTap: () => Get.toNamed(
+                  AppRoutes.PRODUCT_DETAILS,
+                  arguments: {'serviceId': item.id},
+                ),
                 child: Container(
                   width: isLarge ? 300.w : 200.w,
                   margin: EdgeInsets.only(right: 16.w),
@@ -510,9 +764,9 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                           height: isLarge ? 170.h : 140.h,
                           width: double.infinity,
                           color: Colors.grey[200],
-                          child: item.image != null
+                          child: item.service?.image != null
                               ? Image.network(
-                                  item.image!,
+                                  item.service!.image!,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Icon(
                                     Icons.image_outlined,
@@ -529,51 +783,73 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       ),
                       SizedBox(height: 12.h),
 
-                      // Availability & Favorite
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            item.category?.name ?? 'Service',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black54,
+                          Expanded(
+                            child: Text(
+                              item.service?.name ?? 'Service Name',
+                              style: GoogleFonts.manrope(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Icon(
                             Icons.favorite_border,
-                            size: 18.sp,
+                            size: 24.sp,
                             color: Colors.black45,
                           ),
                         ],
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 8.h),
 
-                      // Title
-                      Text(
-                        item.name ?? 'Service Name',
-                        style: GoogleFonts.manrope(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Rating & Distance/Time
+                      // Rating, Distance, Time
                       Row(
                         children: [
-                          Icon(Icons.star, size: 14.sp, color: Colors.black87),
+                          Icon(Icons.star, size: 16.sp, color: Colors.black),
                           SizedBox(width: 4.w),
+                          Flexible(
+                            child: Text(
+                              "4.6 (5k+) . ${item.distanceMile?.toStringAsFixed(1) ?? '2.2'} mi. 30 min",
+                              style: GoogleFonts.manrope(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+
+                      // Price & Delivery Fee
+                      Row(
+                        children: [
                           Text(
-                            '4.7 (1.2k+) . 3.0 mi. 45 min', // Static as requested
+                            "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '12.14'}/lb",
                             style: GoogleFonts.manrope(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Flexible(
+                            child: Text(
+                              "delivery fee on .\$4.99",
+                              style: GoogleFonts.manrope(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -588,7 +864,6 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
       ],
     );
   }
-
 
   /// We removed _buildMobileCleanersSection as it was unused and replaced.
 }

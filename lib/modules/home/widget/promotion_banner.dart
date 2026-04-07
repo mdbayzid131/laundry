@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
 import 'package:laundry/data/models/banner_model.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'package:laundry/core/utils/gradient_parser.dart';
 
@@ -28,7 +29,7 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
     return Obx(() {
       if (_homeController.isLoadingBanners.value &&
           _homeController.banners.isEmpty) {
-        return SizedBox(height: 180.h);
+        return _buildShimmerLoading();
       }
 
       if (_homeController.banners.isEmpty) {
@@ -200,6 +201,21 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: 180.h,
+        margin: EdgeInsets.symmetric(horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+      ),
     );
   }
 }

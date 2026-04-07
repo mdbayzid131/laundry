@@ -21,14 +21,15 @@ class ProductDetailsController extends GetxController {
     super.onInit();
     final args = Get.arguments;
     if (args != null && args['serviceId'] != null) {
-      getServiceDetails(args['serviceId']);
+      getServiceDetails();
     }
   }
 
-  Future<void> getServiceDetails(String id) async {
+  Future<void> getServiceDetails() async {
+    String storeServiceId = Get.arguments['serviceId'];
     isLoading.value = true;
     try {
-      final response = await _serviceRepository.getServiceDetails(id);
+      final response = await _serviceRepository.getStoreServiceDetails(storeServiceId);
       if (response.statusCode == 200) {
         final detailsResponse = ServiceDetailsResponseModel.fromJson(response.data);
         serviceDetails.value = detailsResponse.data;

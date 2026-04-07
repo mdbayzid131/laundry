@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:laundry/config/themes/app_theme.dart';
+import 'package:get/get.dart';
+import 'package:laundry/modules/home/controllers/home_controller.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -16,8 +18,8 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> markers = {};
   VendorModel? selectedVendor;
 
-  // Portland coordinates
   static const LatLng _center = LatLng(45.5152, -122.6784);
+  LatLng _currentCameraPosition = _center;
 
   // Sample vendor data
   final List<VendorModel> vendors = [
@@ -88,9 +90,6 @@ class _MapScreenState extends State<MapScreen> {
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueBlue.sign,
           ),
-          // icon: await CustomMapMarker.createCustomMarker(
-          //   size: 80,
-          // ), // Matching primaryColor (0xFFA6D4E9)
         ),
       );
     }
@@ -114,7 +113,6 @@ class _MapScreenState extends State<MapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag Handle
             Center(
               child: Container(
                 width: 40.w,
@@ -126,11 +124,8 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
             SizedBox(height: 20.h),
-
-            // Operator Card (Photo and Logo)
             Row(
               children: [
-                // Vendor Photo
                 Container(
                   width: 60.w,
                   height: 60.w,
@@ -143,29 +138,19 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
                 SizedBox(width: 12.w),
-                // Vendor Name & Logo
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              vendor.name,
-                              style: GoogleFonts.manrope(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ),
-
-                          // Logo
-                        ],
+                      Text(
+                        vendor.name,
+                        style: GoogleFonts.manrope(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
                       ),
                       SizedBox(height: 4.h),
-                      // Rating & Reviews
                       Row(
                         children: [
                           Icon(Icons.star, color: Colors.amber, size: 16.sp),
@@ -195,29 +180,19 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
             SizedBox(height: 16.h),
-
-            // Delivery Info
             Row(
               children: [
-                _buildInfoChip(
-                  icon: Icons.access_time,
-                  label: vendor.deliveryTime,
-                ),
+                _buildInfoChip(icon: Icons.access_time, label: vendor.deliveryTime),
                 SizedBox(width: 12.w),
                 _buildInfoChip(icon: Icons.location_on, label: vendor.distance),
               ],
             ),
             SizedBox(height: 24.h),
-
-            // Action Buttons
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // Navigate to vendor details
-                    },
+                    onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       side: BorderSide(color: AppTheme.primaryColor),
@@ -225,39 +200,21 @@ class _MapScreenState extends State<MapScreen> {
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
-                    child: Text(
-                      'View Details',
-                      style: GoogleFonts.manrope(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primaryColor,
-                      ),
-                    ),
+                    child: Text('View Details', style: GoogleFonts.manrope(fontWeight: FontWeight.w600, color: AppTheme.primaryColor)),
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // Select vendor
-                    },
+                    onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
                       backgroundColor: AppTheme.primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
-                    child: Text(
-                      'Select',
-                      style: GoogleFonts.manrope(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: Text('Select', style: GoogleFonts.manrope(fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
                 ),
               ],
@@ -272,23 +229,13 @@ class _MapScreenState extends State<MapScreen> {
   Widget _buildInfoChip({required IconData icon, required String label}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
+      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(8.r)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16.sp, color: Colors.black54),
           SizedBox(width: 6.w),
-          Text(
-            label,
-            style: GoogleFonts.manrope(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
+          Text(label, style: GoogleFonts.manrope(fontSize: 13.sp, fontWeight: FontWeight.w500, color: Colors.black87)),
         ],
       ),
     );
@@ -299,7 +246,6 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Google Map
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(target: _center, zoom: 13.0),
@@ -308,131 +254,58 @@ class _MapScreenState extends State<MapScreen> {
             myLocationButtonEnabled: false,
             zoomControlsEnabled: false,
             mapToolbarEnabled: false,
+            onCameraMove: (p) => _currentCameraPosition = p.target,
           ),
-
-          // Top Search Bar
+          IgnorePointer(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: Icon(Icons.location_on, color: AppTheme.primaryColor, size: 40.sp),
+              ),
+            ),
+          ),
           SafeArea(
             child: Padding(
               padding: EdgeInsets.all(16.w),
               child: Row(
                 children: [
-                  // Back Button
-                  Container(
-                    width: 44.w,
-                    height: 44.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8.r,
-                          offset: Offset(0, 2.h),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: Icon(Icons.arrow_back, size: 20.sp),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-
-                  // Search Field
-                  Expanded(
-                    child: Container(
-                      height: 44.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(22.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8.r,
-                            offset: Offset(0, 2.h),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search LaundryLink...',
-                          hintStyle: GoogleFonts.manrope(
-                            fontSize: 14.sp,
-                            color: Colors.grey[400],
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            size: 20.sp,
-                            color: Colors.grey[400],
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 12.h,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-
-                  // Layers Button
-                  Container(
-                    width: 44.w,
-                    height: 44.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 8.r,
-                          offset: Offset(0, 2.h),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: Icon(Icons.layers, size: 20.sp),
-                      onPressed: () {},
-                      padding: EdgeInsets.zero,
-                    ),
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: IconButton(icon: Icon(Icons.arrow_back, color: Colors.black), onPressed: () => Get.back()),
                   ),
                 ],
               ),
             ),
           ),
-
-          // Bottom Navigation Bar
-
-          // My Location Button
           Positioned(
             bottom: 100.h,
             right: 16.w,
-            child: Container(
-              width: 48.w,
-              height: 48.w,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8.r,
-                    offset: Offset(0, 2.h),
-                  ),
-                ],
+            child: FloatingActionButton(
+              backgroundColor: Colors.white,
+              onPressed: () => mapController.animateCamera(CameraUpdate.newLatLng(_center)),
+              child: Icon(Icons.my_location, color: AppTheme.primaryColor),
+            ),
+          ),
+          Positioned(
+            bottom: 24.h,
+            left: 16.w,
+            right: 16.w,
+            child: ElevatedButton(
+              onPressed: () {
+                final HomeController hc = Get.find<HomeController>();
+                hc.updateLocation(
+                  _currentCameraPosition.latitude,
+                  _currentCameraPosition.longitude,
+                  "Selected Location (${_currentCameraPosition.latitude.toStringAsFixed(2)}, ${_currentCameraPosition.longitude.toStringAsFixed(2)})",
+                );
+                Get.back();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                padding: EdgeInsets.all(16.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
               ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.my_location,
-                  size: 22.sp,
-                  color: const Color(0xFF4A90E2),
-                ),
-                onPressed: () {
-                  mapController.animateCamera(CameraUpdate.newLatLng(_center));
-                },
-              ),
+              child: Text('Select this location', style: GoogleFonts.manrope(fontSize: 16.sp, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
         ],
@@ -441,27 +314,10 @@ class _MapScreenState extends State<MapScreen> {
   }
 }
 
-// Vendor Model
 class VendorModel {
-  final String id;
-  final String name;
+  final String id, name, deliveryTime, distance, logoUrl, photoUrl;
   final LatLng location;
   final double rating;
   final int reviews;
-  final String deliveryTime;
-  final String distance;
-  final String logoUrl;
-  final String photoUrl;
-
-  VendorModel({
-    required this.id,
-    required this.name,
-    required this.location,
-    required this.rating,
-    required this.reviews,
-    required this.deliveryTime,
-    required this.distance,
-    required this.logoUrl,
-    required this.photoUrl,
-  });
+  VendorModel({required this.id, required this.name, required this.location, required this.rating, required this.reviews, required this.deliveryTime, required this.distance, required this.logoUrl, required this.photoUrl});
 }

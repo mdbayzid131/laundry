@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/banner_model.dart';
 import 'package:laundry/data/models/category_model.dart';
-import 'package:laundry/data/models/services_model.dart';
+import 'package:laundry/data/models/storage_services_model.dart';
 import 'package:laundry/data/repositories/category_repository.dart';
 import 'package:laundry/data/repositories/banner_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
+import 'package:geolocator/geolocator.dart';
+
+enum LocationSelectionType { current, manual }
 
 class HomeController extends GetxController {
   final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
@@ -20,26 +23,31 @@ class HomeController extends GetxController {
   RxList<BannerData> banners = <BannerData>[].obs;
 
   RxBool isLoadingServices = false.obs;
-  RxList<ServiceData> services = <ServiceData>[].obs;
+  RxList<StoreServiceData> services = <StoreServiceData>[].obs;
+
+  // New Variables for Location & Search
+  RxDouble lat = 0.0.obs;
+  RxDouble lng = 0.0.obs;
+  RxString selectedCategoryId = ''.obs;
+  RxString searchTerm = ''.obs;
+  RxString currentAddress = 'Select Location'.obs;
+  final locationType = LocationSelectionType.current.obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Wait for first frame to avoid "visitChildElements called during build" error
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Wait for first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await getCurrentLocation();
       loadInitialData();
     });
   }
 
-  Future<void> loadInitialData({bool showDialog = true}) async {
+  Future<void> loadInitialData() async {
     try {
-      if (showDialog) Helpers.showLoadingDialog();
-      // Run both parallelly
-      await Future.wait([getCategories(), getBanners(), getServices()]);
+      await Future.wait([getCategories(), getBanners(), getStoreServices()]);
     } catch (e) {
       Helpers.showDebugLog('Error loading initial data: $e');
-    } finally {
-      if (showDialog) Helpers.hideLoadingDialog();
     }
   }
 
@@ -48,9 +56,7 @@ class HomeController extends GetxController {
     try {
       final response = await _categoryRepository.getCategories();
       if (response.statusCode == 200) {
-        final categoryResponse = CategoriesResponseModel.fromJson(
-          response.data,
-        );
+        final categoryResponse = CategoriesResponseModel.fromJson(response.data);
         categories.value = categoryResponse.data ?? [];
       }
     } catch (e) {
@@ -75,12 +81,17 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> getServices() async {
+  Future<void> getStoreServices() async {
     isLoadingServices.value = true;
     try {
-      final response = await _serviceRepository.getServices();
+      final response = await _serviceRepository.getStoreServices(
+        lat.value,
+        lng.value,
+        selectedCategoryId.value,
+        searchTerm.value,
+      );
       if (response.statusCode == 200) {
-        final servicesResponse = ServicesResponseModel.fromJson(response.data);
+        final servicesResponse = StoreServiceResponseModel.fromJson(response.data);
         services.value = servicesResponse.data ?? [];
       }
     } catch (e) {
@@ -88,5 +99,63 @@ class HomeController extends GetxController {
     } finally {
       isLoadingServices.value = false;
     }
+  }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Helpers.showCustomSnackBar('Location services are disabled.', isError: true);
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Helpers.showCustomSnackBar('Location permissions are denied', isError: true);
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Helpers.showCustomSnackBar(
+          'Location permissions are permanently denied.',
+          isError: true,
+        );
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+      lat.value = position.latitude;
+      lng.value = position.longitude;
+      locationType.value = LocationSelectionType.current;
+      currentAddress.value = "Current Location";
+      loadInitialData();
+    } catch (e) {
+      Helpers.showDebugLog('Error getting location: $e');
+    }
+  }
+
+  void onSearch(String value) {
+    searchTerm.value = value;
+    getStoreServices();
+  }
+
+  void onCategorySelected(String categoryId) {
+    if (selectedCategoryId.value == categoryId) {
+      selectedCategoryId.value = '';
+    } else {
+      selectedCategoryId.value = categoryId;
+    }
+    getStoreServices();
+  }
+
+  void updateLocation(double newLat, double newLng, String newAddress) {
+    lat.value = newLat;
+    lng.value = newLng;
+    currentAddress.value = newAddress;
+    locationType.value = LocationSelectionType.manual;
+    loadInitialData();
   }
 }
