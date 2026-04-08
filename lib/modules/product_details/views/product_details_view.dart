@@ -15,46 +15,95 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildProductImageCard(),
-                    SizedBox(height: 20.h),
-                    _buildTitleAndRating(),
-                    SizedBox(height: 8.h),
-                    _buildPriceHeader(),
-                    SizedBox(height: 24.h),
-                    _buildVendorSection(),
-                    SizedBox(height: 24.h),
-                    _buildServiceHeader('Service'),
-                    _buildPrimaryServiceCard(),
-                    SizedBox(height: 24.h),
-                    _buildServiceHeader('Add-on Services'),
-                    _buildAddonServicesList(),
-                    SizedBox(height: 24.h),
-                    _buildSpecialInstructions(),
-                    SizedBox(height: 32.h),
-                    _buildQuantitySection(),
-                    SizedBox(height: 24.h),
-                    _buildPricingBreakdown(),
-                    SizedBox(height: 32.h),
-                    _buildRelatedServices(),
-                    SizedBox(height: 32.h),
-                    _buildCustomerReviews(),
-                    SizedBox(height: 100.h), // Bottom padding for sticky bar
-                  ],
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xffB5DEEF)),
+            );
+          }
+
+          if (controller.serviceDetails.value == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Failed to load service details'),
+                  SizedBox(height: 16.h),
+                  ElevatedButton(
+                    onPressed: () => controller.getServiceDetails(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              _buildTopBar(),
+              Expanded(
+                child: RefreshIndicator(
+                  color: const Color(0xffB5DEEF),
+                  onRefresh: () => controller.getServiceDetails(),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildProductImageCard(),
+                        SizedBox(height: 20.h),
+                        _buildTitleAndRating(),
+                        SizedBox(height: 8.h),
+                        _buildPriceHeader(),
+                        SizedBox(height: 24.h),
+                        _buildVendorSection(),
+                        SizedBox(height: 24.h),
+                        _buildServiceHeader('Service'),
+                        _buildPrimaryServiceCard(),
+
+                        // Add-on Services Section
+                        if (controller
+                                .serviceDetails
+                                .value
+                                ?.service
+                                ?.serviceAddons
+                                ?.isNotEmpty ??
+                            false) ...[
+                          SizedBox(height: 24.h),
+                          _buildServiceHeader('Add-on Services'),
+                          _buildAddonServicesList(),
+                        ],
+
+                        SizedBox(height: 24.h),
+                        _buildSpecialInstructions(),
+                        SizedBox(height: 32.h),
+                        _buildQuantitySection(),
+                        SizedBox(height: 24.h),
+                        _buildPricingBreakdown(),
+                        SizedBox(height: 32.h),
+                        _buildRelatedServices(),
+
+                        // Customer Reviews Section
+                        if (controller.serviceDetails.value?.reviews?.isNotEmpty ??
+                            false) ...[
+                          SizedBox(height: 32.h),
+                          _buildCustomerReviews(),
+                        ],
+
+                        SizedBox(
+                          height: 100.h,
+                        ), // Bottom padding for sticky bar
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
       ),
       bottomSheet: _buildStickyBottomBar(),
     );
@@ -92,9 +141,14 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
         child: Padding(
           padding: EdgeInsets.all(20.w),
           child: Obx(() {
-            final image = controller.serviceDetails.value?.image;
+            final image = controller.serviceDetails.value?.service?.image;
             if (image != null && image.isNotEmpty) {
-               return Image.network(image, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Image.asset(ImagePaths.shirtPhoto, fit: BoxFit.contain));
+              return Image.network(
+                image,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) =>
+                    Image.asset(ImagePaths.shirtPhoto, fit: BoxFit.contain),
+              );
             }
             return Image.asset(ImagePaths.shirtPhoto, fit: BoxFit.contain);
           }),
@@ -107,14 +161,16 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Obx(() => Text(
-          controller.serviceDetails.value?.name ?? 'Service Details',
-          style: GoogleFonts.manrope(
-            fontSize: 22.sp,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xff1A2530),
+        Obx(
+          () => Text(
+            controller.serviceDetails.value?.service?.name ?? 'Service Details',
+            style: GoogleFonts.manrope(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xff1A2530),
+            ),
           ),
-        )),
+        ),
         SizedBox(height: 8.h),
         Row(
           children: [
@@ -131,12 +187,14 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               ),
             ),
             SizedBox(width: 8.w),
-            Text(
-              '4.8 (127 reviews)',
-              style: GoogleFonts.manrope(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black45,
+            Obx(
+              () => Text(
+                '4.8 (${controller.serviceDetails.value?.count?.reviews ?? 0} reviews)',
+                style: GoogleFonts.manrope(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black45,
+                ),
               ),
             ),
           ],
@@ -174,7 +232,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
 
   Widget _buildVendorSection() {
     return Obx(() {
-      final operator = controller.serviceDetails.value?.operator;
+      final store = controller.serviceDetails.value?.store;
       return Container(
         padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
@@ -186,7 +244,13 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           children: [
             CircleAvatar(
               radius: 20.r,
-              backgroundImage: AssetImage(ImagePaths.op2),
+              backgroundColor: Colors.blue.shade50,
+              backgroundImage: store?.logo != null
+                  ? NetworkImage(store!.logo!)
+                  : null,
+              child: store?.logo == null
+                  ? Text(store?.name?.substring(0, 1) ?? 'V')
+                  : null,
             ),
             SizedBox(width: 12.w),
             Expanded(
@@ -194,7 +258,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    operator?.storeName ?? 'Vendor',
+                    store?.name ?? 'Vendor',
                     style: GoogleFonts.manrope(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w800,
@@ -202,10 +266,12 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                     ),
                   ),
                   Text(
-                    'Available',
+                    store?.isActive == true ? 'Available' : 'Unavailable',
                     style: GoogleFonts.manrope(
                       fontSize: 12.sp,
-                      color: Colors.green,
+                      color: store?.isActive == true
+                          ? Colors.green
+                          : Colors.red,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -239,7 +305,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
 
   Widget _buildPrimaryServiceCard() {
     return Obx(() {
-      final category = controller.serviceDetails.value?.category;
+      final category = controller.serviceDetails.value?.service?.category;
       return Container(
         width: double.infinity,
         padding: EdgeInsets.all(16.w),
@@ -262,7 +328,10 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             SizedBox(height: 4.h),
             Text(
               category?.description ?? 'Premium quality cleaning',
-              style: GoogleFonts.manrope(fontSize: 12.sp, color: Colors.black38),
+              style: GoogleFonts.manrope(
+                fontSize: 12.sp,
+                color: Colors.black38,
+              ),
             ),
           ],
         ),
@@ -272,7 +341,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
 
   Widget _buildAddonServicesList() {
     return Obx(() {
-      final addons = controller.serviceDetails.value?.addons;
+      final addons = controller.serviceDetails.value?.service?.serviceAddons;
       if (addons == null || addons.isEmpty) {
         return const SizedBox();
       }
@@ -323,9 +392,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4.r),
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xffB5DEEF)
-                      : Colors.black12,
+                  color: isSelected ? const Color(0xffB5DEEF) : Colors.black12,
                   width: 2,
                 ),
                 color: isSelected
@@ -654,18 +721,20 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             ),
           ],
         ),
-        _buildReviewItem(
-          'Rahim',
-          'Excellent laundry service - fresh, clean, and perfectly folded.',
-          'Posted 2 days ago',
-          ImagePaths.op6,
-        ),
-        _buildReviewItem(
-          'Sadia',
-          'Excellent laundry service - fresh, clean, and perfectly folded.',
-          'Posted 5 days ago',
-          ImagePaths.op7,
-        ),
+        Obx(() {
+          final reviews = controller.serviceDetails.value?.reviews ?? [];
+          return Column(
+            children: reviews.take(2).map((review) {
+              return _buildReviewItem(
+                'User ${review.userId?.substring(0, 4)}',
+                review.comment ?? '',
+                'Posted ${review.createdAt?.substring(0, 10)}',
+                ImagePaths.op6, // Placeholder avatar
+                review.rating ?? 5,
+              );
+            }).toList(),
+          );
+        }),
         SizedBox(height: 16.h),
         Center(
           child: Row(
@@ -696,6 +765,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     String comment,
     String time,
     String avatar,
+    int rating,
   ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 20.h),
@@ -723,7 +793,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                         5,
                         (index) => Icon(
                           Icons.star_rounded,
-                          color: Colors.black,
+                          color: index < rating ? Colors.black : Colors.black12,
                           size: 14.sp,
                         ),
                       ),
@@ -758,48 +828,31 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
 
   Widget _buildStickyBottomBar() {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.black.withOpacity(0.05))),
       ),
-      child: Row(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Obx(() => Text(
-                'Cart: ${controller.quantity.value} item(s) • \$${controller.totalPrice.toStringAsFixed(2)}',
-                style: GoogleFonts.manrope(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black45,
-                ),
-              )),
-            ],
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xffB5DEEF),
+          minimumSize: Size(double.infinity, 55.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          const Spacer(),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xffB5DEEF),
-              minimumSize: Size(150.w, 50.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Add to Cart',
-              style: GoogleFonts.manrope(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
+          elevation: 4,
+          shadowColor: const Color(0xffB5DEEF).withOpacity(0.4),
+        ),
+        child: Text(
+          'Confirm',
+          style: GoogleFonts.manrope(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
           ),
-        ],
+        ),
       ),
     );
   }

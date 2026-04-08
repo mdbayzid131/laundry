@@ -7,7 +7,7 @@ class ProductDetailsController extends GetxController {
   final ServiceRepository _serviceRepository = Get.find<ServiceRepository>();
 
   RxBool isLoading = false.obs;
-  Rxn<ServiceDetailsData> serviceDetails = Rxn<ServiceDetailsData>();
+  Rxn<StoreServiceDetailsData> serviceDetails = Rxn<StoreServiceDetailsData>();
 
   // Product details state
   final RxDouble basePrice = 0.0.obs;
@@ -26,20 +26,22 @@ class ProductDetailsController extends GetxController {
   }
 
   Future<void> getServiceDetails() async {
+    
     String storeServiceId = Get.arguments['serviceId'];
     isLoading.value = true;
     try {
       final response = await _serviceRepository.getStoreServiceDetails(storeServiceId);
       if (response.statusCode == 200) {
-        final detailsResponse = ServiceDetailsResponseModel.fromJson(response.data);
+        final detailsResponse = StoreServiceDetailsResponseModel.fromJson(response.data);
         serviceDetails.value = detailsResponse.data;
-        basePrice.value = double.tryParse(serviceDetails.value?.basePrice ?? '0') ?? 0.0;
+        basePrice.value = double.tryParse(serviceDetails.value?.service?.basePrice ?? '0') ?? 0.0;
         
         // Initialize Addons
-        if (serviceDetails.value?.addons != null) {
-          for (var addonWrapper in serviceDetails.value!.addons!) {
-            if (addonWrapper.addon?.id != null) {
-              selectedAddons[addonWrapper.addon!.id!] = false;
+        if (serviceDetails.value?.service?.serviceAddons != null) {
+          for (var addonWrapper in serviceDetails.value!.service!.serviceAddons!) {
+            final addonId = addonWrapper.addon?.id;
+            if (addonId != null) {
+              selectedAddons[addonId] = false;
             }
           }
         }
@@ -54,8 +56,8 @@ class ProductDetailsController extends GetxController {
   // Pricing breakdown
   double get totalPrice {
     double total = basePrice.value * quantity.value;
-    if (serviceDetails.value?.addons != null) {
-      for (var addonWrapper in serviceDetails.value!.addons!) {
+    if (serviceDetails.value?.service?.serviceAddons != null) {
+      for (var addonWrapper in serviceDetails.value!.service!.serviceAddons!) {
         final addon = addonWrapper.addon;
         if (addon != null && selectedAddons[addon.id] == true) {
           double addonPrice = double.tryParse(addon.price ?? '0') ?? 0.0;

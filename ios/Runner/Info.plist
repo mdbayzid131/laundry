@@ -8,6 +8,8 @@
 	<string>This app needs access to location to find nearby laundry services.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location to find nearby laundry services.</string>
+	<key>NSFaceIDUsageDescription</key>
+    <string>We use Face ID to protect your account.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

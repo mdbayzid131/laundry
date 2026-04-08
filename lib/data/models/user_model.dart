@@ -35,7 +35,17 @@ class UserData {
   final String? avatar;
   final String? status;
   final bool? isVerified;
-  final List<UserAddress>? userAddresses;
+  final bool? isDeleted;
+  final double? lat;
+  final double? lng;
+  final bool? isTwoFactorEnabled;
+  final List<dynamic>? userSubscriptions;
+  final String? stripeCustomerId;
+  final bool? isSubscribed;
+  final String? internalUserId;
+  final String? createdAt;
+  final String? updatedAt;
+  final List<UserAddress>? addresses;
   final List<dynamic>? orders;
   final List<dynamic>? reviews;
   final CountModel? count;
@@ -49,7 +59,17 @@ class UserData {
     this.avatar,
     this.status,
     this.isVerified,
-    this.userAddresses,
+    this.isDeleted,
+    this.lat,
+    this.lng,
+    this.isTwoFactorEnabled,
+    this.userSubscriptions,
+    this.stripeCustomerId,
+    this.isSubscribed,
+    this.internalUserId,
+    this.createdAt,
+    this.updatedAt,
+    this.addresses,
     this.orders,
     this.reviews,
     this.count,
@@ -65,9 +85,19 @@ class UserData {
       avatar: json['avatar'],
       status: json['status'],
       isVerified: json['isVerified'],
-      userAddresses: json['userAddresses'] != null
+      isDeleted: json['isDeleted'],
+      lat: json['lat'] != null ? double.tryParse(json['lat'].toString()) : null,
+      lng: json['lng'] != null ? double.tryParse(json['lng'].toString()) : null,
+      isTwoFactorEnabled: json['isTwoFactorEnabled'],
+      userSubscriptions: json['userSubscriptions'] ?? [],
+      stripeCustomerId: json['stripeCustomerId'],
+      isSubscribed: json['isSubscribed'],
+      internalUserId: json['userId'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      addresses: json['addresses'] != null
           ? List<UserAddress>.from(
-              json['userAddresses'].map((x) => UserAddress.fromJson(x)),
+              json['addresses'].map((x) => UserAddress.fromJson(x)),
             )
           : [],
       orders: json['orders'] ?? [],
@@ -86,7 +116,17 @@ class UserData {
       'avatar': avatar,
       'status': status,
       'isVerified': isVerified,
-      'userAddresses': userAddresses?.map((x) => x.toJson()).toList(),
+      'isDeleted': isDeleted,
+      'lat': lat,
+      'lng': lng,
+      'isTwoFactorEnabled': isTwoFactorEnabled,
+      'userSubscriptions': userSubscriptions,
+      'stripeCustomerId': stripeCustomerId,
+      'isSubscribed': isSubscribed,
+      'userId': internalUserId,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'addresses': addresses?.map((x) => x.toJson()).toList(),
       'orders': orders,
       'reviews': reviews,
       '_count': count?.toJson(),
@@ -97,7 +137,7 @@ class UserData {
 class UserAddress {
   final String? id;
   final String? userId;
-  final String? address;
+  final String? streetAddress;
   final String? city;
   final String? state;
   final String? country;
@@ -109,7 +149,7 @@ class UserAddress {
   UserAddress({
     this.id,
     this.userId,
-    this.address,
+    this.streetAddress,
     this.city,
     this.state,
     this.country,
@@ -123,7 +163,7 @@ class UserAddress {
     return UserAddress(
       id: json['id'],
       userId: json['userId'],
-      address: json['address'],
+      streetAddress: json['streetAddress'],
       city: json['city'],
       state: json['state'],
       country: json['country'],
@@ -138,7 +178,7 @@ class UserAddress {
     return {
       'id': id,
       'userId': userId,
-      'address': address,
+      'streetAddress': streetAddress,
       'city': city,
       'state': state,
       'country': country,

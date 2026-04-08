@@ -1,5 +1,7 @@
 import 'package:laundry/core/middleware/auth_middleware.dart';
 import 'package:laundry/core/widgets/screens/no_internet_screen.dart';
+import 'package:laundry/modules/auth_lock/binding/lock_binding.dart';
+import 'package:laundry/modules/auth_lock/view/lock_screen.dart';
 import 'package:laundry/modules/bottom_nab_bar/bindings/bottom_nab_bar_binding.dart';
 import 'package:laundry/modules/bottom_nab_bar/views/bottom_nab_bar_view.dart';
 import 'package:get/get.dart';
@@ -45,6 +47,8 @@ import 'package:laundry/modules/laundry_details/views/laundry_details_view.dart'
 import 'package:laundry/modules/laundry_details/bindings/laundry_details_binding.dart';
 import 'package:laundry/modules/product_details/bindings/product_details_binding.dart';
 import 'package:laundry/modules/product_details/views/product_details_view.dart';
+import 'package:laundry/modules/change_password/bindings/change_password_binding.dart';
+import 'package:laundry/modules/change_password/views/change_password_view.dart';
 
 import '../../modules/home/bindings/home_binding.dart';
 import '../../modules/home/views/home_view.dart';
@@ -97,6 +101,8 @@ class AppRoutes {
   static const String PRODUCT_DETAILS = '/product-details';
   static const String MEMBERSHIP = '/membership';
   static const String OTP_FORM_REGISTER = '/otp-form-register';
+  static const String CHANGE_PASSWORD = '/change-password';
+  static const String LOCK = '/lock';
 }
 
 final pages = [
@@ -298,5 +304,16 @@ final pages = [
     name: AppRoutes.OTP_FORM_REGISTER,
     page: () => const OtpVerifyScreen(),
     binding: AuthBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.CHANGE_PASSWORD,
+    page: () => const ChangePasswordView(),
+    binding: ChangePasswordBinding(),
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.LOCK,
+    page: () => const LockScreen(),
+    binding: LockBinding(),
   ),
 ];

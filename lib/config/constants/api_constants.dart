@@ -24,4 +24,9 @@ class ApiConstants {
   // Service Endpoints
   static const String getStoreService = '/storeservice';
   static const String getStoreServiceDetails = '/storeservice/:storeServiceId';
+
+  // Address Endpoints
+  static const String getAddresses = '/address/my-addresses';
+  static const String updateAddress = '/address';
+  static const String setDefaultAddress = '/address/:addressId/set-default';
 }

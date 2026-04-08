@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/routes/app_pages.dart';
+import 'package:laundry/modules/biometric%20login/view/biometric_settings_tile.dart';
 import '../controllers/privacy_security_controller.dart';
 
 class PrivacySecurityView extends GetView<PrivacySecurityController> {
@@ -84,13 +85,10 @@ class PrivacySecurityView extends GetView<PrivacySecurityController> {
                   'Change Password',
                   'Update your account password',
                   hasNext: true,
+                  onTap: () => Get.toNamed(AppRoutes.CHANGE_PASSWORD),
                 ),
                 _buildDivider(),
-                _buildListTile(
-                  Icons.fingerprint,
-                  'Biometric Login',
-                  'Use Face ID or Fingerprint',
-                ),
+                const BiometricSettingsTile(),
               ]),
               SizedBox(height: 24.h),
 

@@ -1,178 +1,37 @@
 {
     "success": true,
-    "message": "Services retrieved successfully",
-    "meta": {
-        "page": 1,
-        "limit": 10,
-        "total": 2,
-        "totalPage": 1
-    },
-    "data": [
-        {
-            "id": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
-            "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-            "categoryId": "0a7e84e3-72bf-43a0-a3c6-a16d00585f04",
-            "name": "Premium Cotton Dry Wash",
-            "basePrice": "19.99",
-            "image": "http://10.10.7.111:5000/image/1308151-1775156304747.jpeg",
-            "isActive": true,
-            "createdAt": "2026-04-02T18:58:24.784Z",
-            "updatedAt": "2026-04-02T18:58:24.784Z",
-            "addons": [
-                {
-                    "id": "c6f2b421-2294-47ec-804d-5d8291b144e6",
-                    "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
-                    "addonId": "aa5803ea-1370-41ce-b828-da49ea61ea3a",
-                    "createdAt": "2026-04-02T18:58:24.784Z",
-                    "updatedAt": "2026-04-02T18:58:24.784Z",
-                    "addon": {
-                        "id": "aa5803ea-1370-41ce-b828-da49ea61ea3a",
-                        "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                        "name": "Urgent Service",
-                        "description": "Urgent Service",
-                        "isActive": true,
-                        "price": "16",
-                        "createdAt": "2026-04-02T18:46:01.155Z",
-                        "updatedAt": "2026-04-02T18:46:01.155Z"
-                    }
-                },
-                {
-                    "id": "741298a6-9057-4919-ac07-44bda112a136",
-                    "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
-                    "addonId": "b0856449-b915-4052-924a-9ba108910878",
-                    "createdAt": "2026-04-02T18:58:24.784Z",
-                    "updatedAt": "2026-04-02T18:58:24.784Z",
-                    "addon": {
-                        "id": "b0856449-b915-4052-924a-9ba108910878",
-                        "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                        "name": "Express Service",
-                        "description": "Express Service",
-                        "isActive": true,
-                        "price": "14",
-                        "createdAt": "2026-04-02T18:45:23.545Z",
-                        "updatedAt": "2026-04-02T18:45:44.810Z"
-                    }
-                },
-                {
-                    "id": "6c4dd9f4-b9f7-4a56-961b-d1431ddf2d8e",
-                    "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
-                    "addonId": "b0a099d5-87e2-4b73-87b7-b8d14b72684c",
-                    "createdAt": "2026-04-02T18:58:24.784Z",
-                    "updatedAt": "2026-04-02T18:58:24.784Z",
-                    "addon": {
-                        "id": "b0a099d5-87e2-4b73-87b7-b8d14b72684c",
-                        "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                        "name": "Stain Removal",
-                        "description": "Stain Removal",
-                        "isActive": true,
-                        "price": "12",
-                        "createdAt": "2026-04-02T18:45:52.646Z",
-                        "updatedAt": "2026-04-02T18:45:52.646Z"
-                    }
-                },
-                {
-                    "id": "cc07f457-1a0d-41fe-a183-df62f0d3af4b",
-                    "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
-                    "addonId": "efc3acce-7b64-446b-a1be-7b8f1ee16452",
-                    "createdAt": "2026-04-02T18:58:24.784Z",
-                    "updatedAt": "2026-04-02T18:58:24.784Z",
-                    "addon": {
-                        "id": "efc3acce-7b64-446b-a1be-7b8f1ee16452",
-                        "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                        "name": "Fabric Softener",
-                        "description": "Fabric Softener",
-                        "isActive": true,
-                        "price": "10",
-                        "createdAt": "2026-04-02T18:45:03.104Z",
-                        "updatedAt": "2026-04-02T18:45:03.104Z"
-                    }
-                },
-                {
-                    "id": "f6484c48-0f3f-444e-9c86-36e18f08e45b",
-                    "serviceId": "6782bc86-45c8-4ff1-a084-f715b0634c2c",
-                    "addonId": "f2f4e099-f18d-4ad1-ba4f-68d7de0cb32b",
-                    "createdAt": "2026-04-02T18:58:24.784Z",
-                    "updatedAt": "2026-04-02T18:58:24.784Z",
-                    "addon": {
-                        "id": "f2f4e099-f18d-4ad1-ba4f-68d7de0cb32b",
-                        "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                        "name": "Delicate Wash",
-                        "description": "Delicate Wash",
-                        "isActive": true,
-                        "price": "10",
-                        "createdAt": "2026-04-02T18:44:55.914Z",
-                        "updatedAt": "2026-04-02T18:44:55.914Z"
-                    }
-                }
-            ],
-            "category": {
-                "id": "0a7e84e3-72bf-43a0-a3c6-a16d00585f04",
-                "name": "Dry Wash",
-                "description": "Premium Dry Wash",
-                "isActive": true,
-                "createdAt": "2026-04-02T15:53:57.919Z",
-                "updatedAt": "2026-04-02T15:58:40.751Z"
-            },
-            "operator": {
-                "id": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                "userId": "091068d9-6c31-4ead-961f-f9a3be66477c",
-                "storeName": "Digital Store",
-                "address": "Dhaka Bangladesh",
-                "latitude": null,
-                "longitude": null,
-                "platformFee": null,
-                "stripeConnectId": "acct_1THnXeIBPnko0FdI",
-                "onboardingComplete": false,
-                "chargesEnabled": false,
-                "payoutsEnabled": false,
-                "createdAt": "2026-04-02T15:52:21.129Z",
-                "updatedAt": "2026-04-02T15:52:21.129Z",
-                "user": {
-                    "name": "Anarul Islam",
-                    "email": "ai.anarul4232@gmail.com",
-                    "phone": "string1"
-                }
+    "message": "User profile fetched successfully",
+    "data": {
+        "id": "cmnnty9z80000tvugnwpcd1d7",
+        "name": "Anarul Islam",
+        "email": "mdbayazid131@gmail.com",
+        "phone": "01700000000",
+        "avatar": null,
+        "role": "USER",
+        "addresses": [
+            {
+                "id": "cmnnty9zb0002tvug4ryzom0g",
+                "userId": "cmnnty9z80000tvugnwpcd1d7",
+                "streetAddress": "Dhaka Bangladesh",
+                "city": "Dhaka",
+                "state": null,
+                "country": "Bangladesh",
+                "postalCode": null,
+                "isDefault": true,
+                "createdAt": "2026-04-06T23:37:13.992Z",
+                "updatedAt": "2026-04-06T23:37:13.992Z"
             }
-        },
-        {
-            "id": "14714d40-12b4-4a50-b3d4-63fccc4bbb7f",
-            "operatorId": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-            "categoryId": "623ef6fa-ae7c-4570-9896-f7baaa82d90d",
-            "name": "Premium service",
-            "basePrice": "50",
-            "image": null,
-            "isActive": true,
-            "createdAt": "2026-04-02T16:04:28.546Z",
-            "updatedAt": "2026-04-02T16:04:28.546Z",
-            "addons": [],
-            "category": {
-                "id": "623ef6fa-ae7c-4570-9896-f7baaa82d90d",
-                "name": "Dry Clean",
-                "description": "Premium quality Dry Clean",
-                "isActive": true,
-                "createdAt": "2026-04-02T15:53:52.201Z",
-                "updatedAt": "2026-04-02T15:58:51.876Z"
-            },
-            "operator": {
-                "id": "af898671-abdb-40c7-a75c-7aa39ad244ca",
-                "userId": "091068d9-6c31-4ead-961f-f9a3be66477c",
-                "storeName": "Digital Store",
-                "address": "Dhaka Bangladesh",
-                "latitude": null,
-                "longitude": null,
-                "platformFee": null,
-                "stripeConnectId": "acct_1THnXeIBPnko0FdI",
-                "onboardingComplete": false,
-                "chargesEnabled": false,
-                "payoutsEnabled": false,
-                "createdAt": "2026-04-02T15:52:21.129Z",
-                "updatedAt": "2026-04-02T15:52:21.129Z",
-                "user": {
-                    "name": "Anarul Islam",
-                    "email": "ai.anarul4232@gmail.com",
-                    "phone": "string1"
-                }
-            }
-        }
-    ]
+        ],
+        "isDeleted": false,
+        "lat": null,
+        "lng": null,
+        "isTwoFactorEnabled": false,
+        "userSubscriptions": [],
+        "stripeCustomerId": null,
+        "isSubscribed": false,
+        "userId": "USR0002",
+        "isVerified": true,
+        "createdAt": "2026-04-06T23:37:13.986Z",
+        "updatedAt": "2026-04-07T16:27:48.224Z"
+    }
 }

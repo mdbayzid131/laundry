@@ -1,20 +1,22 @@
-class ServiceDetailsResponseModel {
+class StoreServiceDetailsResponseModel {
   final bool? success;
   final String? message;
-  final ServiceDetailsData? data;
+  final StoreServiceDetailsData? data;
 
-  ServiceDetailsResponseModel({
+  StoreServiceDetailsResponseModel({
     this.success,
     this.message,
     this.data,
   });
 
-  factory ServiceDetailsResponseModel.fromJson(Map<String, dynamic> json) {
-    return ServiceDetailsResponseModel(
+  factory StoreServiceDetailsResponseModel.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return StoreServiceDetailsResponseModel(
       success: json['success'],
       message: json['message'],
       data: json['data'] != null
-          ? ServiceDetailsData.fromJson(json['data'])
+          ? StoreServiceDetailsData.fromJson(json['data'])
           : null,
     );
   }
@@ -27,56 +29,135 @@ class ServiceDetailsResponseModel {
     };
   }
 }
+class StoreServiceDetailsData {
+  final String? id;
+  final String? storeId;
+  final String? serviceId;
+  final bool? isActive;
+  final String? createdAt;
+  final String? updatedAt;
+  final StoreServiceService? service;
+  final StoreServiceStore? store;
+  final List<Review>? reviews;
+  final ServiceCount? count;
 
-class ServiceDetailsData {
+  StoreServiceDetailsData({
+    this.id,
+    this.storeId,
+    this.serviceId,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+    this.service,
+    this.store,
+    this.reviews,
+    this.count,
+  });
+
+  factory StoreServiceDetailsData.fromJson(Map<String, dynamic> json) {
+    return StoreServiceDetailsData(
+      id: json['id'],
+      storeId: json['storeId'],
+      serviceId: json['serviceId'],
+      isActive: json['isActive'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      service: json['service'] != null
+          ? StoreServiceService.fromJson(json['service'])
+          : null,
+      store: json['store'] != null
+          ? StoreServiceStore.fromJson(json['store'])
+          : null,
+      reviews: json['reviews'] != null
+          ? List<Review>.from(json['reviews'].map((x) => Review.fromJson(x)))
+          : [],
+      count: json['_count'] != null
+          ? ServiceCount.fromJson(json['_count'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'storeId': storeId,
+      'serviceId': serviceId,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'service': service?.toJson(),
+      'store': store?.toJson(),
+      'reviews': reviews?.map((x) => x.toJson()).toList(),
+      '_count': count?.toJson(),
+    };
+  }
+}
+
+class StoreServiceService {
   final String? id;
   final String? operatorId;
   final String? categoryId;
   final String? name;
   final String? basePrice;
+  final String? description;
   final String? image;
   final bool? isActive;
   final String? createdAt;
   final String? updatedAt;
-  final List<ServiceAddon>? addons;
-  final Category? category;
-  final Operator? operator;
+  final ServiceCategory? category;
+  final List<ServiceAddonLink>? serviceAddons;
+  final List<StoreServiceLink>? storeServices;
+  final ServiceOperator? operator;
 
-  ServiceDetailsData({
+  StoreServiceService({
     this.id,
     this.operatorId,
     this.categoryId,
     this.name,
     this.basePrice,
+    this.description,
     this.image,
     this.isActive,
     this.createdAt,
     this.updatedAt,
-    this.addons,
     this.category,
+    this.serviceAddons,
+    this.storeServices,
     this.operator,
   });
 
-  factory ServiceDetailsData.fromJson(Map<String, dynamic> json) {
-    return ServiceDetailsData(
+  factory StoreServiceService.fromJson(Map<String, dynamic> json) {
+    return StoreServiceService(
       id: json['id'],
       operatorId: json['operatorId'],
       categoryId: json['categoryId'],
       name: json['name'],
       basePrice: json['basePrice'],
+      description: json['description'],
       image: json['image'],
       isActive: json['isActive'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      addons: json['addons'] != null
-          ? List<ServiceAddon>.from(
-              json['addons'].map((x) => ServiceAddon.fromJson(x)),
+      category: json['category'] != null
+          ? ServiceCategory.fromJson(json['category'])
+          : null,
+      serviceAddons: json['serviceAddons'] != null
+          ? List<ServiceAddonLink>.from(
+              json['serviceAddons'].map(
+                (x) => ServiceAddonLink.fromJson(x),
+              ),
             )
           : [],
-      category:
-          json['category'] != null ? Category.fromJson(json['category']) : null,
-      operator:
-          json['operator'] != null ? Operator.fromJson(json['operator']) : null,
+      storeServices: json['storeServices'] != null
+          ? List<StoreServiceLink>.from(
+              json['storeServices'].map(
+                (x) => StoreServiceLink.fromJson(x),
+              ),
+            )
+          : [],
+      operator: json['operator'] != null
+          ? ServiceOperator.fromJson(json['operator'])
+          : null,
     );
   }
 
@@ -87,26 +168,109 @@ class ServiceDetailsData {
       'categoryId': categoryId,
       'name': name,
       'basePrice': basePrice,
+      'description': description,
       'image': image,
       'isActive': isActive,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
-      'addons': addons?.map((x) => x.toJson()).toList(),
       'category': category?.toJson(),
+      'serviceAddons': serviceAddons?.map((x) => x.toJson()).toList(),
+      'storeServices': storeServices?.map((x) => x.toJson()).toList(),
       'operator': operator?.toJson(),
     };
   }
 }
 
-class ServiceAddon {
+class Review {
+  final String? id;
+  final int? rating;
+  final String? comment;
+  final String? createdAt;
+  final String? updatedAt;
+  final String? userId;
+
+  Review({
+    this.id,
+    this.rating,
+    this.comment,
+    this.createdAt,
+    this.updatedAt,
+    this.userId,
+  });
+
+  factory Review.fromJson(Map<String, dynamic> json) {
+    return Review(
+      id: json['id'],
+      rating: json['rating'],
+      comment: json['comment'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      userId: json['userId'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'rating': rating,
+      'comment': comment,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'userId': userId,
+    };
+  }
+}
+
+
+class ServiceCategory {
+  final String? id;
+  final String? name;
+  final String? description;
+  final bool? isActive;
+  final String? createdAt;
+  final String? updatedAt;
+
+  ServiceCategory({
+    this.id,
+    this.name,
+    this.description,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ServiceCategory.fromJson(Map<String, dynamic> json) {
+    return ServiceCategory(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      isActive: json['isActive'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
+}
+
+class ServiceAddonLink {
   final String? id;
   final String? serviceId;
   final String? addonId;
   final String? createdAt;
   final String? updatedAt;
-  final Addon? addon;
+  final ServiceAddon? addon;
 
-  ServiceAddon({
+  ServiceAddonLink({
     this.id,
     this.serviceId,
     this.addonId,
@@ -115,14 +279,14 @@ class ServiceAddon {
     this.addon,
   });
 
-  factory ServiceAddon.fromJson(Map<String, dynamic> json) {
-    return ServiceAddon(
+  factory ServiceAddonLink.fromJson(Map<String, dynamic> json) {
+    return ServiceAddonLink(
       id: json['id'],
       serviceId: json['serviceId'],
       addonId: json['addonId'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      addon: json['addon'] != null ? Addon.fromJson(json['addon']) : null,
+      addon: json['addon'] != null ? ServiceAddon.fromJson(json['addon']) : null,
     );
   }
 
@@ -138,35 +302,35 @@ class ServiceAddon {
   }
 }
 
-class Addon {
+class ServiceAddon {
   final String? id;
   final String? operatorId;
   final String? name;
+  final String? price;
   final String? description;
   final bool? isActive;
-  final String? price;
   final String? createdAt;
   final String? updatedAt;
 
-  Addon({
+  ServiceAddon({
     this.id,
     this.operatorId,
     this.name,
+    this.price,
     this.description,
     this.isActive,
-    this.price,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory Addon.fromJson(Map<String, dynamic> json) {
-    return Addon(
+  factory ServiceAddon.fromJson(Map<String, dynamic> json) {
+    return ServiceAddon(
       id: json['id'],
       operatorId: json['operatorId'],
       name: json['name'],
+      price: json['price'],
       description: json['description'],
       isActive: json['isActive'],
-      price: json['price'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -177,37 +341,37 @@ class Addon {
       'id': id,
       'operatorId': operatorId,
       'name': name,
+      'price': price,
       'description': description,
       'isActive': isActive,
-      'price': price,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
   }
 }
 
-class Category {
+class StoreServiceLink {
   final String? id;
-  final String? name;
-  final String? description;
+  final String? storeId;
+  final String? serviceId;
   final bool? isActive;
   final String? createdAt;
   final String? updatedAt;
 
-  Category({
+  StoreServiceLink({
     this.id,
-    this.name,
-    this.description,
+    this.storeId,
+    this.serviceId,
     this.isActive,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
+  factory StoreServiceLink.fromJson(Map<String, dynamic> json) {
+    return StoreServiceLink(
       id: json['id'],
-      name: json['name'],
-      description: json['description'],
+      storeId: json['storeId'],
+      serviceId: json['serviceId'],
       isActive: json['isActive'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -217,8 +381,8 @@ class Category {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
-      'description': description,
+      'storeId': storeId,
+      'serviceId': serviceId,
       'isActive': isActive,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -226,106 +390,159 @@ class Category {
   }
 }
 
-class Operator {
+class ServiceOperator {
   final String? id;
+  final String? operatorId;
   final String? userId;
-  final String? storeName;
-  final String? address;
-  final double? latitude;
-  final double? longitude;
-  final dynamic platformFee;
-  final String? stripeConnectId;
+  final String? approvalStatus;
+  final String? status;
+  final String? stripeConnectedAccountId;
+  final String? onboardingUrl;
   final bool? onboardingComplete;
-  final bool? chargesEnabled;
-  final bool? payoutsEnabled;
   final String? createdAt;
   final String? updatedAt;
-  final OperatorUser? user;
 
-  Operator({
+  ServiceOperator({
     this.id,
+    this.operatorId,
     this.userId,
-    this.storeName,
-    this.address,
-    this.latitude,
-    this.longitude,
-    this.platformFee,
-    this.stripeConnectId,
+    this.approvalStatus,
+    this.status,
+    this.stripeConnectedAccountId,
+    this.onboardingUrl,
     this.onboardingComplete,
-    this.chargesEnabled,
-    this.payoutsEnabled,
     this.createdAt,
     this.updatedAt,
-    this.user,
   });
 
-  factory Operator.fromJson(Map<String, dynamic> json) {
-    return Operator(
+  factory ServiceOperator.fromJson(Map<String, dynamic> json) {
+    return ServiceOperator(
       id: json['id'],
+      operatorId: json['operatorId'],
       userId: json['userId'],
-      storeName: json['storeName'],
-      address: json['address'],
-      latitude: json['latitude'] != null
-          ? double.tryParse(json['latitude'].toString())
-          : null,
-      longitude: json['longitude'] != null
-          ? double.tryParse(json['longitude'].toString())
-          : null,
-      platformFee: json['platformFee'],
-      stripeConnectId: json['stripeConnectId'],
+      approvalStatus: json['approvalStatus'],
+      status: json['status'],
+      stripeConnectedAccountId: json['stripeConnectedAccountId'],
+      onboardingUrl: json['onboardingUrl'],
       onboardingComplete: json['onboardingComplete'],
-      chargesEnabled: json['chargesEnabled'],
-      payoutsEnabled: json['payoutsEnabled'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      user: json['user'] != null ? OperatorUser.fromJson(json['user']) : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'operatorId': operatorId,
       'userId': userId,
-      'storeName': storeName,
-      'address': address,
-      'latitude': latitude,
-      'longitude': longitude,
-      'platformFee': platformFee,
-      'stripeConnectId': stripeConnectId,
+      'approvalStatus': approvalStatus,
+      'status': status,
+      'stripeConnectedAccountId': stripeConnectedAccountId,
+      'onboardingUrl': onboardingUrl,
       'onboardingComplete': onboardingComplete,
-      'chargesEnabled': chargesEnabled,
-      'payoutsEnabled': payoutsEnabled,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
-      'user': user?.toJson(),
     };
   }
 }
 
-class OperatorUser {
-  final String? name;
-  final String? email;
-  final String? phone;
+class ServiceCount {
+  final int? reviews;
 
-  OperatorUser({
-    this.name,
-    this.email,
-    this.phone,
+  ServiceCount({
+    this.reviews,
   });
 
-  factory OperatorUser.fromJson(Map<String, dynamic> json) {
-    return OperatorUser(
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
+  factory ServiceCount.fromJson(Map<String, dynamic> json) {
+    return ServiceCount(
+      reviews: json['reviews'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
-      'email': email,
-      'phone': phone,
+      'reviews': reviews,
     };
   }
 }
+
+class StoreServiceStore {
+  final String? id;
+  final String? operatorId;
+  final String? name;
+  final String? logo;
+  final String? banner;
+  final String? address;
+  final String? country;
+  final String? state;
+  final String? city;
+  final String? postalCode;
+  final double? lat;
+  final double? lng;
+  final bool? isActive;
+  final String? createdAt;
+  final String? updatedAt;
+
+  StoreServiceStore({
+    this.id,
+    this.operatorId,
+    this.name,
+    this.logo,
+    this.banner,
+    this.address,
+    this.country,
+    this.state,
+    this.city,
+    this.postalCode,
+    this.lat,
+    this.lng,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory StoreServiceStore.fromJson(Map<String, dynamic> json) {
+    return StoreServiceStore(
+      id: json['id'],
+      operatorId: json['operatorId'],
+      name: json['name'],
+      logo: json['logo'],
+      banner: json['banner'],
+      address: json['address'],
+      country: json['country'],
+      state: json['state'],
+      city: json['city'],
+      postalCode: json['postalCode'],
+      lat: json['lat'] != null
+          ? double.tryParse(json['lat'].toString())
+          : null,
+      lng: json['lng'] != null
+          ? double.tryParse(json['lng'].toString())
+          : null,
+      isActive: json['isActive'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'operatorId': operatorId,
+      'name': name,
+      'logo': logo,
+      'banner': banner,
+      'address': address,
+      'country': country,
+      'state': state,
+      'city': city,
+      'postalCode': postalCode,
+      'lat': lat,
+      'lng': lng,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
+}
+

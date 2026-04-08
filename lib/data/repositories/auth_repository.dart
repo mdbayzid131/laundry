@@ -114,14 +114,12 @@ class AuthRepo {
 
   /// ===================== CHANGE PASSWORD =====================
   Future<Response> changePassword({
-    required String currentPassword,
+    required String oldPassword,
     required String newPassword,
-    required String confirmPassword,
   }) async {
-    return await apiClient.postData(ApiConstants.resetPassword, {      
-      "currentPassword": currentPassword,
+    return await apiClient.postData(ApiConstants.changePassword, {      
+      "oldPassword": oldPassword,
       "newPassword": newPassword,
-      "confirmPassword": confirmPassword,
     });
   }
 
