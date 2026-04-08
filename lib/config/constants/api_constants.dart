@@ -29,4 +29,14 @@ class ApiConstants {
   static const String getAddresses = '/address/my-addresses';
   static const String updateAddress = '/address';
   static const String setDefaultAddress = '/address/:addressId/set-default';
+
+  // Cart Endpoints
+  static const String addToCart = '/cart/add';
+  static const String getMyCart = '/cart/my-cart';
+  static const String updateCartQuantity = '/cart/update-quantity/:cartItemId';
+  static const String deleteCartItem = '/cart/item/:cartItemId';
+
+  // Order Endpoints
+  static const String myOrders = '/order/my-orders';
+
 }
