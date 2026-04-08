@@ -22,7 +22,7 @@ class BottomNavBarView extends GetView<BottomNavBarController> {
         () => IndexedStack(
           index: controller.currentIndex.value,
           children: [
-            const LaundryHomeScreen(),
+             LaundryHomeScreen(),
             const MapScreen(),
             const CartScreen(),
             const ProfileView(),

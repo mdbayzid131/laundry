@@ -13,6 +13,6 @@ class BottomNavBarBinding extends Bindings {
     Get.lazyPut(() => MapController());
     Get.lazyPut(() => CartController());
     Get.lazyPut(() => ProfileController());
-    Get.lazyPut(() => BannerController());
+    //Get.lazyPut(() => BannerController());
   }
 }

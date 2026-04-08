@@ -5,10 +5,14 @@ import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/themes/app_theme.dart';
+import 'package:laundry/modules/home/controllers/home_controller.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
+import 'package:shimmer/shimmer.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
-  const LaundryHomeScreen({super.key});
+  LaundryHomeScreen({super.key});
+
+  
 
   @override
   State<LaundryHomeScreen> createState() => _LaundryHomeScreenState();
@@ -271,19 +275,46 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   }
 
   Widget _buildCategoryButtons() {
+    final HomeController controller = Get.find<HomeController>();
+    return Obx(() {
+      if (controller.isLoadingCategories.value) {
+        return _buildCategoryShimmer();
+      }
+      if (controller.categories.isEmpty) {
+        return const SizedBox();
+      }
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Row(
+          children: controller.categories
+              .map((category) => _buildCategoryButton(category as String))
+              .toList(),
+        ),
+      );
+    });
+  }
+    Widget _buildCategoryShimmer() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
-        children: [
-          _buildCategoryButton('Wash'),
-          _buildCategoryButton('Dry Clean'),
-          _buildCategoryButton('Fold'),
-          _buildCategoryButton('Ironing'),
-          _buildCategoryButton('Duvet'),
-          _buildCategoryButton('Shoes'),
-          _buildCategoryButton('Leather'),
-        ],
+        children: List.generate(
+          5,
+          (index) => Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              margin: EdgeInsets.only(right: 12.w),
+              width: 100.w,
+              height: 48.h,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

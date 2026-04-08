@@ -62,7 +62,7 @@ class AuthService extends GetxService {
   }) async {
     try {
       final response = await _authRepo.login(email: email, password: password);
-      await _handleAuthResponse(response);
+      await handleAuthResponse(response);
       return response;
     } catch (e) {
       rethrow;
@@ -91,6 +91,22 @@ class AuthService extends GetxService {
     }
   }
 
+  /// =====================verify User =====================
+  Future<Response> verifyUser({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await _authRepo.verifyUser(
+        email: email,
+        otp: otp,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// ===================== OTP VERIFY =====================
   Future<Response> verifyOtp({required String email, required int otp}) async {
     try {
@@ -106,6 +122,7 @@ class AuthService extends GetxService {
     }
   }
 
+
   /// ===================== RESEND OTP =====================
   Future<void> resendOtp(String email) async {
     try {
@@ -117,12 +134,13 @@ class AuthService extends GetxService {
 
   /// ===================== RESET PASSWORD =====================
   Future<Response> resetPassword({
-    required String token,
+    required String resetToken,
     required String newPassword,
     required String confirmPassword,
   }) async {
     try {
       final response = await _authRepo.resetPassword(
+        resetToken: resetToken,
         newPassword: newPassword,
         confirmPassword: confirmPassword,
       );
@@ -177,7 +195,7 @@ class AuthService extends GetxService {
   /// ===================== HELPER METHODS =====================
 
   /// Handles successful auth response (Login/Signup)
-  Future<void> _handleAuthResponse(Response response) async {
+  Future<void> handleAuthResponse(Response response) async {
     // Adjust these keys based on your actual API response structure
     // Example: { "data": { "accessToken": "...", "refreshToken": "..." } }
     final data = response.data;

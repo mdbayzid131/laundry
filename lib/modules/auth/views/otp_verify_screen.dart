@@ -65,7 +65,7 @@ class OtpVerifyScreen extends GetView<OtpController> {
               // OTP Input Boxes (Placeholder using Row of Containers/TextFields)
               Pinput(
                 controller: controller.otpController,
-                length: 4,
+                length: 6,
 
                 separatorBuilder: (index) => SizedBox(width: 20.w),
                 defaultPinTheme: PinTheme(

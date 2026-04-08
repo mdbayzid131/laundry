@@ -1,0 +1,35 @@
+{
+    "success": true,
+    "message": "Category fetched successfully",
+    "meta": {
+        "total": 3,
+        "page": 1,
+        "limit": 10
+    },
+    "data": [
+        {
+            "id": "cmnnnvyq50006tv30idmbdkqv",
+            "name": "Premium Clean",
+            "description": "description for premium clean",
+            "isActive": true,
+            "createdAt": "2026-04-06T20:47:28.398Z",
+            "updatedAt": "2026-04-06T20:47:28.398Z"
+        },
+        {
+            "id": "cmnkk742g0000tv60jbllmzll",
+            "name": "Premium Clean",
+            "description": "description for premium clean",
+            "isActive": true,
+            "createdAt": "2026-04-04T16:40:51.545Z",
+            "updatedAt": "2026-04-04T16:40:51.545Z"
+        },
+        {
+            "id": "cmnkjrr9g0000tv3g75qjknuy",
+            "name": "Dry Wash",
+            "description": "description for dry wasy",
+            "isActive": true,
+            "createdAt": "2026-04-04T16:28:55.108Z",
+            "updatedAt": "2026-04-04T23:53:38.106Z"
+        }
+    ]
+}

@@ -65,7 +65,8 @@ class ApiClient extends GetxService {
           bearerToken = await StorageService.getString(
             StorageConstants.bearerToken,
           );
-          if (bearerToken.isNotEmpty) {
+          if (bearerToken.isNotEmpty &&
+              !options.path.contains(ApiConstants.refreshToken)) {
             options.headers['Authorization'] = 'Bearer $bearerToken';
           }
           debugPrint("➡️ ====> API REQUEST==========================");
@@ -93,7 +94,6 @@ class ApiClient extends GetxService {
           if (e.type == DioExceptionType.connectionError) {
             // Check if we actually have internet access
             bool hasInternet = await InternetConnection().hasInternetAccess;
-          
 
             if (hasInternet) {
               // Internet is available, but connection failed -> Server likely down
@@ -118,7 +118,7 @@ class ApiClient extends GetxService {
 
           // 2️⃣ Token expired → try refresh FIRST
           if (e.response?.statusCode == 401 &&
-              !e.requestOptions.path.contains(StorageConstants.refreshToken)) {
+              !e.requestOptions.path.contains(ApiConstants.refreshToken)) {
             final refreshed = await refreshToken();
 
             if (refreshed) {
@@ -128,11 +128,20 @@ class ApiClient extends GetxService {
 
               e.requestOptions.headers['Authorization'] = 'Bearer $newToken';
 
-              final response = await dio.fetch(e.requestOptions);
+              final options = e.requestOptions;
+              final response = await dio.request(
+                options.path,
+                data: options.data,
+                queryParameters: options.queryParameters,
+                options: Options(
+                  method: options.method,
+                  headers: options.headers,
+                ),
+              );
               return handler.resolve(response);
             } else {
               logoutUser();
-              return handler.reject(e);
+              return handler.next(e);
             }
           }
 
@@ -150,7 +159,7 @@ class ApiClient extends GetxService {
             }
           }
           // // 4️⃣ Server error
-          
+
           // else if (e.type == DioExceptionType.badResponse) {
           //   if (_lastErrorTime == null ||
           //       DateTime.now().difference(_lastErrorTime!) >
@@ -370,28 +379,58 @@ class ApiClient extends GetxService {
 
   Future<bool> refreshToken() async {
     try {
-      final refreshToken = await StorageService.getString(
+      final refreshTokenValue = await StorageService.getString(
         StorageConstants.refreshToken,
       );
 
-      final response = await postData(ApiConstants.refreshToken, {
-        'refreshToken': refreshToken,
-      });
+      if (refreshTokenValue.isEmpty) return false;
+
+      // Use a fresh Dio instance or specific options to avoid recursion
+      final response = await PostRefreshToken(refreshTokenValue);
 
       if (response.statusCode == 200) {
-        await StorageService.setString(
-          StorageConstants.bearerToken,
-          response.data['accessToken'],
-        );
+        final data = response.data;
+        final authData = data['data'] ?? data;
+        final newAccessToken = authData['accessToken'] ?? authData['token'];
+        final newRefreshToken = authData['refreshToken'];
+
+        if (newAccessToken != null) {
+          await StorageService.setString(
+            StorageConstants.bearerToken,
+            newAccessToken,
+          );
+        }
+        if (newRefreshToken != null) {
+          await StorageService.setString(
+            StorageConstants.refreshToken,
+            newRefreshToken,
+          );
+        }
         return true;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint("❌ ====> Error Refreshing Token: $e");
+    }
     return false;
+  }
+
+  // A helper to call the refresh endpoint without interceptor overhead if needed
+  Future<Response> PostRefreshToken(String refreshToken) async {
+    return await dio.post(
+      ApiConstants.refreshToken,
+      data: {'refreshToken': refreshToken},
+      options: Options(headers: {'Content-Type': 'application/json'}),
+    );
   }
 
   void logoutUser() {
     StorageService.clearAll();
+    // Use Get.offAllNamed to clear navigation stack and go to login
     Get.offAllNamed(AppRoutes.LOGIN);
+    Helpers.showCustomSnackBar(
+      "Session expired. Please login again.",
+      isError: true,
+    );
   }
 }
 

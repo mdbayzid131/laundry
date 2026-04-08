@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/core/widgets/custom_back_button.dart';
 import 'package:laundry/core/widgets/custom_elevated_button.dart';
 import 'package:laundry/core/widgets/custom_text_field.dart';
+import 'package:laundry/modules/auth/controllers/oto_controller.dart';
 import '../controllers/set_new_pass_controller.dart';
 import '../../../config/themes/app_theme.dart';
 
 class SetNewPasswordScreen extends GetView<SetNewPassController> {
-  const SetNewPasswordScreen({super.key});
+  SetNewPasswordScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -97,9 +99,7 @@ class SetNewPasswordScreen extends GetView<SetNewPassController> {
               // Verify Code (or Save Password) Button
               CustomElevatedButton(
                 label: 'Verify Code', // Text from the design
-                onPressed: () {
-                  // TODO: save new password logic
-                },
+                onPressed: controller.submitNewPassword,
               ),
               SizedBox(height: 20.h),
             ],

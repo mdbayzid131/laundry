@@ -1,0 +1,112 @@
+class CategoryModel {
+  final bool success;
+  final String message;
+  final MetaModel meta;
+  final List<CategoryData> data;
+
+  CategoryModel({
+    required this.success,
+    required this.message,
+    required this.meta,
+    required this.data,
+  });
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      meta: MetaModel.fromJson(json['meta']),
+      data: (json['data'] as List)
+          .map((e) => CategoryData.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+      'meta': meta.toJson(),
+      'data': data.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+// ─────────────────────────────────────────
+// Meta Model — Pagination
+// ─────────────────────────────────────────
+class MetaModel {
+  final int total;
+  final int page;
+  final int limit;
+
+  // Extra pagination helpers
+  int get totalPages => (total / limit).ceil();
+  bool get hasNextPage => page < totalPages;
+  bool get hasPreviousPage => page > 1;
+
+  MetaModel({
+    required this.total,
+    required this.page,
+    required this.limit,
+  });
+
+  factory MetaModel.fromJson(Map<String, dynamic>) {
+    return MetaModel(
+      total: json['total'] ?? 0,
+      page: json['page'] ?? 1,
+      limit: json['limit'] ?? 10,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total': total,
+      'page': page,
+      'limit': limit,
+    };
+  }
+}
+
+// ─────────────────────────────────────────
+// Category Data Model
+// ─────────────────────────────────────────
+class CategoryData {
+  final String id;
+  final String name;
+  final String description;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  CategoryData({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory CategoryData.fromJson(Map<String, dynamic> ) {
+    return CategoryData(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      isActive: json['isActive'] ?? false,
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'isActive': isActive,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+}

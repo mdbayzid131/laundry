@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
+import 'package:laundry/core/services/api_checker.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
 
@@ -31,11 +32,15 @@ class LoginController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _authService.login(
+      final response = await _authService.login(
         email: emailController.text,
         password: passwordController.text,
       );
-
+      ApiChecker.checkWriteApi(response);
+      if (response.statusCode == 200) {
+        Helpers.showCustomSnackBar('Login successful', isError: false);
+        Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
+      }
       Helpers.showCustomSnackBar('Login successful');
       Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
     } catch (e) {

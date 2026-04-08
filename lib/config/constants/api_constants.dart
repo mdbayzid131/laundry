@@ -8,7 +8,8 @@ class ApiConstants {
   static const String signup = '/auth/register';
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh';
-  static const String forgotPassword = '/auth/forgot-password';
+  static const String forgotPassword = '/auth/reset-password';
+  static const String category = '/category';
   
   // User Endpoints
   static const String profile = '/user/profile';

@@ -1,16 +1,10 @@
-
-
 import 'package:laundry/config/constants/api_constants.dart';
 import 'package:laundry/core/services/api_client.dart';
 import 'package:dio/dio.dart';
 
-
-
 class AuthRepo {
   final ApiClient apiClient;
   AuthRepo({required this.apiClient});
-
-
 
   // Future<String> getDeviceId() async {
   //   final deviceInfo = DeviceInfoPlugin();
@@ -25,8 +19,6 @@ class AuthRepo {
   //     return "unsupported";
   //   }
   // }
-
-
 
   /// ===================== SIGNUP =====================
   Future<Response> signup({
@@ -65,7 +57,7 @@ class AuthRepo {
 
   /// ===================== RESEND OTP =====================
   Future<Response> resentOtp({required String email}) async {
-    return await apiClient.postData(ApiConstants.resendVerifyEmail, {   
+    return await apiClient.postData(ApiConstants.resendVerifyEmail, {
       "email": email,
     });
   }
@@ -81,12 +73,25 @@ class AuthRepo {
     });
   }
 
+  /// =====================verify User =====================
+  Future<Response> verifyUser({
+    required String email,
+    required String otp,
+  }) async {
+    return await apiClient.postData(ApiConstants.verifyUser, {
+      "email": email,
+      "otp": otp,
+    });
+  }
+
   /// ===================== RESET PASSWORD =====================
   Future<Response> resetPassword({
+    required String resetToken,
     required String newPassword,
     required String confirmPassword,
   }) async {
     return await apiClient.postData(ApiConstants.resetPassword, {
+      "resetToken": resetToken,
       "newPassword": newPassword,
       "confirmPassword": confirmPassword,
     });
@@ -94,10 +99,7 @@ class AuthRepo {
 
   /// ===================== LOGOUT =====================
   Future<Response> logout() async {
-
-
-    return await apiClient.postData(ApiConstants.logout, {
-    });
+    return await apiClient.postData(ApiConstants.logout, {});
   }
 
   /// ===================== REFRESH TOKEN =====================
@@ -113,12 +115,10 @@ class AuthRepo {
     required String newPassword,
     required String confirmPassword,
   }) async {
-    return await apiClient.postData(ApiConstants.resetPassword, {      
+    return await apiClient.postData(ApiConstants.resetPassword, {
       "currentPassword": currentPassword,
       "newPassword": newPassword,
       "confirmPassword": confirmPassword,
     });
   }
-
-
 }

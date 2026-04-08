@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
+import 'package:laundry/core/services/api_checker.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
 
@@ -51,6 +52,7 @@ class RegisterController extends GetxController {
         phone: phoneController.text,
         address: addressController.text,
       );
+      ApiChecker.checkWriteApi(response);
       if (response.statusCode == 201) {
         Helpers.showCustomSnackBar('Registration successful', isError: false);
         Get.offAllNamed(AppRoutes.OTP_FORM_REGISTER, arguments: {

@@ -131,7 +131,7 @@ final pages = [
   ),
   GetPage(
     name: AppRoutes.HOME,
-    page: () => const LaundryHomeScreen(),
+    page: () => LaundryHomeScreen(),
     binding: HomeBinding(),
     middlewares: [AuthMiddleware()],
   ),
@@ -181,7 +181,7 @@ final pages = [
   ),
   GetPage(
     name: AppRoutes.SET_NEW_PASSWORD,
-    page: () => const SetNewPasswordScreen(),
+    page: () => SetNewPasswordScreen(),
     binding: AuthBinding(),
   ),
   GetPage(

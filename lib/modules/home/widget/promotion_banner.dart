@@ -45,7 +45,7 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
             carouselController: _carouselController,
             itemCount: _bannerController.banners.length,
             options: CarouselOptions(
-              height: 140.h,
+              height: 160.h,
               viewportFraction: 1,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 4),

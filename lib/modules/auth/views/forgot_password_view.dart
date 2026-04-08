@@ -13,6 +13,7 @@ import '../../../config/themes/app_theme.dart';
 class ForgotPasswordView extends GetView<ForgotPasswordController> {
   const ForgotPasswordView({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,9 +79,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                 Obx(
                   () => CustomElevatedButton(
                     label: 'Send',
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.OTP);
-                    },
+                    onPressed: controller.forgotPassword,
                     // onPressed: controller.sendResetLink,
                     isLoading: controller.isLoading.value,
                   ),

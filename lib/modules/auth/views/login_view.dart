@@ -127,7 +127,7 @@ class LoginView extends GetView<LoginController> {
                 Obx(
                   () => CustomElevatedButton(
                     label: 'Sign In',
-                    onPressed: controller.goToHome,
+                    onPressed: controller.login,
                     isLoading: controller.isLoading.value,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,

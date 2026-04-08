@@ -1,64 +1,34 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:laundry/config/constants/image_paths.dart';
-import 'package:laundry/data/models/banner_model.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:laundry/core/services/api_checker.dart';
+import 'package:laundry/core/utils/helpers.dart';
+import 'package:laundry/data/models/category_model.dart';
+import 'package:laundry/data/repositories/category_repository.dart';
 
-class HomeController extends GetxController {}
+class HomeController extends GetxController {
+  final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
 
-class BannerController extends GetxController {
-  RxBool isLoading = false.obs;
-  // final RxList<BannerModel> _banners = <BannerModel>[].obs;
-  // List<BannerModel> get banners => _banners;
-  // // final UserProfileManageRepo _userProfileManageRepo =
-  // //     Get.find<UserProfileManageRepo>();
+  RxBool isLoadingCategories = false.obs;
+  RxList<CategoryData> categories = <CategoryData>[].obs;
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   getBanners();
-  // }
-  // /// ===================== GET BANNERS =====================
-  // Future<void> getBanners() async {
-  //   isLoading.value = true;
-
-  //   try {
-  //     final Response<dynamic> response = await _userProfileManageRepo
-  //         .getBanners();
-  //     if (response.statusCode == 200) {
-  //       BannerResponseModel bannerResponseModel = BannerResponseModel.fromJson(response.data);
-  //       _banners.value = bannerResponseModel.data.banners;
-  //     }
-
-  //   } catch (e) {
-  //     print(e.toString());
-  //     Helpers.showErrorSnackbar(e.toString());
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-  List<BannerModel> banners = [
-    BannerModel(
-      id: '1',
-      image: ImagePaths.banner1,
-      title: 'Banner 1',
-      description: 'Description 1',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    BannerModel(
-      id: '2',
-      image: ImagePaths.banner2,
-      title: 'Banner 2',
-      description: 'Description 2',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    BannerModel(
-      id: '3',
-      image: ImagePaths.banner3,
-      title: 'Banner 3',
-      description: 'Description 3',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
+  Future<void> getCategories() async {
+    isLoadingCategories.value = true;
+    try {
+      final response = await _categoryRepository.getCategories();
+      ApiChecker.checkGetApi(response);
+      if (response.statusCode == 200) {
+        final categoryResponse = CategoriesResponseModel.fromJson(
+          response.data,
+        );
+        categories.value = categoryResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog(e.toString());
+    } finally {
+      isLoadingCategories.value = false;
+    }
+  }
 }
