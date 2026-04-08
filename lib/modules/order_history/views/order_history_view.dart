@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/data/models/order_model.dart';
 import '../controllers/order_history_controller.dart';
 
 class OrderHistoryView extends GetView<OrderHistoryController> {
@@ -61,22 +63,43 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
           _buildTabs(),
           SizedBox(height: 20.h),
           Expanded(
-            child: Obx(
-              () => ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                itemCount: controller.filteredOrders.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == controller.filteredOrders.length) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 30.h),
-                      child: _buildLoadMoreButton(),
-                    );
-                  }
-                  final order = controller.filteredOrders[index];
-                  return _buildOrderCard(order);
-                },
-              ),
-            ),
+            child: Obx(() {
+              if (controller.isLoading.value && controller.allOrders.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.filteredOrders.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No orders found',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16.sp,
+                      color: Colors.black54,
+                    ),
+                  ),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () => controller.fetchOrders(),
+                child: ListView.builder(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  itemCount:
+                      controller.filteredOrders.length +
+                      (controller.hasMoreData.value ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == controller.filteredOrders.length) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20.h),
+                        child: _buildLoadMoreButton(),
+                      );
+                    }
+                    final order = controller.filteredOrders[index];
+                    return _buildOrderCard(order);
+                  },
+                ),
+              );
+            }),
           ),
         ],
       ),
@@ -127,20 +150,46 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
     );
   }
 
-  Widget _buildOrderCard(OrderModel order) {
+  Widget _buildOrderCard(Order order) {
     Color statusColor;
-    switch (order.status) {
-      case 'Completed':
-        statusColor = const Color(0xff22C55E);
+    final status = order.status?.toUpperCase() ?? '';
+    switch (status) {
+      case 'PENDING':
+        statusColor = Colors.orange;
         break;
-      case 'In Progress':
-        statusColor = const Color(0xff3B82F6);
+      case 'PICKED_UP':
+        statusColor = Colors.blue;
         break;
-      case 'Cancelled':
-        statusColor = const Color(0xffEF4444);
+      case 'PROCESSING':
+        statusColor = Colors.purple;
+        break;
+      case 'READY_FOR_DELIVERY':
+        statusColor = Colors.cyan;
+        break;
+      case 'COMPLETED':
+        statusColor = Colors.green;
+        break;
+      case 'CANCELLED':
+        statusColor = Colors.red;
         break;
       default:
         statusColor = Colors.grey;
+    }
+
+    final firstItem = order.orderItems?.isNotEmpty == true
+        ? order.orderItems!.first
+        : null;
+    final serviceName = firstItem?.serviceName ?? 'No Service';
+    final itemsCount = order.orderItems?.length ?? 0;
+
+    String formattedDate = '';
+    if (order.createdAt != null) {
+      try {
+        final date = DateTime.parse(order.createdAt!);
+        formattedDate = DateFormat('MMM dd, yyyy • h:mm a').format(date);
+      } catch (e) {
+        formattedDate = order.createdAt!;
+      }
     }
 
     return Container(
@@ -164,7 +213,7 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Order #${order.orderNo}',
+                'Order #${order.orderNumber}',
                 style: GoogleFonts.manrope(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w700,
@@ -172,7 +221,7 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
                 ),
               ),
               Text(
-                order.status,
+                status,
                 style: GoogleFonts.manrope(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
@@ -183,7 +232,7 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
           ),
           SizedBox(height: 4.h),
           Text(
-            order.date,
+            formattedDate,
             style: GoogleFonts.manrope(fontSize: 12.sp, color: Colors.black45),
           ),
           SizedBox(height: 16.h),
@@ -198,7 +247,7 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: SvgPicture.asset(
-                  _getIconForService(order.serviceType),
+                  _getIconForService(serviceName),
                   colorFilter: const ColorFilter.mode(
                     Color(0xff1A2530),
                     BlendMode.srcIn,
@@ -211,7 +260,7 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      order.serviceType,
+                      serviceName,
                       style: GoogleFonts.manrope(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w700,
@@ -220,7 +269,7 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      '${order.itemsCount} items • ${order.deliveryType}',
+                      '$itemsCount items • ${order.isSubscription == true ? ' Express delivery' : ' Regular delivery'}',
                       style: GoogleFonts.manrope(
                         fontSize: 12.sp,
                         color: Colors.black45,
@@ -235,11 +284,11 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
           const Divider(height: 1, color: Color(0xffF1F5F9)),
           SizedBox(height: 16.h),
           Text(
-            '\$${order.price.toStringAsFixed(2)}',
+            '\$${order.totalAmount ?? '0.00'}',
             style: GoogleFonts.manrope(
               fontSize: 18.sp,
               fontWeight: FontWeight.w800,
-              color: order.status == 'Cancelled'
+              color: status == 'CANCELLED'
                   ? Colors.grey.shade400
                   : const Color(0xff1A2530),
             ),
@@ -250,29 +299,38 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
   }
 
   String _getIconForService(String serviceType) {
-    if (serviceType.contains('Wash')) return ImagePaths.shirtIcon;
-    if (serviceType.contains('Dry')) return ImagePaths.dryCleanIcon;
+    final lower = serviceType.toLowerCase();
+    if (lower.contains('wash')) return ImagePaths.shirtIcon;
+    if (lower.contains('dry')) return ImagePaths.dryCleanIcon;
     return ImagePaths.ironAndPressIcon;
   }
 
   Widget _buildLoadMoreButton() {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: Colors.black12),
-        ),
-        child: Text(
-          'Load More Orders',
-          style: GoogleFonts.manrope(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w600,
-            color: Colors.black54,
+    return Obx(() {
+      if (controller.isLoadingMore.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      return GestureDetector(
+        onTap: () => controller.fetchOrders(isLoadMore: true),
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: Colors.black12),
+            ),
+            child: Text(
+              'Load More Orders',
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
+              ),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

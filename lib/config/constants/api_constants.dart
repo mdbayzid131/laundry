@@ -29,4 +29,7 @@ class ApiConstants {
   static const String getAddresses = '/address/my-addresses';
   static const String updateAddress = '/address';
   static const String setDefaultAddress = '/address/:addressId/set-default';
+
+  // Order Endpoints
+  static const String myOrders = '/order/my-orders';
 }
