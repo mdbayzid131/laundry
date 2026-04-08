@@ -1,12 +1,15 @@
 import 'package:get/get.dart';
 import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/single_service_details_model.dart';
+import 'package:laundry/data/repositories/cart_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
 
 class ProductDetailsController extends GetxController {
   final ServiceRepository _serviceRepository = Get.find<ServiceRepository>();
+  final CartRepository _cartRepository = Get.find<CartRepository>();
 
   RxBool isLoading = false.obs;
+  RxBool isAddingToCart = false.obs;
   Rxn<StoreServiceDetailsData> serviceDetails = Rxn<StoreServiceDetailsData>();
 
   // Product details state
@@ -26,19 +29,25 @@ class ProductDetailsController extends GetxController {
   }
 
   Future<void> getServiceDetails() async {
-    
     String storeServiceId = Get.arguments['serviceId'];
     isLoading.value = true;
     try {
-      final response = await _serviceRepository.getStoreServiceDetails(storeServiceId);
+      final response = await _serviceRepository.getStoreServiceDetails(
+        storeServiceId,
+      );
       if (response.statusCode == 200) {
-        final detailsResponse = StoreServiceDetailsResponseModel.fromJson(response.data);
+        final detailsResponse = StoreServiceDetailsResponseModel.fromJson(
+          response.data,
+        );
         serviceDetails.value = detailsResponse.data;
-        basePrice.value = double.tryParse(serviceDetails.value?.service?.basePrice ?? '0') ?? 0.0;
-        
+        basePrice.value =
+            double.tryParse(serviceDetails.value?.service?.basePrice ?? '0') ??
+            0.0;
+
         // Initialize Addons
         if (serviceDetails.value?.service?.serviceAddons != null) {
-          for (var addonWrapper in serviceDetails.value!.service!.serviceAddons!) {
+          for (var addonWrapper
+              in serviceDetails.value!.service!.serviceAddons!) {
             final addonId = addonWrapper.addon?.id;
             if (addonId != null) {
               selectedAddons[addonId] = false;
@@ -61,7 +70,7 @@ class ProductDetailsController extends GetxController {
         final addon = addonWrapper.addon;
         if (addon != null && selectedAddons[addon.id] == true) {
           double addonPrice = double.tryParse(addon.price ?? '0') ?? 0.0;
-          total += addonPrice * quantity.value;
+          total += addonPrice;
         }
       }
     }
@@ -81,6 +90,36 @@ class ProductDetailsController extends GetxController {
   void toggleAddon(String addonId) {
     if (selectedAddons.containsKey(addonId)) {
       selectedAddons[addonId] = !(selectedAddons[addonId]!);
+    }
+  }
+
+  Future<void> addToCart() async {
+    if (serviceDetails.value == null) return;
+
+    isAddingToCart.value = true;
+    try {
+      List<String> addonIds = selectedAddons.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toList();
+
+      final response = await _cartRepository.addToCart(
+        serviceId: serviceDetails.value!.serviceId!,
+        quantity: quantity.value,
+        addonIds: addonIds,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Helpers.showCustomSnackBar(
+          'Item added to cart successfully',
+          isError: false,
+        );
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error adding to cart: $e');
+      Helpers.showCustomSnackBar('Could not add item to cart', isError: true);
+    } finally {
+      isAddingToCart.value = false;
     }
   }
 }

@@ -13,6 +13,7 @@ import 'package:laundry/data/repositories/category_repository.dart';
 import 'package:laundry/data/repositories/banner_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
 import 'package:laundry/data/repositories/address_repository.dart';
+import 'package:laundry/data/repositories/cart_repository.dart';
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
@@ -27,6 +28,7 @@ class InitialBinding extends Bindings {
     Get.put(BannerRepository(), permanent: true);
     Get.put(ServiceRepository(), permanent: true);
     Get.put(AddressRepository(), permanent: true);
+    Get.put(CartRepository(), permanent: true);
     // Global controllers
     Get.put(InternetController(), permanent: true);
 

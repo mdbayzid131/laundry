@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/constants/image_paths.dart';
@@ -87,15 +86,21 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                         _buildRelatedServices(),
 
                         // Customer Reviews Section
-                        if (controller.serviceDetails.value?.reviews?.isNotEmpty ??
+                        if (controller
+                                .serviceDetails
+                                .value
+                                ?.reviews
+                                ?.isNotEmpty ??
                             false) ...[
-                          SizedBox(height: 32.h),
+                          SizedBox(height: 40.h),
                           _buildCustomerReviews(),
                         ],
 
+                        // SizedBox(height: 32.h),
+                        // _buildConfirmButton(),
                         SizedBox(
-                          height: 100.h,
-                        ), // Bottom padding for sticky bar
+                          height: 120.h,
+                        ), // Extra space for sticky bottom
                       ],
                     ),
                   ),
@@ -105,7 +110,42 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
           );
         }),
       ),
-      bottomSheet: _buildStickyBottomBar(),
+      bottomSheet: _buildStickyCartBar(),
+    );
+  }
+
+  Widget _buildConfirmButton() {
+    return Container(
+      width: double.infinity,
+      height: 60.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xffB5DEEF).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xffB5DEEF),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+        ),
+        child: Text(
+          'Confirm',
+          style: GoogleFonts.manrope(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
     );
   }
 
@@ -191,7 +231,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               () => Text(
                 '4.8 (${controller.serviceDetails.value?.count?.reviews ?? 0} reviews)',
                 style: GoogleFonts.manrope(
-                  fontSize: 13.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.black45,
                 ),
@@ -690,29 +730,43 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildServiceHeader('Customer Reviews'),
+            Text(
+              'Customer Reviews',
+              style: GoogleFonts.manrope(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xff1A2530),
+              ),
+            ),
             GestureDetector(
               onTap: () {},
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xffB5DEEF).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: const Color(0xffB5DEEF),
+                  borderRadius: BorderRadius.circular(10.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xffB5DEEF).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.edit_note,
-                      size: 18.sp,
-                      color: const Color(0xffB5DEEF),
+                      Icons.edit_note_rounded,
+                      size: 22.sp,
+                      color: Colors.white,
                     ),
                     SizedBox(width: 4.w),
                     Text(
                       'Write a Review',
                       style: GoogleFonts.manrope(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xffB5DEEF),
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -721,6 +775,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             ),
           ],
         ),
+        SizedBox(height: 24.h),
         Obx(() {
           final reviews = controller.serviceDetails.value?.reviews ?? [];
           return Column(
@@ -779,22 +834,23 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       name,
                       style: GoogleFonts.manrope(
-                        fontSize: 14.sp,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
+                        color: const Color(0xff1A2530),
                       ),
                     ),
+                    SizedBox(width: 8.w),
                     Row(
                       children: List.generate(
                         5,
                         (index) => Icon(
                           Icons.star_rounded,
                           color: index < rating ? Colors.black : Colors.black12,
-                          size: 14.sp,
+                          size: 16.sp,
                         ),
                       ),
                     ),
@@ -813,9 +869,9 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                 Text(
                   time,
                   style: GoogleFonts.manrope(
-                    fontSize: 11.sp,
-                    color: const Color(0xffB5DEEF),
-                    fontWeight: FontWeight.w700,
+                    fontSize: 12.sp,
+                    color: const Color(0xff579796),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -826,33 +882,90 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     );
   }
 
-  Widget _buildStickyBottomBar() {
+  Widget _buildStickyCartBar() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.black.withOpacity(0.05))),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xffB5DEEF),
-          minimumSize: Size(double.infinity, 55.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+      child: Row(
+        children: [
+          Expanded(
+            child: Obx(
+              () => RichText(
+                text: TextSpan(
+                  style: GoogleFonts.manrope(color: const Color(0xff1A2530)),
+                  children: [
+                    TextSpan(
+                      text: 'Cart: ',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.black45,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '${controller.quantity.value} items • ',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '\$${controller.totalPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          elevation: 4,
-          shadowColor: const Color(0xffB5DEEF).withOpacity(0.4),
-        ),
-        child: Text(
-          'Confirm',
-          style: GoogleFonts.manrope(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
+          SizedBox(width: 20.w),
+          Obx(
+            () => ElevatedButton(
+              onPressed: controller.isAddingToCart.value
+                  ? null
+                  : () => controller.addToCart(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xffB5DEEF),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+              child: controller.isAddingToCart.value
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      'Add to Cart',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

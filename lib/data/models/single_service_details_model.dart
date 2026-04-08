@@ -29,6 +29,7 @@ class StoreServiceDetailsResponseModel {
     };
   }
 }
+
 class StoreServiceDetailsData {
   final String? id;
   final String? storeId;
@@ -37,9 +38,9 @@ class StoreServiceDetailsData {
   final String? createdAt;
   final String? updatedAt;
   final StoreServiceService? service;
-  final StoreServiceStore? store;
-  final List<Review>? reviews;
-  final ServiceCount? count;
+  final List<ReviewModel>? reviews;
+  final ReviewCountModel? count;
+  final StoreModel? store;
 
   StoreServiceDetailsData({
     this.id,
@@ -49,9 +50,9 @@ class StoreServiceDetailsData {
     this.createdAt,
     this.updatedAt,
     this.service,
-    this.store,
     this.reviews,
     this.count,
+    this.store,
   });
 
   factory StoreServiceDetailsData.fromJson(Map<String, dynamic> json) {
@@ -65,15 +66,15 @@ class StoreServiceDetailsData {
       service: json['service'] != null
           ? StoreServiceService.fromJson(json['service'])
           : null,
-      store: json['store'] != null
-          ? StoreServiceStore.fromJson(json['store'])
-          : null,
       reviews: json['reviews'] != null
-          ? List<Review>.from(json['reviews'].map((x) => Review.fromJson(x)))
+          ? List<ReviewModel>.from(
+              json['reviews'].map((x) => ReviewModel.fromJson(x)),
+            )
           : [],
       count: json['_count'] != null
-          ? ServiceCount.fromJson(json['_count'])
+          ? ReviewCountModel.fromJson(json['_count'])
           : null,
+      store: json['store'] != null ? StoreModel.fromJson(json['store']) : null,
     );
   }
 
@@ -86,9 +87,9 @@ class StoreServiceDetailsData {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'service': service?.toJson(),
-      'store': store?.toJson(),
       'reviews': reviews?.map((x) => x.toJson()).toList(),
       '_count': count?.toJson(),
+      'store': store?.toJson(),
     };
   }
 }
@@ -104,10 +105,10 @@ class StoreServiceService {
   final bool? isActive;
   final String? createdAt;
   final String? updatedAt;
-  final ServiceCategory? category;
-  final List<ServiceAddonLink>? serviceAddons;
-  final List<StoreServiceLink>? storeServices;
-  final ServiceOperator? operator;
+  final CategoryModel? category;
+  final List<ServiceAddonModel>? serviceAddons;
+  final List<StoreServiceLinkModel>? storeServices;
+  final OperatorModel? operator;
 
   StoreServiceService({
     this.id,
@@ -139,24 +140,22 @@ class StoreServiceService {
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       category: json['category'] != null
-          ? ServiceCategory.fromJson(json['category'])
+          ? CategoryModel.fromJson(json['category'])
           : null,
       serviceAddons: json['serviceAddons'] != null
-          ? List<ServiceAddonLink>.from(
-              json['serviceAddons'].map(
-                (x) => ServiceAddonLink.fromJson(x),
-              ),
+          ? List<ServiceAddonModel>.from(
+              json['serviceAddons'].map((x) => ServiceAddonModel.fromJson(x)),
             )
           : [],
       storeServices: json['storeServices'] != null
-          ? List<StoreServiceLink>.from(
+          ? List<StoreServiceLinkModel>.from(
               json['storeServices'].map(
-                (x) => StoreServiceLink.fromJson(x),
+                (x) => StoreServiceLinkModel.fromJson(x),
               ),
             )
           : [],
       operator: json['operator'] != null
-          ? ServiceOperator.fromJson(json['operator'])
+          ? OperatorModel.fromJson(json['operator'])
           : null,
     );
   }
@@ -181,48 +180,7 @@ class StoreServiceService {
   }
 }
 
-class Review {
-  final String? id;
-  final int? rating;
-  final String? comment;
-  final String? createdAt;
-  final String? updatedAt;
-  final String? userId;
-
-  Review({
-    this.id,
-    this.rating,
-    this.comment,
-    this.createdAt,
-    this.updatedAt,
-    this.userId,
-  });
-
-  factory Review.fromJson(Map<String, dynamic> json) {
-    return Review(
-      id: json['id'],
-      rating: json['rating'],
-      comment: json['comment'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-      userId: json['userId'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'rating': rating,
-      'comment': comment,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
-      'userId': userId,
-    };
-  }
-}
-
-
-class ServiceCategory {
+class CategoryModel {
   final String? id;
   final String? name;
   final String? description;
@@ -230,7 +188,7 @@ class ServiceCategory {
   final String? createdAt;
   final String? updatedAt;
 
-  ServiceCategory({
+  CategoryModel({
     this.id,
     this.name,
     this.description,
@@ -239,8 +197,8 @@ class ServiceCategory {
     this.updatedAt,
   });
 
-  factory ServiceCategory.fromJson(Map<String, dynamic> json) {
-    return ServiceCategory(
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
       id: json['id'],
       name: json['name'],
       description: json['description'],
@@ -262,15 +220,15 @@ class ServiceCategory {
   }
 }
 
-class ServiceAddonLink {
+class ServiceAddonModel {
   final String? id;
   final String? serviceId;
   final String? addonId;
   final String? createdAt;
   final String? updatedAt;
-  final ServiceAddon? addon;
+  final AddonModel? addon;
 
-  ServiceAddonLink({
+  ServiceAddonModel({
     this.id,
     this.serviceId,
     this.addonId,
@@ -279,14 +237,15 @@ class ServiceAddonLink {
     this.addon,
   });
 
-  factory ServiceAddonLink.fromJson(Map<String, dynamic> json) {
-    return ServiceAddonLink(
+  factory ServiceAddonModel.fromJson(Map<String, dynamic> json) {
+    return ServiceAddonModel(
       id: json['id'],
       serviceId: json['serviceId'],
       addonId: json['addonId'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      addon: json['addon'] != null ? ServiceAddon.fromJson(json['addon']) : null,
+      addon:
+          json['addon'] != null ? AddonModel.fromJson(json['addon']) : null,
     );
   }
 
@@ -302,34 +261,34 @@ class ServiceAddonLink {
   }
 }
 
-class ServiceAddon {
+class AddonModel {
   final String? id;
   final String? operatorId;
   final String? name;
-  final String? price;
   final String? description;
+  final String? price;
   final bool? isActive;
   final String? createdAt;
   final String? updatedAt;
 
-  ServiceAddon({
+  AddonModel({
     this.id,
     this.operatorId,
     this.name,
-    this.price,
     this.description,
+    this.price,
     this.isActive,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory ServiceAddon.fromJson(Map<String, dynamic> json) {
-    return ServiceAddon(
+  factory AddonModel.fromJson(Map<String, dynamic> json) {
+    return AddonModel(
       id: json['id'],
       operatorId: json['operatorId'],
       name: json['name'],
-      price: json['price'],
       description: json['description'],
+      price: json['price'],
       isActive: json['isActive'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -341,8 +300,8 @@ class ServiceAddon {
       'id': id,
       'operatorId': operatorId,
       'name': name,
-      'price': price,
       'description': description,
+      'price': price,
       'isActive': isActive,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -350,7 +309,7 @@ class ServiceAddon {
   }
 }
 
-class StoreServiceLink {
+class StoreServiceLinkModel {
   final String? id;
   final String? storeId;
   final String? serviceId;
@@ -358,7 +317,7 @@ class StoreServiceLink {
   final String? createdAt;
   final String? updatedAt;
 
-  StoreServiceLink({
+  StoreServiceLinkModel({
     this.id,
     this.storeId,
     this.serviceId,
@@ -367,8 +326,8 @@ class StoreServiceLink {
     this.updatedAt,
   });
 
-  factory StoreServiceLink.fromJson(Map<String, dynamic> json) {
-    return StoreServiceLink(
+  factory StoreServiceLinkModel.fromJson(Map<String, dynamic> json) {
+    return StoreServiceLinkModel(
       id: json['id'],
       storeId: json['storeId'],
       serviceId: json['serviceId'],
@@ -390,41 +349,38 @@ class StoreServiceLink {
   }
 }
 
-class ServiceOperator {
+class OperatorModel {
   final String? id;
   final String? operatorId;
   final String? userId;
   final String? approvalStatus;
   final String? status;
-  final String? stripeConnectedAccountId;
-  final String? onboardingUrl;
-  final bool? onboardingComplete;
+  final String? stripeAccountId;
+  final String? stripeAccountStatus;
   final String? createdAt;
   final String? updatedAt;
 
-  ServiceOperator({
+  OperatorModel({
     this.id,
     this.operatorId,
     this.userId,
     this.approvalStatus,
     this.status,
-    this.stripeConnectedAccountId,
-    this.onboardingUrl,
-    this.onboardingComplete,
+    this.stripeAccountId,
+    this.stripeAccountStatus,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory ServiceOperator.fromJson(Map<String, dynamic> json) {
-    return ServiceOperator(
+  factory OperatorModel.fromJson(Map<String, dynamic> json) {
+    return OperatorModel(
       id: json['id'],
       operatorId: json['operatorId'],
       userId: json['userId'],
       approvalStatus: json['approvalStatus'],
       status: json['status'],
-      stripeConnectedAccountId: json['stripeConnectedAccountId'],
-      onboardingUrl: json['onboardingUrl'],
-      onboardingComplete: json['onboardingComplete'],
+      stripeAccountId: json['stripeAccountId'],
+      stripeAccountStatus: json['stripeAccountStatus'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );
@@ -437,24 +393,79 @@ class ServiceOperator {
       'userId': userId,
       'approvalStatus': approvalStatus,
       'status': status,
-      'stripeConnectedAccountId': stripeConnectedAccountId,
-      'onboardingUrl': onboardingUrl,
-      'onboardingComplete': onboardingComplete,
+      'stripeAccountId': stripeAccountId,
+      'stripeAccountStatus': stripeAccountStatus,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
   }
 }
 
-class ServiceCount {
+class ReviewModel {
+  final String? id;
+  final String? reviewNumber;
+  final String? userId;
+  final String? storeServiceId;
+  final String? storeBundleId;
+  final int? rating;
+  final String? comment;
+  final String? operatorReply;
+  final String? createdAt;
+  final String? updatedAt;
+
+  ReviewModel({
+    this.id,
+    this.reviewNumber,
+    this.userId,
+    this.storeServiceId,
+    this.storeBundleId,
+    this.rating,
+    this.comment,
+    this.operatorReply,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ReviewModel.fromJson(Map<String, dynamic> json) {
+    return ReviewModel(
+      id: json['id'],
+      reviewNumber: json['reviewNumber'],
+      userId: json['userId'],
+      storeServiceId: json['storeServiceId'],
+      storeBundleId: json['storeBundleId'],
+      rating: json['rating'],
+      comment: json['comment'],
+      operatorReply: json['operatorReply'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'reviewNumber': reviewNumber,
+      'userId': userId,
+      'storeServiceId': storeServiceId,
+      'storeBundleId': storeBundleId,
+      'rating': rating,
+      'comment': comment,
+      'operatorReply': operatorReply,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+    };
+  }
+}
+
+class ReviewCountModel {
   final int? reviews;
 
-  ServiceCount({
+  ReviewCountModel({
     this.reviews,
   });
 
-  factory ServiceCount.fromJson(Map<String, dynamic> json) {
-    return ServiceCount(
+  factory ReviewCountModel.fromJson(Map<String, dynamic> json) {
+    return ReviewCountModel(
       reviews: json['reviews'],
     );
   }
@@ -466,7 +477,7 @@ class ServiceCount {
   }
 }
 
-class StoreServiceStore {
+class StoreModel {
   final String? id;
   final String? operatorId;
   final String? name;
@@ -483,7 +494,7 @@ class StoreServiceStore {
   final String? createdAt;
   final String? updatedAt;
 
-  StoreServiceStore({
+  StoreModel({
     this.id,
     this.operatorId,
     this.name,
@@ -501,8 +512,8 @@ class StoreServiceStore {
     this.updatedAt,
   });
 
-  factory StoreServiceStore.fromJson(Map<String, dynamic> json) {
-    return StoreServiceStore(
+  factory StoreModel.fromJson(Map<String, dynamic> json) {
+    return StoreModel(
       id: json['id'],
       operatorId: json['operatorId'],
       name: json['name'],
@@ -513,12 +524,8 @@ class StoreServiceStore {
       state: json['state'],
       city: json['city'],
       postalCode: json['postalCode'],
-      lat: json['lat'] != null
-          ? double.tryParse(json['lat'].toString())
-          : null,
-      lng: json['lng'] != null
-          ? double.tryParse(json['lng'].toString())
-          : null,
+      lat: json['lat'] != null ? double.tryParse(json['lat'].toString()) : null,
+      lng: json['lng'] != null ? double.tryParse(json['lng'].toString()) : null,
       isActive: json['isActive'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -545,4 +552,3 @@ class StoreServiceStore {
     };
   }
 }
-
