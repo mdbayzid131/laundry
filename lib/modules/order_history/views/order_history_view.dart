@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/data/models/order_model.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 import '../controllers/order_history_controller.dart';
 
 class OrderHistoryView extends GetView<OrderHistoryController> {
@@ -283,15 +285,32 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
           SizedBox(height: 16.h),
           const Divider(height: 1, color: Color(0xffF1F5F9)),
           SizedBox(height: 16.h),
-          Text(
-            '\$${order.totalAmount ?? '0.00'}',
-            style: GoogleFonts.manrope(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w800,
-              color: status == 'CANCELLED'
-                  ? Colors.grey.shade400
-                  : const Color(0xff1A2530),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '\$${order.totalAmount ?? '0.00'}',
+                style: GoogleFonts.manrope(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
+                  color: status == 'CANCELLED'
+                      ? Colors.grey.shade400
+                      : const Color(0xff1A2530),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () => Get.toNamed(AppRoutes.TRACK_ORDER, arguments: order),
+                child: Text(
+                  'View Details',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
