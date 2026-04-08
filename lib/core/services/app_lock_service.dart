@@ -29,8 +29,8 @@ class AppLockService extends GetxService with WidgetsBindingObserver {
     if (value) {
       isAuthenticating.value = true;
       try {
-        final hasBiometric =
-            await BiometricService.instance.hasUsableBiometric();
+        final hasBiometric = await BiometricService.instance
+            .hasUsableBiometric();
         if (!hasBiometric) {
           Get.snackbar(
             'Unavailable',
@@ -106,7 +106,7 @@ class AppLockService extends GetxService with WidgetsBindingObserver {
 
     if (state == AppLifecycleState.resumed) {
       if (!isUnlocked.value && Get.currentRoute != AppRoutes.LOCK) {
-        Get.offAllNamed(AppRoutes.LOCK);
+        Get.toNamed(AppRoutes.LOCK);
       }
     }
   }

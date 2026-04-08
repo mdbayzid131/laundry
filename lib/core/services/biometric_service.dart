@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:laundry/core/utils/helpers.dart';
 import 'package:local_auth/local_auth.dart';
 
 class BiometricService {
@@ -52,7 +53,7 @@ class BiometricService {
       );
       return result;
     } catch (e) {
-      print('Biometric Error: $e');
+      Helpers.showDebugLog('Biometric Error: ${e.toString()}');
       return false;
     }
   }

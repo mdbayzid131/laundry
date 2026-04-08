@@ -45,7 +45,7 @@ class RegisterController extends GetxController {
     try {
       isLoading.value = true;
 
-     var response = await _authService.signup(
+      var response = await _authService.signup(
         name: nameController.text,
         email: emailController.text,
         password: passwordController.text,
@@ -53,18 +53,18 @@ class RegisterController extends GetxController {
         address: addressController.text,
       );
       ApiChecker.checkWriteApi(response);
-if(response.statusCode == 201){
-  Helpers.showCustomSnackBar(
-        'Registration successful, please verify your email',isError: false
-
-      );
-      Get.toNamed(AppRoutes.OTP_FORM_REGISTER, arguments: emailController.text);
-}
+      if (response.statusCode == 201) {
+        Helpers.showCustomSnackBar(
+          'Registration successful, please verify your email',
+          isError: false,
+        );
+        Get.toNamed(
+          AppRoutes.OTP_FORM_REGISTER,
+          arguments: emailController.text,
+        );
+      }
     } catch (e) {
-      Helpers.showDebugLog(
-        e.toString(),
-
-      );
+      Helpers.showDebugLog(e.toString());
     } finally {
       isLoading.value = false;
     }

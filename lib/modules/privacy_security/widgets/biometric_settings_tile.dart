@@ -81,7 +81,7 @@ class _BiometricSettingsTileState extends State<BiometricSettingsTile> {
               onChanged: (value) async {
                 await AppLockService.to.setBiometricEnabled(value);
               },
-              activeColor: Colors.white,
+              activeThumbColor: Colors.white,
               activeTrackColor: const Color(0xffB5DEEF),
             ),
           ],
