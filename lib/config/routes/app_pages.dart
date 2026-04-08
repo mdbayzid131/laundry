@@ -37,6 +37,8 @@ import 'package:laundry/modules/legal/views/terms_conditions_view.dart';
 import 'package:laundry/modules/legal/bindings/legal_binding.dart';
 import 'package:laundry/modules/notifications/views/notifications_view.dart';
 import 'package:laundry/modules/notifications/bindings/notifications_binding.dart';
+import 'package:laundry/modules/track_order/bindings/track_order_binding.dart';
+import 'package:laundry/modules/track_order/views/track_order_view.dart';
 import '../../modules/auth/bindings/auth_binding.dart';
 import '../../modules/auth/views/login_view.dart';
 import '../../modules/auth/views/register_view.dart';
@@ -103,6 +105,7 @@ class AppRoutes {
   static const String OTP_FORM_REGISTER = '/otp-form-register';
   static const String CHANGE_PASSWORD = '/change-password';
   static const String LOCK = '/lock';
+  static const String TRACK_ORDER = '/track-order';
 }
 
 final pages = [
@@ -315,5 +318,10 @@ final pages = [
     name: AppRoutes.LOCK,
     page: () => const LockScreen(),
     binding: LockBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.TRACK_ORDER,
+    page: () => const TrackOrderView(),
+    binding: TrackOrderBinding(),
   ),
 ];
