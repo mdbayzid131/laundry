@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
+import 'package:laundry/data/models/user_model.dart';
+import 'package:shimmer/shimmer.dart';
+import '../controllers/profile_controller.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -16,6 +18,7 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
+    final ProfileController controller = Get.find<ProfileController>();
     return Scaffold(
       backgroundColor: Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -29,59 +32,67 @@ class _ProfileViewState extends State<ProfileView> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Profile Card
-              _buildProfileCard(),
-              SizedBox(height: 20.h),
+      body: RefreshIndicator(
+        color: AppTheme.primaryColor,
+        onRefresh: () => controller.getProfile(showDialog: true),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Card
+                _buildProfileCard(),
+                SizedBox(height: 20.h),
 
-              // Menu Items
-              _buildMenuItem(
-                Icons.local_shipping_outlined,
-                'Track Active Order',
-                () => Get.toNamed(AppRoutes.ORDER_TRACKING),
-              ),
-              SizedBox(height: 12.h),
-              _buildMenuItem(
-                Icons.history,
-                'Order History',
-                () => Get.toNamed(AppRoutes.ORDER_HISTORY),
-              ),
-              SizedBox(height: 12.h),
-              _buildMenuItem(
-                Icons.assignment_outlined,
-                'Order Status',
-                () => Get.toNamed(AppRoutes.ORDER_STATUS),
-              ),
-              SizedBox(height: 12.h),
-              _buildMenuItem(
-                Icons.report_problem_outlined,
-                'Order Issue',
-                () => Get.toNamed(AppRoutes.ORDER_ISSUE),
-              ),
-              SizedBox(height: 24.h),
+                // Menu Items
+                _buildMenuItem(
+                  Icons.local_shipping_outlined,
+                  'Track Active Order',
+                  () => Get.toNamed(AppRoutes.ORDER_TRACKING),
+                ),
+                SizedBox(height: 12.h),
+                _buildMenuItem(
+                  Icons.history,
+                  'Order History',
+                  () => Get.toNamed(AppRoutes.ORDER_HISTORY),
+                ),
+                SizedBox(height: 12.h),
+                _buildMenuItem(
+                  Icons.assignment_outlined,
+                  'Order Status',
+                  () => Get.toNamed(AppRoutes.ORDER_STATUS),
+                ),
+                SizedBox(height: 12.h),
+                _buildMenuItem(
+                  Icons.report_problem_outlined,
+                  'Order Issue',
+                  () => Get.toNamed(AppRoutes.ORDER_ISSUE),
+                ),
+                SizedBox(height: 24.h),
 
-              // Personal Information
-              _buildPersonalInfoSection(),
+                // Personal Information
+                _buildPersonalInfoSection(),
 
-              SizedBox(height: 24.h),
-              _buildPaymentMethodsSection(),
+                SizedBox(height: 12.h),
+                _buildSavedAddressesSection(),
 
-              SizedBox(height: 24.h),
-              _buildNotificationsSection(),
+                // SizedBox(height: 24.h),
+                _buildPaymentMethodsSection(),
 
-              SizedBox(height: 24.h),
-              _buildAccountSettingsSection(),
+                SizedBox(height: 12.h),
+                _buildNotificationsSection(),
 
-              SizedBox(height: 24.h),
-              _buildSignOutButton(),
+                SizedBox(height: 24.h),
+                _buildAccountSettingsSection(),
 
-              SizedBox(height: 100.h),
-            ],
+                SizedBox(height: 24.h),
+                _buildSignOutButton(),
+
+                SizedBox(height: 100.h),
+              ],
+            ),
           ),
         ),
       ),
@@ -89,79 +100,86 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _buildProfileCard() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 16.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                width: 80.w,
-                height: 80.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[300],
-                  border: Border.all(color: Colors.white, width: 3.w),
-                ),
-                child: ClipOval(
-                  child: Icon(
-                    Icons.person,
-                    size: 40.sp,
-                    color: Colors.grey[400],
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: EdgeInsets.all(6.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+    final ProfileController controller = Get.find<ProfileController>();
+    return Obx(() {
+      final user = controller.userData.value;
+      if (controller.isLoading.value && controller.userData.value == null) {
+        return SizedBox(height: 150.h);
+      }
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(24.w),
+        decoration: BoxDecoration(
+          color: AppTheme.primaryColor,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 16.r,
+              offset: Offset(0, 4.h),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 90.w,
+                  height: 90.w,
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
+                    color: Colors.grey[300],
+                    border: Border.all(color: Colors.white, width: 3.w),
                   ),
-                  child: Icon(
-                    Icons.camera_alt_outlined,
-                    size: 20.sp,
-                    color: const Color(0xFF4A90E2),
+                  child: ClipOval(
+                    child: (user?.avatar != null && user!.avatar!.isNotEmpty)
+                        ? Image.network(user.avatar!, fit: BoxFit.cover)
+                        : Icon(Icons.person, size: 50.sp, color: Colors.white),
                   ),
                 ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(6.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.camera_alt_outlined,
+                      size: 20.sp,
+                      color: const Color(0xFF4A90E2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Text(
+              user?.name ?? 'Guest User',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.manrope(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
               ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Text(
-            'Sarah Johnson',
-            style: GoogleFonts.manrope(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            'sarah.johnson@email.com',
-            style: GoogleFonts.manrope(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w400,
-              color: Colors.white.withOpacity(0.8),
+            SizedBox(height: 4.h),
+            Text(
+              user?.email ?? 'No email available',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withOpacity(0.9),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
@@ -209,55 +227,58 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Widget _buildPersonalInfoSection() {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8.r,
-            offset: Offset(0, 2.h),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Personal Information',
-                style: GoogleFonts.manrope(
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Edit',
+    final ProfileController controller = Get.find<ProfileController>();
+    return Obx(() {
+      final user = controller.userData.value;
+      return Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8.r,
+              offset: Offset(0, 2.h),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Personal Information',
                   style: GoogleFonts.manrope(
-                    fontSize: 15.sp,
+                    fontSize: 17.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4A90E2),
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          _buildInfoField('Full Name', 'Sarah Johnson'),
-          SizedBox(height: 16.h),
-          _buildInfoField('Phone Number', '+1 (555) 123-4567'),
-          SizedBox(height: 16.h),
-          _buildInfoField('Email Address', 'sarah.johnson@email.com'),
-          SizedBox(height: 16.h),
-        ],
-      ),
-    );
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Edit',
+                    style: GoogleFonts.manrope(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF4A90E2),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            _buildInfoField('Full Name', user?.name ?? 'Not added'),
+            SizedBox(height: 16.h),
+            _buildInfoField('Phone Number', user?.phone ?? 'Not added'),
+            SizedBox(height: 16.h),
+            _buildInfoField('Email Address', user?.email ?? 'Not added'),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildInfoField(String label, String value) {
@@ -622,29 +643,694 @@ class _ProfileViewState extends State<ProfileView> {
   // Sign Out Button:
 
   Widget _buildSignOutButton() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 16.h),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFEBEE),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFFEE2E2), width: 1.w),
+    final ProfileController controller = Get.find();
+    return GestureDetector(
+      onTap: () {
+        Get.dialog(
+          AlertDialog(
+            title: Text(
+              'Logout',
+              style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'Are you sure you want to logout?',
+              style: GoogleFonts.manrope(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'No',
+                  style: GoogleFonts.manrope(color: Colors.grey),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                  controller.logout();
+                },
+                child: Text(
+                  'Yes',
+                  style: GoogleFonts.manrope(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFEBEE),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: const Color(0xFFFEE2E2), width: 1.w),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.logout, color: const Color(0xFFE53935), size: 20.sp),
+            SizedBox(width: 8.w),
+            Text(
+              'Sign Out',
+              style: GoogleFonts.manrope(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFE53935),
+              ),
+            ),
+          ],
+        ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+    );
+  }
+
+  Widget _buildSavedAddressesSection() {
+    final ProfileController controller = Get.find<ProfileController>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Saved Addresses',
+              style: GoogleFonts.manrope(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            TextButton(
+              onPressed: () => _showAddAddressPopup(),
+              child: Text(
+                'Add New',
+                style: GoogleFonts.manrope(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF4A90E2),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.h),
+        Obx(() {
+          if (controller.isAddressLoading.value) {
+            final count = controller.addresses.isEmpty
+                ? 2
+                : controller.addresses.length;
+            return _buildAddressShimmer(count);
+          }
+          if (controller.addresses.isEmpty) {
+            return Container(
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Center(
+                child: Text(
+                  'No addresses saved',
+                  style: GoogleFonts.manrope(color: Colors.black45),
+                ),
+              ),
+            );
+          }
+          return ListView.separated(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.addresses.length,
+            separatorBuilder: (context, index) => SizedBox(height: 12.h),
+            itemBuilder: (context, index) {
+              final address = controller.addresses[index];
+              return _buildAddressCard(address);
+            },
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildAddressShimmer(int itemCount) {
+    return Column(
+      children: List.generate(
+        itemCount,
+        (index) => Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            height: 150.h,
+            margin: EdgeInsets.only(bottom: 12.h),
+            padding: EdgeInsets.all(24.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 60.w,
+                  height: 60.h,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 100.w,
+                        height: 20.h,
+                        color: Colors.white,
+                      ),
+                      SizedBox(height: 12.h),
+                      Container(
+                        width: 100.w,
+                        height: 16.h,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 32.w,
+                  height: 32.h,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddressCard(UserAddress address) {
+    final ProfileController controller = Get.find<ProfileController>();
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8.r,
+            offset: Offset(0, 2.h),
+          ),
+        ],
+      ),
+      child: Column(
         children: [
-          Icon(Icons.logout, color: const Color(0xFFE53935), size: 20.sp),
-          SizedBox(width: 8.w),
-          Text(
-            'Sign Out',
-            style: GoogleFonts.manrope(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFFE53935),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(
+                  Icons.location_on_outlined,
+                  size: 20.sp,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      address.streetAddress ?? 'N/A',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      '${address.city}, ${address.country}',
+                      style: GoogleFonts.manrope(
+                        fontSize: 12.sp,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Obx(() {
+                return Radio<String>(
+                  value: address.id!,
+                  groupValue: controller.addresses
+                      .firstWhereOrNull((e) => e.isDefault == true)
+                      ?.id,
+                  activeColor: AppTheme.primaryColor,
+                  onChanged: (val) {
+                    if (val != null) {
+                      controller.setDefaultAddress(address);
+                    }
+                  },
+                );
+              }),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton.icon(
+                onPressed: () => _showAddressDetails(address),
+                icon: Icon(
+                  Icons.visibility_outlined,
+                  size: 16.sp,
+                  color: AppTheme.primaryColor,
+                ),
+                label: Text(
+                  'View Details',
+                  style: GoogleFonts.manrope(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddressDetails(UserAddress address) {
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.all(24.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Address Details',
+                  style: GoogleFonts.manrope(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            _buildDetailRow('Street', address.streetAddress),
+            _buildDetailRow('City', address.city),
+            _buildDetailRow('State', address.state),
+            _buildDetailRow('Country', address.country),
+            _buildDetailRow('Postal Code', address.postalCode),
+            SizedBox(height: 24.h),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      final ProfileController controller =
+                          Get.find<ProfileController>();
+                      await controller.deleteAddress(address.id!);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
+                    child: const Icon(Icons.delete_outline),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  flex: 3,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                      _showEditAddressPopup(address);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                    ),
+                    child: Text(
+                      'Edit Address',
+                      style: GoogleFonts.manrope(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _buildDetailRow(String label, String? value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100.w,
+            child: Text(
+              label,
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black45,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value ?? 'N/A',
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _showEditAddressPopup(UserAddress address) {
+    final ProfileController controller = Get.find<ProfileController>();
+    final formKey = GlobalKey<FormState>();
+    final streetController = TextEditingController(text: address.streetAddress);
+    final cityController = TextEditingController(text: address.city);
+    final stateController = TextEditingController(text: address.state);
+    final countryController = TextEditingController(text: address.country);
+    final postalController = TextEditingController(text: address.postalCode);
+
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Edit Address',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xff1A2530),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Icon(
+                          Icons.close,
+                          size: 24.sp,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  _buildAddressTextField(
+                    'Street Address',
+                    'Enter street',
+                    streetController,
+                  ),
+                  _buildAddressTextField('City', 'Enter city', cityController),
+                  _buildAddressTextField(
+                    'State',
+                    'Enter state',
+                    stateController,
+                  ),
+                  _buildAddressTextField(
+                    'Country',
+                    'Enter country',
+                    countryController,
+                  ),
+                  _buildAddressTextField(
+                    'Postal Code',
+                    'Enter zip',
+                    postalController,
+                    keyboardType: TextInputType.number,
+                  ),
+                  SizedBox(height: 32.h),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (formKey.currentState?.validate() ?? false) {
+                          await controller.updateAddress(address.id!, {
+                            "streetAddress": streetController.text,
+                            "city": cityController.text,
+                            "state": stateController.text,
+                            "country": countryController.text,
+                            "postalCode": postalController.text,
+                            "isDefault": address.isDefault,
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffB5DEEF),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Save Changes',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showAddAddressPopup() {
+    final ProfileController controller = Get.find<ProfileController>();
+    final formKey = GlobalKey<FormState>();
+    final streetController = TextEditingController();
+    final cityController = TextEditingController();
+    final stateController = TextEditingController();
+    final countryController = TextEditingController();
+    final postalController = TextEditingController();
+
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Add New Address',
+                        style: GoogleFonts.manrope(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xff1A2530),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Icon(
+                          Icons.close,
+                          size: 24.sp,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
+                  _buildAddressTextField(
+                    'Street Address',
+                    'Enter street',
+                    streetController,
+                  ),
+                  _buildAddressTextField('City', 'Enter city', cityController),
+                  _buildAddressTextField(
+                    'State',
+                    'Enter state',
+                    stateController,
+                  ),
+                  _buildAddressTextField(
+                    'Country',
+                    'Enter country',
+                    countryController,
+                  ),
+                  _buildAddressTextField(
+                    'Postal Code',
+                    'Enter zip',
+                    postalController,
+                    keyboardType: TextInputType.number,
+                  ),
+                  SizedBox(height: 32.h),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (formKey.currentState?.validate() ?? false) {
+                          await controller.createAddress({
+                            "streetAddress": streetController.text,
+                            "city": cityController.text,
+                            "state": stateController.text,
+                            "country": countryController.text,
+                            "postalCode": postalController.text,
+                            "isDefault": false,
+                          });
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffB5DEEF),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Create Address',
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddressTextField(
+    String label,
+    String hint,
+    TextEditingController controller, {
+    TextInputType? keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xff1A2530),
+          ),
+        ),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          style: GoogleFonts.manrope(fontSize: 14.sp),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'This field is required';
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: GoogleFonts.manrope(
+              fontSize: 14.sp,
+              color: Colors.black26,
+            ),
+            filled: true,
+            fillColor: const Color(0xffF9F9F9),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 14.h,
+            ),
+            errorStyle: GoogleFonts.manrope(fontSize: 11.sp),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: BorderSide.none,
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Colors.red),
+            ),
+          ),
+        ),
+        SizedBox(height: 16.h),
+      ],
     );
   }
 }

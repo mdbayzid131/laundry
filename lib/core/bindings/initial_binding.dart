@@ -9,6 +9,13 @@ import 'package:laundry/core/services/auth_service.dart';
 import 'package:laundry/core/services/connectivity_service.dart';
 import 'package:laundry/core/services/storage_service.dart';
 import 'package:laundry/data/repositories/user_repository.dart';
+import 'package:laundry/data/repositories/category_repository.dart';
+import 'package:laundry/data/repositories/banner_repository.dart';
+import 'package:laundry/data/repositories/service_repository.dart';
+import 'package:laundry/data/repositories/address_repository.dart';
+import 'package:laundry/data/repositories/cart_repository.dart';
+import 'package:laundry/data/repositories/order_repository.dart';
+import 'package:laundry/data/repositories/store_repository.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -20,6 +27,13 @@ class InitialBinding extends Bindings {
     Get.put(AuthService(), permanent: true);
 
     Get.put(UserRepository(), permanent: true);
+    Get.put(CategoryRepository(), permanent: true);
+    Get.put(BannerRepository(), permanent: true);
+    Get.put(ServiceRepository(), permanent: true);
+    Get.put(AddressRepository(), permanent: true);
+    Get.put(CartRepository(), permanent: true);
+    Get.put(OrderRepository(), permanent: true);
+    Get.put(StoreRepository(), permanent: true);
     // Global controllers
     Get.put(InternetController(), permanent: true);
 

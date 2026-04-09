@@ -53,7 +53,7 @@ class OtpVerifyScreen extends GetView<OtpController> {
               SizedBox(height: 10.h),
 
               Text(
-                "Enter the 4-digit code sent to your email\njhon@gmail.com",
+                "Enter the 6-digit code sent to your email\n${controller.email}",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.manrope(
                   fontSize: 14.sp,
@@ -65,12 +65,12 @@ class OtpVerifyScreen extends GetView<OtpController> {
               // OTP Input Boxes (Placeholder using Row of Containers/TextFields)
               Pinput(
                 controller: controller.otpController,
-                length: 4,
+                length: 6,
 
                 separatorBuilder: (index) => SizedBox(width: 20.w),
                 defaultPinTheme: PinTheme(
-                  width: 56.w,
-                  height: 56.h,
+                  width: 50.w,
+                  height: 50.h,
                   textStyle: GoogleFonts.manrope(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
@@ -92,11 +92,14 @@ class OtpVerifyScreen extends GetView<OtpController> {
               SizedBox(height: 40.h),
 
               // Verify Button
-              CustomElevatedButton(
-                label: 'Verify',
-                onPressed: () {
-                  controller.verifyOtp();
-                },
+              Obx(
+                () => CustomElevatedButton(
+                  label: 'Verify',
+                  isLoading: controller.isLoading.value,
+                  onPressed: () {
+                    controller.verifyOtp();
+                  },
+                ),
               ),
               SizedBox(height: 40.h),
 
@@ -112,24 +115,30 @@ class OtpVerifyScreen extends GetView<OtpController> {
               SizedBox(height: 10.h),
               Align(
                 alignment: Alignment.center, // full width prevent
-                child: TextButton(
-                  onPressed: () {},
+                child: Obx(
+                  () => TextButton(
+                    onPressed: controller.isResendEnabled.value
+                        ? () => controller.resendOtp()
+                        : null,
 
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
 
-                    // ✅ press color (only text area)
-                    overlayColor: AppTheme.textColor.withOpacity(0.15),
-                  ),
+                      // ✅ press color (only text area)
+                      overlayColor: AppTheme.textColor.withOpacity(0.15),
+                    ),
 
-                  child: Text(
-                    'Resend Code',
-                    style: GoogleFonts.manrope(
-                      fontSize: 14.sp,
-                      color: AppTheme.textColor,
-                      fontWeight: FontWeight.w600,
+                    child: Text(
+                      'Resend Code',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14.sp,
+                        color: controller.isResendEnabled.value
+                            ? AppTheme.textColor
+                            : Colors.grey,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -162,14 +171,23 @@ class OtpVerifyScreen extends GetView<OtpController> {
                         ),
                       ),
                       SizedBox(width: 5.w),
-                      Text(
-                        '01:55',
-                        style: GoogleFonts.manrope(
-                          fontSize: 14.sp,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      Obx(() {
+                        final minutes =
+                            (controller.remainingSeconds.value ~/ 60)
+                                .toString()
+                                .padLeft(2, '0');
+                        final seconds = (controller.remainingSeconds.value % 60)
+                            .toString()
+                            .padLeft(2, '0');
+                        return Text(
+                          '$minutes:$seconds',
+                          style: GoogleFonts.manrope(
+                            fontSize: 14.sp,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),

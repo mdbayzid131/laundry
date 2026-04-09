@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +5,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
+import 'package:laundry/data/models/banner_model.dart';
+import 'package:shimmer/shimmer.dart';
+
+import 'package:laundry/core/utils/gradient_parser.dart';
 
 class PromotionalBannerCarousel extends StatefulWidget {
   const PromotionalBannerCarousel({super.key});
@@ -19,33 +22,27 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
   int _currentIndex = 0;
   final CarouselSliderController _carouselController =
       CarouselSliderController();
-  final BannerController _bannerController = Get.find<BannerController>();
-
-  /// Banner map (easy to extend later)
+  final HomeController _homeController = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
-    final BannerController bannerController = Get.put(BannerController());
     return Obx(() {
-      if (bannerController.isLoading.value &&
-          bannerController.banners.isEmpty) {
-        return SizedBox(
-          height: 180.h,
-          child: const Center(child: CircularProgressIndicator()),
-        );
+      if (_homeController.isLoadingBanners.value &&
+          _homeController.banners.isEmpty) {
+        return _buildShimmerLoading();
       }
 
-      if (bannerController.banners.isEmpty) {
-        return SizedBox(height: 140.h);
+      if (_homeController.banners.isEmpty) {
+        return const SizedBox();
       }
 
       return Column(
         children: [
           CarouselSlider.builder(
             carouselController: _carouselController,
-            itemCount: _bannerController.banners.length,
+            itemCount: _homeController.banners.length,
             options: CarouselOptions(
-              height: 140.h,
+              height: 180.h,
               viewportFraction: 1,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 4),
@@ -56,52 +53,142 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
               },
             ),
             itemBuilder: (context, index, realIndex) {
-              // return _buildBannerItem(_bannerController.banners[index].image);
-              return buildPromotionalBanner();
+              return buildPromotionalBanner(_homeController.banners[index]);
             },
           ),
-
           SizedBox(height: 12.h),
-
           _buildIndicators(),
         ],
       );
     });
   }
 
-  /// Single banner item
-  Widget _buildBannerItem(String imagePath) {
+  Widget buildPromotionalBanner(BannerData banner) {
+    // Helper to highlight percentages in green
+    List<TextSpan> _buildTitleSpans(String title) {
+      final spans = <TextSpan>[];
+      final regex = RegExp(r'(\d+%)');
+      final matches = regex.allMatches(title);
+      int lastIndex = 0;
+
+      for (final match in matches) {
+        if (match.start > lastIndex) {
+          spans.add(TextSpan(text: title.substring(lastIndex, match.start)));
+        }
+        spans.add(
+          TextSpan(
+            text: match.group(0),
+            style: const TextStyle(color: Color(0xFF4ADE80)), // Bright green
+          ),
+        );
+        lastIndex = match.end;
+      }
+
+      if (lastIndex < title.length) {
+        spans.add(TextSpan(text: title.substring(lastIndex)));
+      }
+      return spans;
+    }
+
     return Container(
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 12.w),
+      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 27, 26, 26), // white background
-        borderRadius: BorderRadius.circular(12.r),
+        gradient: GradientParser.parse(banner.backgroundColor),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: Image.asset(
-          imagePath,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported),
-        ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: GoogleFonts.manrope(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                    children: _buildTitleSpans(banner.title ?? ''),
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  banner.description ?? '',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 10.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Text(
+                    banner.buttonText ?? 'Schedule Now',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Expanded(
+            flex: 4,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16.r),
+              child: Container(
+                height: double.infinity,
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.1)),
+                child: (banner.image != null && banner.image!.isNotEmpty)
+                    ? Image.network(
+                        banner.image!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.image,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                      )
+                    : Icon(
+                        Icons.local_laundry_service,
+                        size: 40.sp,
+                        color: Colors.white,
+                      ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// Dot indicators
   Widget _buildIndicators() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(_bannerController.banners.length, (index) {
+      children: List.generate(_homeController.banners.length, (index) {
         final isActive = _currentIndex == index;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -116,70 +203,19 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
       }),
     );
   }
-}
 
-  Widget buildPromotionalBanner() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        height: 180.h,
+        margin: EdgeInsets.symmetric(horizontal: 16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
         ),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dry Clean 30% OFF',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'DEMO BANNER',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w700,
-                    color:  Colors.red,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  'Enjoy discounts on\nevery order',
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                SizedBox(height: 12.h),
-              ],
-            ),
-          ),
-          SizedBox(width: 16.w),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.r),
-            child: Container(
-              width: 100.w,
-              height: 100.h,
-              color: Colors.white.withOpacity(0.2),
-              child: Icon(
-                Icons.local_laundry_service,
-                size: 50.sp,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
+}

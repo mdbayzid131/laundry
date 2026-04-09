@@ -1,64 +1,179 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/banner_model.dart';
+import 'package:laundry/data/models/category_model.dart';
+import 'package:laundry/data/models/storage_services_model.dart';
+import 'package:laundry/data/repositories/category_repository.dart';
+import 'package:laundry/data/repositories/banner_repository.dart';
+import 'package:laundry/data/repositories/service_repository.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:laundry/core/services/storage_service.dart';
+import 'package:laundry/config/constants/storage_constants.dart';
 
-class HomeController extends GetxController {}
+enum LocationSelectionType { current, manual }
 
-class BannerController extends GetxController {
-  RxBool isLoading = false.obs;
-  // final RxList<BannerModel> _banners = <BannerModel>[].obs;
-  // List<BannerModel> get banners => _banners;
-  // // final UserProfileManageRepo _userProfileManageRepo =
-  // //     Get.find<UserProfileManageRepo>();
+class HomeController extends GetxController {
+  final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
+  final BannerRepository _bannerRepository = Get.find<BannerRepository>();
+  final ServiceRepository _serviceRepository = Get.find<ServiceRepository>();
 
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   getBanners();
-  // }
-  // /// ===================== GET BANNERS =====================
-  // Future<void> getBanners() async {
-  //   isLoading.value = true;
+  RxBool isLoadingCategories = false.obs;
+  RxList<CategoryData> categories = <CategoryData>[].obs;
 
-  //   try {
-  //     final Response<dynamic> response = await _userProfileManageRepo
-  //         .getBanners();
-  //     if (response.statusCode == 200) {
-  //       BannerResponseModel bannerResponseModel = BannerResponseModel.fromJson(response.data);
-  //       _banners.value = bannerResponseModel.data.banners;
-  //     }
+  RxBool isLoadingBanners = false.obs;
+  RxList<BannerData> banners = <BannerData>[].obs;
 
-  //   } catch (e) {
-  //     print(e.toString());
-  //     Helpers.showErrorSnackbar(e.toString());
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-  List<BannerModel> banners = [
-    BannerModel(
-      id: '1',
-      image: ImagePaths.banner1,
-      title: 'Banner 1',
-      description: 'Description 1',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    BannerModel(
-      id: '2',
-      image: ImagePaths.banner2,
-      title: 'Banner 2',
-      description: 'Description 2',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-    BannerModel(
-      id: '3',
-      image: ImagePaths.banner3,
-      title: 'Banner 3',
-      description: 'Description 3',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    ),
-  ];
+  RxBool isLoadingServices = false.obs;
+  RxList<StoreServiceData> services = <StoreServiceData>[].obs;
+
+  // New Variables for Location & Search
+  RxDouble lat = 0.0.obs;
+  RxDouble lng = 0.0.obs;
+  RxString selectedCategoryId = ''.obs;
+  RxString searchTerm = ''.obs;
+  RxString currentAddress = 'Select Location'.obs;
+  final locationType = LocationSelectionType.current.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Wait for first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Helpers.showLoadingDialog();
+      await getCurrentLocation(fetchInitialData: false);
+      await loadInitialData(showLoader: false);
+      Helpers.hideLoadingDialog();
+    });
+  }
+
+  Future<void> loadInitialData({bool showLoader = true}) async {
+    if (showLoader) Helpers.showLoadingDialog();
+    try {
+      await Future.wait([getCategories(), getBanners(), getStoreServices()]);
+    } catch (e) {
+      Helpers.showDebugLog('Error loading initial data: $e');
+    } finally {
+      if (showLoader) Helpers.hideLoadingDialog();
+    }
+  }
+
+  Future<void> getCategories() async {
+    isLoadingCategories.value = true;
+    try {
+      final response = await _categoryRepository.getCategories();
+      if (response.statusCode == 200) {
+        final categoryResponse = CategoriesResponseModel.fromJson(response.data);
+        categories.value = categoryResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog(e.toString());
+    } finally {
+      isLoadingCategories.value = false;
+    }
+  }
+
+  Future<void> getBanners() async {
+    isLoadingBanners.value = true;
+    try {
+      final response = await _bannerRepository.getBanners();
+      if (response.statusCode == 200) {
+        final bannerResponse = BannerResponseModel.fromJson(response.data);
+        banners.value = bannerResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching banners: $e');
+    } finally {
+      isLoadingBanners.value = false;
+    }
+  }
+
+  Future<void> getStoreServices() async {
+    isLoadingServices.value = true;
+    try {
+      final response = await _serviceRepository.getStoreServices(
+        lat.value,
+        lng.value,
+        selectedCategoryId.value,
+        searchTerm.value,
+      );
+      if (response.statusCode == 200) {
+        final servicesResponse = StoreServiceResponseModel.fromJson(response.data);
+        services.value = servicesResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching services: $e');
+    } finally {
+      isLoadingServices.value = false;
+    }
+  }
+
+  Future<void> getCurrentLocation({bool fetchInitialData = true}) async {
+    if (fetchInitialData) Helpers.showLoadingDialog();
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Helpers.showCustomSnackBar('Location services are disabled.', isError: true);
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Helpers.showCustomSnackBar('Location permissions are denied', isError: true);
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Helpers.showCustomSnackBar(
+          'Location permissions are permanently denied.',
+          isError: true,
+        );
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+      lat.value = position.latitude;
+      lng.value = position.longitude;
+      locationType.value = LocationSelectionType.current;
+      currentAddress.value = "Current Location";
+      
+      StorageService.setDouble(StorageConstants.userLat, lat.value);
+      StorageService.setDouble(StorageConstants.userLng, lng.value);
+      
+      if (fetchInitialData) {
+        await loadInitialData(showLoader: false);
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error getting location: $e');
+    } finally {
+      if (fetchInitialData) Helpers.hideLoadingDialog();
+    }
+  }
+
+  void onSearch(String value) {
+    searchTerm.value = value;
+    getStoreServices();
+  }
+
+  void onCategorySelected(String categoryId) {
+    if (selectedCategoryId.value == categoryId) {
+      selectedCategoryId.value = '';
+    } else {
+      selectedCategoryId.value = categoryId;
+    }
+    getStoreServices();
+  }
+
+  void updateLocation(double newLat, double newLng, String newAddress) {
+    lat.value = newLat;
+    lng.value = newLng;
+    currentAddress.value = newAddress;
+    locationType.value = LocationSelectionType.manual;
+    StorageService.setDouble(StorageConstants.userLat, lat.value);
+    StorageService.setDouble(StorageConstants.userLng, lng.value);
+    loadInitialData();
+  }
 }

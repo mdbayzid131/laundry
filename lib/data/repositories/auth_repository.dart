@@ -34,17 +34,17 @@ class AuthRepo {
     required String email,
     required String password,
     required String phone,
-    required String country,
-    String role = "PARENT",
+    required String address,
   }) async {
     return await apiClient.postData(ApiConstants.signup, {
-      "name": name,
-      "email": email,
-      "password": password,
-      "phone": phone,
-      "country": country,
-      "role": role,
-    });
+  "email": email,
+  "name": name,
+  "address": address,
+  "password": password,
+  "phone": phone,
+});
+
+
   }
 
   /// ===================== LOGIN =====================
@@ -67,7 +67,7 @@ class AuthRepo {
 
   /// ===================== RESEND OTP =====================
   Future<Response> resentOtp({required String email}) async {
-    return await apiClient.postData(ApiConstants.resendVerifyEmail, {   
+    return await apiClient.postData(ApiConstants.resendOtp, {   
       "email": email,
     });
   }
@@ -75,23 +75,26 @@ class AuthRepo {
   /// ===================== OTP VERIFY =====================
   Future<Response> otpVerify({
     required String email,
-    required int oneTimeCode,
+    required int otp,
   }) async {
-    return await apiClient.postData(ApiConstants.verifyEmail, {
+    return await apiClient.postData(ApiConstants.verifyUser, {
       "email": email,
-      "oneTimeCode": oneTimeCode,
+      "otp": otp,
     });
   }
 
   /// ===================== RESET PASSWORD =====================
   Future<Response> resetPassword({
-    required String newPassword,
-    required String confirmPassword,
+    required String password,
+    required String resetToken,
   }) async {
-    return await apiClient.postData(ApiConstants.resetPassword, {
-      "newPassword": newPassword,
-      "confirmPassword": confirmPassword,
-    });
+    return await apiClient.postData(
+      ApiConstants.resetPassword, 
+      {
+        "password": password,
+      },
+      resetToken: 'Bearer $resetToken',
+    );
   }
 
   /// ===================== LOGOUT =====================
@@ -111,14 +114,12 @@ class AuthRepo {
 
   /// ===================== CHANGE PASSWORD =====================
   Future<Response> changePassword({
-    required String currentPassword,
+    required String oldPassword,
     required String newPassword,
-    required String confirmPassword,
   }) async {
-    return await apiClient.postData(ApiConstants.resetPassword, {      
-      "currentPassword": currentPassword,
+    return await apiClient.postData(ApiConstants.changePassword, {      
+      "oldPassword": oldPassword,
       "newPassword": newPassword,
-      "confirmPassword": confirmPassword,
     });
   }
 

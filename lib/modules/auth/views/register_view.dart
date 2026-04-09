@@ -38,10 +38,10 @@ class RegisterView extends GetView<RegisterController> {
 
                 SizedBox(height: 6.h),
                 CustomTextField(
-                  // Use dummy controller or proper if implemented
-                  // controller: controller.phoneController,
+                  controller: controller.phoneController,
                   hintText: 'Enter your number',
                   keyboardType: TextInputType.phone,
+                  validator: (value) => Validators.phone(value),
                   label: 'Phone Number',
                 ),
                 SizedBox(height: 16.h),
@@ -100,10 +100,10 @@ class RegisterView extends GetView<RegisterController> {
 
                 SizedBox(height: 6.h),
                 CustomTextField(
-                  // Use dummy controller or proper if implemented
-                  // controller: controller.addressController,
+                  controller: controller.addressController,
                   hintText: 'Enter your address',
                   label: 'Address',
+                  validator: (value) => value == null || value.isEmpty ? 'Address is required' : null,
                 ),
                 SizedBox(height: 30.h),
 

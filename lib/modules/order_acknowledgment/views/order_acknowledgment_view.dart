@@ -181,8 +181,8 @@ class OrderAcknowledgmentView extends GetView<OrderAcknowledgmentController> {
               : [],
         ),
         child: ElevatedButton(
-          onPressed: controller.isAllChecked
-              ? () => Get.toNamed(AppRoutes.PAYMENT_METHOD)
+          onPressed: controller.isAllChecked && !controller.isLoading.value
+              ? () => controller.checkout()
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
@@ -191,21 +191,23 @@ class OrderAcknowledgmentView extends GetView<OrderAcknowledgmentController> {
               borderRadius: BorderRadius.circular(12.r),
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Proceed to Payment',
-                style: GoogleFonts.manrope(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+          child: controller.isLoading.value
+              ? const Center(child: CircularProgressIndicator(color: Colors.white))
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Proceed to Payment',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Icon(Icons.arrow_forward, size: 20.sp, color: Colors.white),
+                  ],
                 ),
-              ),
-              SizedBox(width: 8.w),
-              Icon(Icons.arrow_forward, size: 20.sp, color: Colors.white),
-            ],
-          ),
         ),
       ),
     );

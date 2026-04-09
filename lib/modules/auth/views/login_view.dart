@@ -67,16 +67,6 @@ class LoginView extends GetView<LoginController> {
                 ),
                 SizedBox(height: 16.h),
 
-                // Phone Field Placeholder (assuming controller has it, otherwise skip or add)
-                SizedBox(height: 6.h),
-                CustomTextField(
-                  hintText: '015451246++',
-                  keyboardType: TextInputType.phone,
-                  label: 'Phone Number',
-                  // We'll create a new controller variable or reuse if existing. For now, comment out controller or use a dummy
-                  // controller: controller.phoneController,
-                ),
-                SizedBox(height: 16.h),
 
                 // Password Field
                 SizedBox(height: 6.h),
@@ -127,7 +117,7 @@ class LoginView extends GetView<LoginController> {
                 Obx(
                   () => CustomElevatedButton(
                     label: 'Sign In',
-                    onPressed: controller.goToHome,
+                    onPressed: controller.login,
                     isLoading: controller.isLoading.value,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,

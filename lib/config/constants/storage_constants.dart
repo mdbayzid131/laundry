@@ -10,4 +10,6 @@ class StorageConstants {
   static const String onboardingSeen = 'onboarding_seen';
   static const String deviceToken = 'device_token';
   static const String quickSetupCompleted = 'quick_setup_completed';
+  static const String userLat = 'user_lat';
+  static const String userLng = 'user_lng';
 }

@@ -67,8 +67,10 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
               child: GestureDetector(
                 onTap: () => Get.toNamed(AppRoutes.CART),
                 child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 32.w, vertical: 14.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 32.w,
+                    vertical: 14.h,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xffB5DEEF),
                     borderRadius: BorderRadius.circular(30.r),
@@ -83,11 +85,14 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.shopping_cart_outlined,
-                          color: Colors.white, size: 22.sp),
+                      Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Colors.white,
+                        size: 22.sp,
+                      ),
                       SizedBox(width: 12.w),
                       Text(
-                        'View cart (1)',
+                        'View cart ${controller.storeDetails.value!.count?.cartItems.toString()}',
                         style: GoogleFonts.manrope(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w800,
@@ -108,32 +113,38 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
   Widget _buildHeader() {
     return Stack(
       children: [
-        Container(
-          height: 280.h,
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: const Color(0xffE2E8F0),
-            // borderRadius: BorderRadius.only(
-            //   bottomLeft: Radius.circular(32.r),
-            //   bottomRight: Radius.circular(32.r),
-            // ),
-          ),
-          child: Image.asset(
-            ImagePaths.op1,
-            fit: BoxFit.cover,
+        Obx(() {
+          final store = controller.storeDetails.value;
+          return Container(
+            height: 280.h,
             width: double.infinity,
-            height: double.infinity,
-          ),
-        ),
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(color: const Color(0xffE2E8F0)),
+            child: store?.banner != null
+                ? Image.network(
+                    store!.banner!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      ImagePaths.op1,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  )
+                : Image.asset(
+                    ImagePaths.op1,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+          );
+        }),
         Container(
           height: 280.h,
           width: double.infinity,
           decoration: BoxDecoration(
-            // borderRadius: BorderRadius.only(
-            //   bottomLeft: Radius.circular(32.r),
-            //   bottomRight: Radius.circular(32.r),
-            // ),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -154,48 +165,75 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           bottom: 20.h,
           left: 20.w,
           right: 20.w,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
+          child: Obx(() {
+            final store = controller.storeDetails.value;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (store?.logo != null)
+                  Container(
+                    width: 50.w,
+                    height: 50.h,
+                    padding: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(
+                        store!.logo!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.dry_cleaning,
+                          color: const Color(0xff1A2530),
+                          size: 25.sp,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Icon(
+                      Icons.dry_cleaning,
+                      color: const Color(0xff1A2530),
+                      size: 25.sp,
+                    ),
+                  ),
+                SizedBox(height: 12.h),
+                Text(
+                  store?.name ?? 'Loading...',
+                  style: GoogleFonts.manrope(
+                    fontSize: 26.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
                 ),
-                child: Icon(
-                  Icons.dry_cleaning,
-                  color: const Color(0xff1A2530),
-                  size: 25.sp,
+                if (store?.distanceMile != null)
+                  Text(
+                    '${store!.distanceMile!.toStringAsFixed(1)} mi',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                  ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Pricing & Fees',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xffB5DEEF),
+                  ),
                 ),
-              ),
-              SizedBox(height: 12.h),
-              Text(
-                'Laundry Express',
-                style: GoogleFonts.manrope(
-                  fontSize: 26.sp,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                '2.5 mi',
-                style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                'Pricing & Fees',
-                style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xffB5DEEF),
-                ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
         ),
       ],
     );
@@ -286,13 +324,19 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
               color: const Color(0xff1A2530),
             ),
             SizedBox(width: 8.w),
-            Text(
-              '2.5 mi away',
-              style: GoogleFonts.manrope(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Obx(() {
+              final store = controller.storeDetails.value;
+              final dist = store?.distanceMile != null
+                  ? '${store!.distanceMile!.toStringAsFixed(1)} mi away'
+                  : '... mi away';
+              return Text(
+                dist,
+                style: GoogleFonts.manrope(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+            }),
             SizedBox(width: 20.w),
             Icon(
               Icons.access_time,
@@ -346,7 +390,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
                   color: const Color(0xffB5DEEF),
-          
+
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(Icons.star, color: Colors.white, size: 20.sp),
@@ -381,71 +425,159 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
   }
 
   Widget _buildCategoryFilters() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Obx(
-        () => Row(
-          children: controller.categories
-              .map(
-                (cat) => Padding(
-                  padding: EdgeInsets.only(right: 12.w),
-                  child: GestureDetector(
-                    onTap: () => controller.selectCategory(cat),
-                    child: Container(
-                      width: 110.w,
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: controller.selectedCategory.value == cat
-                              ? const Color(0xffB5DEEF)
-                              : const Color(0xffF1F5F9),
-                        ),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        cat,
-                        style: GoogleFonts.manrope(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700,
-                          color: controller.selectedCategory.value == cat
-                              ? const Color(0xff1A2530)
-                              : Colors.black38,
-                        ),
-                      ),
-                    ),
+    return Obx(() {
+      if (controller.isLoadingCategories.value) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: const CircularProgressIndicator(),
+          ),
+        );
+      }
+      if (controller.operatorCategories.isEmpty) {
+        return const SizedBox();
+      }
+
+      List<Widget> filterPills = [];
+
+      // Add 'All' pill
+      filterPills.add(
+        Padding(
+          padding: EdgeInsets.only(right: 12.w, left: 20.w),
+          child: GestureDetector(
+            onTap: () => controller.selectCategory(''),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: controller.selectedCategory.value.isEmpty
+                      ? const Color(0xffB5DEEF)
+                      : const Color(0xffF1F5F9),
+                ),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'All',
+                style: GoogleFonts.manrope(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w700,
+                  color: controller.selectedCategory.value.isEmpty
+                      ? const Color(0xff1A2530)
+                      : Colors.black38,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Add categories
+      filterPills.addAll(
+        controller.operatorCategories.map((catData) {
+          final catId = catData.categoryId ?? '';
+          final catName = catData.category?.name ?? 'Unknown';
+          return Padding(
+            padding: EdgeInsets.only(right: 12.w),
+            child: GestureDetector(
+              onTap: () => controller.selectCategory(catId),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: controller.selectedCategory.value == catId
+                        ? const Color(0xffB5DEEF)
+                        : const Color(0xffF1F5F9),
+                  ),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  catName,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
+                    color: controller.selectedCategory.value == catId
+                        ? const Color(0xff1A2530)
+                        : Colors.black38,
                   ),
                 ),
-              )
-              .toList(),
-        ),
-      ),
-    );
+              ),
+            ),
+          );
+        }).toList(),
+      );
+
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(right: 20.w),
+        child: Row(children: filterPills),
+      );
+    });
   }
 
   Widget _buildPromotedServices() {
-    return Column(
-      children: [
-        _buildPromotedCard(
-          'Dry Clean',
-          ImagePaths.op2,
-          '4.6 (5k+)',
-          '2.2 mi, 30 min',
-          '\$12.14/piece',
-          'delivery fee on \$2.00',
-        ),
-        _buildPromotedCard(
-          'Dry Clean',
-          ImagePaths.op3,
-          '4.6 (5k+)',
-          '2.2 mi, 30 min',
-          '\$12.14/piece',
-          'delivery fee on \$2.00',
-        ),
-      ],
-    );
+    return Obx(() {
+      if (controller.isLoadingServices.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      final services = controller.filteredServices;
+      if (services.isEmpty) {
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+          padding: EdgeInsets.all(24.w),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xffF8FAFC),
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: const Color(0xffE2E8F0)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.dry_cleaning_outlined,
+                size: 48.sp,
+                color: Colors.black26,
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'No Services Available',
+                style: GoogleFonts.manrope(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xff1A2530),
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                'There are currently no services listed for this category.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.manrope(
+                  fontSize: 14.sp,
+                  color: Colors.black45,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return Column(
+        children: services.map((serviceItem) {
+          return _buildPromotedCard(
+            serviceItem.service?.name ?? '',
+            serviceItem.service?.image ?? ImagePaths.op2,
+            '4.6 (5k+)',
+            '2.2 mi, 30 min',
+            '\$${serviceItem.service?.basePrice ?? '0'}/piece',
+            'delivery fee on \$2.00',
+          );
+        }).toList(),
+      );
+    });
   }
 
   Widget _buildPromotedCard(
@@ -474,12 +606,26 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(16.r),
                   ),
-                  child: Image.asset(
-                    image,
-                    height: 180.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: image.startsWith('http')
+                      ? Image.network(
+                          image,
+                          height: 180.h,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.asset(
+                                ImagePaths.op2,
+                                height: 180.h,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                        )
+                      : Image.asset(
+                          image,
+                          height: 180.h,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 Positioned(
                   top: 12.h,
@@ -633,7 +779,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
         _buildGridItem('Wash', ImagePaths.op5),
         _buildGridItem('Wash', ImagePaths.op6),
         _buildGridItem('Wash', ImagePaths.op7),
-                _buildGridItem('Wash1', ImagePaths.op4),
+        _buildGridItem('Wash1', ImagePaths.op4),
         _buildGridItem('Wash1', ImagePaths.op5),
         _buildGridItem('Wash1', ImagePaths.op6),
         _buildGridItem('Wash1', ImagePaths.op7),
@@ -776,12 +922,25 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           SizedBox(width: 16.w),
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r),
-            child: Image.asset(
-              image,
-              width: 80.w,
-              height: 80.h,
-              fit: BoxFit.cover,
-            ),
+            child: image.startsWith('http')
+                ? Image.network(
+                    image,
+                    height: 80.h,
+                    width: 80.w,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      ImagePaths.op2,
+                      height: 80.h,
+                      width: 80.w,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    image,
+                    height: 80.h,
+                    width: 80.w,
+                    fit: BoxFit.cover,
+                  ),
           ),
           SizedBox(width: 12.w),
           Container(

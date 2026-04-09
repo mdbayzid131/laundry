@@ -1,5 +1,7 @@
 import 'package:laundry/core/middleware/auth_middleware.dart';
 import 'package:laundry/core/widgets/screens/no_internet_screen.dart';
+import 'package:laundry/modules/auth_lock/binding/lock_binding.dart';
+import 'package:laundry/modules/auth_lock/view/lock_screen.dart';
 import 'package:laundry/modules/bottom_nab_bar/bindings/bottom_nab_bar_binding.dart';
 import 'package:laundry/modules/bottom_nab_bar/views/bottom_nab_bar_view.dart';
 import 'package:get/get.dart';
@@ -35,6 +37,8 @@ import 'package:laundry/modules/legal/views/terms_conditions_view.dart';
 import 'package:laundry/modules/legal/bindings/legal_binding.dart';
 import 'package:laundry/modules/notifications/views/notifications_view.dart';
 import 'package:laundry/modules/notifications/bindings/notifications_binding.dart';
+import 'package:laundry/modules/track_order/bindings/track_order_binding.dart';
+import 'package:laundry/modules/track_order/views/track_order_view.dart';
 import '../../modules/auth/bindings/auth_binding.dart';
 import '../../modules/auth/views/login_view.dart';
 import '../../modules/auth/views/register_view.dart';
@@ -45,6 +49,8 @@ import 'package:laundry/modules/laundry_details/views/laundry_details_view.dart'
 import 'package:laundry/modules/laundry_details/bindings/laundry_details_binding.dart';
 import 'package:laundry/modules/product_details/bindings/product_details_binding.dart';
 import 'package:laundry/modules/product_details/views/product_details_view.dart';
+import 'package:laundry/modules/change_password/bindings/change_password_binding.dart';
+import 'package:laundry/modules/change_password/views/change_password_view.dart';
 
 import '../../modules/home/bindings/home_binding.dart';
 import '../../modules/home/views/home_view.dart';
@@ -52,8 +58,6 @@ import '../../modules/profile/bindings/profile_binding.dart';
 import '../../modules/profile/views/profile_view.dart';
 import '../../modules/splash/bindings/splash_binding.dart';
 import '../../modules/splash/views/splash_view.dart';
-import '../../modules/splash/views/intro_screens_view.dart';
-import '../../modules/splash/bindings/intro_screens_binding.dart';
 import '../../modules/map/bindings/map_binding.dart';
 import '../../modules/map/views/map_screen.dart';
 import '../../modules/cart/bindings/cart_binding.dart';
@@ -97,8 +101,11 @@ class AppRoutes {
   static const String NOTIFICATIONS = '/notifications';
   static const String LAUNDRY_DETAILS = '/laundry-details';
   static const String PRODUCT_DETAILS = '/product-details';
-  static const String INTRO_SCREENS = '/intro-screens';
   static const String MEMBERSHIP = '/membership';
+  static const String OTP_FORM_REGISTER = '/otp-form-register';
+  static const String CHANGE_PASSWORD = '/change-password';
+  static const String LOCK = '/lock';
+  static const String TRACK_ORDER = '/track-order';
 }
 
 final pages = [
@@ -292,13 +299,29 @@ final pages = [
     binding: ProductDetailsBinding(),
   ),
   GetPage(
-    name: AppRoutes.INTRO_SCREENS,
-    page: () => const IntroScreensView(),
-    binding: IntroScreensBinding(),
-  ),
-  GetPage(
     name: AppRoutes.MEMBERSHIP,
     page: () => const MembershipView(),
     binding: MembershipBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.OTP_FORM_REGISTER,
+    page: () => const OtpVerifyScreen(),
+    binding: AuthBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.CHANGE_PASSWORD,
+    page: () => const ChangePasswordView(),
+    binding: ChangePasswordBinding(),
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.LOCK,
+    page: () => const LockScreen(),
+    binding: LockBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.TRACK_ORDER,
+    page: () => const TrackOrderView(),
+    binding: TrackOrderBinding(),
   ),
 ];

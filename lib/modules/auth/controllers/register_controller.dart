@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
+import 'package:laundry/core/services/api_checker.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
 
 class RegisterController extends GetxController {
   final AuthService _authService = Get.find();
 
+  final addressController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   final phoneController = TextEditingController();
-  final countryController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   final isLoading = false.obs;
@@ -21,10 +22,12 @@ class RegisterController extends GetxController {
 
   @override
   void onClose() {
+    addressController.dispose();
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    phoneController.dispose();
     super.onClose();
   }
 
@@ -42,24 +45,26 @@ class RegisterController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _authService.signup(
+      var response = await _authService.signup(
         name: nameController.text,
         email: emailController.text,
         password: passwordController.text,
         phone: phoneController.text,
-        country: countryController.text,
+        address: addressController.text,
       );
-
-      Helpers.showCustomSnackBar(
-        'Registration successful',
-
-      );
-      Get.offAllNamed(AppRoutes.LOGIN);
+      ApiChecker.checkWriteApi(response);
+      if (response.statusCode == 201) {
+        Helpers.showCustomSnackBar(
+          'Registration successful, please verify your email',
+          isError: false,
+        );
+        Get.toNamed(
+          AppRoutes.OTP_FORM_REGISTER,
+          arguments: emailController.text,
+        );
+      }
     } catch (e) {
-      Helpers.showCustomSnackBar(
-        e.toString(),
-
-      );
+      Helpers.showDebugLog(e.toString());
     } finally {
       isLoading.value = false;
     }

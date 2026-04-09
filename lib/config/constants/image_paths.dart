@@ -11,6 +11,8 @@ class ImagePaths {
   static String shirtIcon = "assets/icons/shirt_svg.svg";
   static String ironAndPressIcon = "assets/icons/iron_and_press.svg";
   static String dryCleanIcon = "assets/icons/dry_clean.svg";
+  static String mapIcon = "assets/icons/map.svg";
+  static String deleteIcon = "assets/icons/delete_icon.svg";
 
   ///<======================ImageIcon =======================>
   static String onboardingImage1 = "assets/images/onboarding_1.png";

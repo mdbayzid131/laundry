@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/constants/image_paths.dart';
@@ -15,48 +14,138 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildProductImageCard(),
-                    SizedBox(height: 20.h),
-                    _buildTitleAndRating(),
-                    SizedBox(height: 8.h),
-                    _buildPriceHeader(),
-                    SizedBox(height: 24.h),
-                    _buildVendorSection(),
-                    SizedBox(height: 24.h),
-                    _buildServiceHeader('Service'),
-                    _buildPrimaryServiceCard(),
-                    SizedBox(height: 24.h),
-                    _buildServiceHeader('Add-on Services'),
-                    _buildAddonServicesList(),
-                    SizedBox(height: 24.h),
-                    _buildSpecialInstructions(),
-                    SizedBox(height: 32.h),
-                    _buildQuantitySection(),
-                    SizedBox(height: 24.h),
-                    _buildPricingBreakdown(),
-                    SizedBox(height: 32.h),
-                    _buildRelatedServices(),
-                    SizedBox(height: 32.h),
-                    _buildCustomerReviews(),
-                    SizedBox(height: 100.h), // Bottom padding for sticky bar
-                  ],
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xffB5DEEF)),
+            );
+          }
+
+          if (controller.serviceDetails.value == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Failed to load service details'),
+                  SizedBox(height: 16.h),
+                  ElevatedButton(
+                    onPressed: () => controller.getServiceDetails(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              _buildTopBar(),
+              Expanded(
+                child: RefreshIndicator(
+                  color: const Color(0xffB5DEEF),
+                  onRefresh: () => controller.getServiceDetails(),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildProductImageCard(),
+                        SizedBox(height: 20.h),
+                        _buildTitleAndRating(),
+                        SizedBox(height: 8.h),
+                        _buildPriceHeader(),
+                        SizedBox(height: 24.h),
+                        _buildVendorSection(),
+                        SizedBox(height: 24.h),
+                        _buildServiceHeader('Service'),
+                        _buildPrimaryServiceCard(),
+
+                        // Add-on Services Section
+                        if (controller
+                                .serviceDetails
+                                .value
+                                ?.service
+                                ?.serviceAddons
+                                ?.isNotEmpty ??
+                            false) ...[
+                          SizedBox(height: 24.h),
+                          _buildServiceHeader('Add-on Services'),
+                          _buildAddonServicesList(),
+                        ],
+
+                        SizedBox(height: 24.h),
+                        _buildSpecialInstructions(),
+                        SizedBox(height: 32.h),
+                        _buildQuantitySection(),
+                        SizedBox(height: 24.h),
+                        _buildPricingBreakdown(),
+                        SizedBox(height: 32.h),
+                        _buildRelatedServices(),
+
+                        // Customer Reviews Section
+                        if (controller
+                                .serviceDetails
+                                .value
+                                ?.reviews
+                                ?.isNotEmpty ??
+                            false) ...[
+                          SizedBox(height: 40.h),
+                          _buildCustomerReviews(),
+                        ],
+
+                        // SizedBox(height: 32.h),
+                        // _buildConfirmButton(),
+                        SizedBox(
+                          height: 120.h,
+                        ), // Extra space for sticky bottom
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          );
+        }),
+      ),
+      bottomSheet: _buildStickyCartBar(),
+    );
+  }
+
+  Widget _buildConfirmButton() {
+    return Container(
+      width: double.infinity,
+      height: 60.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xffB5DEEF).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xffB5DEEF),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+        ),
+        child: Text(
+          'Confirm',
+          style: GoogleFonts.manrope(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
-      bottomSheet: _buildStickyBottomBar(),
     );
   }
 
@@ -91,7 +180,18 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
         borderRadius: BorderRadius.circular(20.r),
         child: Padding(
           padding: EdgeInsets.all(20.w),
-          child: Image.asset(ImagePaths.shirtPhoto, fit: BoxFit.contain),
+          child: Obx(() {
+            final image = controller.serviceDetails.value?.service?.image;
+            if (image != null && image.isNotEmpty) {
+              return Image.network(
+                image,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) =>
+                    Image.asset(ImagePaths.shirtPhoto, fit: BoxFit.contain),
+              );
+            }
+            return Image.asset(ImagePaths.shirtPhoto, fit: BoxFit.contain);
+          }),
         ),
       ),
     );
@@ -101,12 +201,14 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Dry Clean - Blazer',
-          style: GoogleFonts.manrope(
-            fontSize: 22.sp,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xff1A2530),
+        Obx(
+          () => Text(
+            controller.serviceDetails.value?.service?.name ?? 'Service Details',
+            style: GoogleFonts.manrope(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xff1A2530),
+            ),
           ),
         ),
         SizedBox(height: 8.h),
@@ -125,12 +227,14 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               ),
             ),
             SizedBox(width: 8.w),
-            Text(
-              '4.8 (127 reviews)',
-              style: GoogleFonts.manrope(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black45,
+            Obx(
+              () => Text(
+                '4.8 (${controller.serviceDetails.value?.count?.reviews ?? 0} reviews)',
+                style: GoogleFonts.manrope(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black45,
+                ),
               ),
             ),
           ],
@@ -167,51 +271,62 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
   }
 
   Widget _buildVendorSection() {
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20.r,
-            backgroundImage: AssetImage(ImagePaths.op2),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Vendor',
-                  style: GoogleFonts.manrope(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xff1A2530),
-                  ),
-                ),
-                Text(
-                  'Available',
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+    return Obx(() {
+      final store = controller.serviceDetails.value?.store;
+      return Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: Colors.black.withOpacity(0.05)),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20.r,
+              backgroundColor: Colors.blue.shade50,
+              backgroundImage: store?.logo != null
+                  ? NetworkImage(store!.logo!)
+                  : null,
+              child: store?.logo == null
+                  ? Text(store?.name?.substring(0, 1) ?? 'V')
+                  : null,
             ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 16.sp,
-            color: Colors.black26,
-          ),
-        ],
-      ),
-    );
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    store?.name ?? 'Vendor',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xff1A2530),
+                    ),
+                  ),
+                  Text(
+                    store?.isActive == true ? 'Available' : 'Unavailable',
+                    style: GoogleFonts.manrope(
+                      fontSize: 12.sp,
+                      color: store?.isActive == true
+                          ? Colors.green
+                          : Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16.sp,
+              color: Colors.black26,
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildServiceHeader(String title) {
@@ -229,111 +344,118 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
   }
 
   Widget _buildPrimaryServiceCard() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xffB5DEEF).withOpacity(0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Standard Dry Clean',
-            style: GoogleFonts.manrope(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xff1A2530),
+    return Obx(() {
+      final category = controller.serviceDetails.value?.service?.category;
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: const Color(0xffB5DEEF).withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              category?.name ?? 'Standard Service',
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xff1A2530),
+              ),
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            'Order Ready within 24 hours',
-            style: GoogleFonts.manrope(fontSize: 12.sp, color: Colors.black38),
-          ),
-        ],
-      ),
-    );
+            SizedBox(height: 4.h),
+            Text(
+              category?.description ?? 'Premium quality cleaning',
+              style: GoogleFonts.manrope(
+                fontSize: 12.sp,
+                color: Colors.black38,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildAddonServicesList() {
-    return Column(
-      children: [
-        _buildAddonItem(
-          'Express Service',
-          'Order Ready within 24 hours',
-          '+\$2.00',
-          controller.expressService,
-          controller.toggleExpressService,
-        ),
-        SizedBox(height: 12.h),
-        _buildAddonItem(
-          'Stain Removal',
-          'Professional stain treatment',
-          '+\$1.50',
-          controller.stainRemoval,
-          controller.toggleStainRemoval,
-        ),
-      ],
-    );
+    return Obx(() {
+      final addons = controller.serviceDetails.value?.service?.serviceAddons;
+      if (addons == null || addons.isEmpty) {
+        return const SizedBox();
+      }
+      return Column(
+        children: addons.map((addonWrapper) {
+          final addonItem = addonWrapper.addon;
+          if (addonItem == null) return const SizedBox();
+          return Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: _buildAddonItem(
+              addonItem.name ?? 'Addon',
+              addonItem.description ?? '',
+              '+\$${addonItem.price ?? '0'}',
+              controller.selectedAddons[addonItem.id] ?? false,
+              () => controller.toggleAddon(addonItem.id!),
+            ),
+          );
+        }).toList(),
+      );
+    });
   }
 
   Widget _buildAddonItem(
     String title,
     String subtitle,
     String price,
-    RxBool value,
+    bool isSelected,
     VoidCallback onTap,
   ) {
-    return Obx(
-      () => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: value.value
-                  ? const Color(0xffB5DEEF)
-                  : Colors.black.withOpacity(0.05),
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xffB5DEEF)
+                : Colors.black.withOpacity(0.05),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 20.w,
-                height: 20.w,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4.r),
-                  border: Border.all(
-                    color: value.value
-                        ? const Color(0xffB5DEEF)
-                        : Colors.black12,
-                    width: 2,
-                  ),
-                  color: value.value
-                      ? const Color(0xffB5DEEF)
-                      : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 20.w,
+              height: 20.w,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4.r),
+                border: Border.all(
+                  color: isSelected ? const Color(0xffB5DEEF) : Colors.black12,
+                  width: 2,
                 ),
-                child: value.value
-                    ? Icon(Icons.check, size: 14.sp, color: Colors.white)
-                    : null,
+                color: isSelected
+                    ? const Color(0xffB5DEEF)
+                    : Colors.transparent,
               ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.manrope(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
+              child: isSelected
+                  ? Icon(Icons.check, size: 14.sp, color: Colors.white)
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
                     ),
+                  ),
+                  if (subtitle.isNotEmpty)
                     Text(
                       subtitle,
                       style: GoogleFonts.manrope(
@@ -341,19 +463,18 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                         color: Colors.black38,
                       ),
                     ),
-                  ],
-                ),
+                ],
               ),
-              Text(
-                price,
-                style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xff1A2530),
-                ),
+            ),
+            Text(
+              price,
+              style: GoogleFonts.manrope(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xff1A2530),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -609,29 +730,43 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildServiceHeader('Customer Reviews'),
+            Text(
+              'Customer Reviews',
+              style: GoogleFonts.manrope(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xff1A2530),
+              ),
+            ),
             GestureDetector(
               onTap: () {},
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xffB5DEEF).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: const Color(0xffB5DEEF),
+                  borderRadius: BorderRadius.circular(10.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xffB5DEEF).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.edit_note,
-                      size: 18.sp,
-                      color: const Color(0xffB5DEEF),
+                      Icons.edit_note_rounded,
+                      size: 22.sp,
+                      color: Colors.white,
                     ),
                     SizedBox(width: 4.w),
                     Text(
                       'Write a Review',
                       style: GoogleFonts.manrope(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xffB5DEEF),
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -640,18 +775,21 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
             ),
           ],
         ),
-        _buildReviewItem(
-          'Rahim',
-          'Excellent laundry service - fresh, clean, and perfectly folded.',
-          'Posted 2 days ago',
-          ImagePaths.op6,
-        ),
-        _buildReviewItem(
-          'Sadia',
-          'Excellent laundry service - fresh, clean, and perfectly folded.',
-          'Posted 5 days ago',
-          ImagePaths.op7,
-        ),
+        SizedBox(height: 24.h),
+        Obx(() {
+          final reviews = controller.serviceDetails.value?.reviews ?? [];
+          return Column(
+            children: reviews.take(2).map((review) {
+              return _buildReviewItem(
+                'User ${review.userId?.substring(0, 4)}',
+                review.comment ?? '',
+                'Posted ${review.createdAt?.substring(0, 10)}',
+                ImagePaths.op6, // Placeholder avatar
+                review.rating ?? 5,
+              );
+            }).toList(),
+          );
+        }),
         SizedBox(height: 16.h),
         Center(
           child: Row(
@@ -682,6 +820,7 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     String comment,
     String time,
     String avatar,
+    int rating,
   ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 20.h),
@@ -695,22 +834,23 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       name,
                       style: GoogleFonts.manrope(
-                        fontSize: 14.sp,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
+                        color: const Color(0xff1A2530),
                       ),
                     ),
+                    SizedBox(width: 8.w),
                     Row(
                       children: List.generate(
                         5,
                         (index) => Icon(
                           Icons.star_rounded,
-                          color: Colors.black,
-                          size: 14.sp,
+                          color: index < rating ? Colors.black : Colors.black12,
+                          size: 16.sp,
                         ),
                       ),
                     ),
@@ -729,9 +869,9 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                 Text(
                   time,
                   style: GoogleFonts.manrope(
-                    fontSize: 11.sp,
-                    color: const Color(0xffB5DEEF),
-                    fontWeight: FontWeight.w700,
+                    fontSize: 12.sp,
+                    color: const Color(0xff579796),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -742,47 +882,87 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
     );
   }
 
-  Widget _buildStickyBottomBar() {
+  Widget _buildStickyCartBar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.black.withOpacity(0.05))),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Cart: 2 items • \$17.98',
-                style: GoogleFonts.manrope(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black45,
+          Expanded(
+            child: Obx(
+              () => RichText(
+                text: TextSpan(
+                  style: GoogleFonts.manrope(color: const Color(0xff1A2530)),
+                  children: [
+                    TextSpan(
+                      text: 'Cart: ',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.black45,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '${controller.quantity.value} items • ',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '\$${controller.totalPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          const Spacer(),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xffB5DEEF),
-              minimumSize: Size(150.w, 50.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              elevation: 0,
             ),
-            child: Text(
-              'Add to Cart',
-              style: GoogleFonts.manrope(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+          ),
+          SizedBox(width: 20.w),
+          Obx(
+            () => ElevatedButton(
+              onPressed: controller.isAddingToCart.value
+                  ? null
+                  : () => controller.addToCart(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xffB5DEEF),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
               ),
+              child: controller.isAddingToCart.value
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text(
+                      'Add to Cart',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
             ),
           ),
         ],

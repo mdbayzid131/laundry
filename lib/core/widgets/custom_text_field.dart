@@ -19,6 +19,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final List<TextInputFormatter>? inputFormatters;
   final Color? fillColior;
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     super.key,
@@ -36,6 +37,7 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.inputFormatters,
     this.fillColior,
+    this.onChanged,
   });
 
   @override
@@ -66,6 +68,7 @@ class CustomTextField extends StatelessWidget {
           readOnly: readOnly,
           keyboardType: keyboardType,
           onTap: onTap,
+          onChanged: onChanged,
 
           style: GoogleFonts.manrope(
             fontSize: 15.sp,

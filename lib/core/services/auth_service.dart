@@ -39,7 +39,7 @@ class AuthService extends GetxService {
     required String email,
     required String password,
     required String phone,
-    required String country,
+    required String address,
   }) async {
     try {
       final response = await _authRepo.signup(
@@ -47,7 +47,7 @@ class AuthService extends GetxService {
         email: email,
         password: password,
         phone: phone,
-        country: country,
+        address: address,
       );
       return response;
     } catch (e) {
@@ -62,7 +62,7 @@ class AuthService extends GetxService {
   }) async {
     try {
       final response = await _authRepo.login(email: email, password: password);
-      await _handleAuthResponse(response);
+      await handleAuthResponse(response);
       return response;
     } catch (e) {
       rethrow;
@@ -72,12 +72,10 @@ class AuthService extends GetxService {
   /// ===================== LOGOUT =====================
   Future<void> logout() async {
     try {
-      // final response = await _authRepo.logout(deviceToken);
+      await _authRepo.logout();
       await _clearLocalAuth();
-      // return response;
     } catch (e) {
       await _clearLocalAuth();
-      rethrow;
     }
   }
 
@@ -92,14 +90,16 @@ class AuthService extends GetxService {
   }
 
   /// ===================== OTP VERIFY =====================
-  Future<Response> verifyOtp({required String email, required int otp}) async {
+  Future<Response> verifyOtp({required String email, required int otp, bool isForgotPassword = false}) async {
     try {
       final response = await _authRepo.otpVerify(
         email: email,
-        oneTimeCode: otp,
+        otp: otp,
       );
-      // If OTP verification logs the user in directly:
-      // await _handleAuthResponse(response);
+      // If OTP verification logs the user in directly (but not for forgot password):
+      if (!isForgotPassword) {
+        await handleAuthResponse(response);
+      }
       return response;
     } catch (e) {
       rethrow;
@@ -117,14 +117,13 @@ class AuthService extends GetxService {
 
   /// ===================== RESET PASSWORD =====================
   Future<Response> resetPassword({
-    required String token,
-    required String newPassword,
-    required String confirmPassword,
+    required String resetToken,
+    required String password,
   }) async {
     try {
       final response = await _authRepo.resetPassword(
-        newPassword: newPassword,
-        confirmPassword: confirmPassword,
+        password: password,
+        resetToken: resetToken,
       );
       return response;
     } catch (e) {
@@ -158,17 +157,16 @@ class AuthService extends GetxService {
   // }
 
   /// ===================== CHANGE PASSWORD =====================
-  Future<void> changePassword({
-    required String currentPassword,
+  Future<Response> changePassword({
+    required String oldPassword,
     required String newPassword,
-    required String confirmPassword,
   }) async {
     try {
-      await _authRepo.changePassword(
-        currentPassword: currentPassword,
+      Response response = await _authRepo.changePassword(
+        oldPassword: oldPassword,
         newPassword: newPassword,
-        confirmPassword: confirmPassword,
       );
+      return response;
     } catch (e) {
       rethrow;
     }
@@ -177,7 +175,7 @@ class AuthService extends GetxService {
   /// ===================== HELPER METHODS =====================
 
   /// Handles successful auth response (Login/Signup)
-  Future<void> _handleAuthResponse(Response response) async {
+  Future<void> handleAuthResponse(Response response) async {
     // Adjust these keys based on your actual API response structure
     // Example: { "data": { "accessToken": "...", "refreshToken": "..." } }
     final data = response.data;

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../config/constants/image_paths.dart';
 import '../../../config/routes/app_pages.dart';
+import '../../../data/models/cart_model.dart';
 import '../controllers/cart_controller.dart';
 
 class CartScreen extends GetView<CartController> {
@@ -26,47 +29,78 @@ class CartScreen extends GetView<CartController> {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.separated(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              itemCount: 3,
-              separatorBuilder: (context, index) => SizedBox(height: 16.h),
-              itemBuilder: (context, index) {
-                final items = [
-                  {
-                    'name': 'Premium Dress Shirt',
-                    'type': 'Dry Clean',
-                    'price': '\$18.00',
-                  },
-                  {
-                    'name': 'Queen Bedsheet Set',
-                    'type': 'Dry Clean',
-                    'price': '\$18.00',
-                  },
-                  {
-                    'name': 'Denim Jeans',
-                    'type': 'Wash & Fold',
-                    'price': '\$18.00',
-                  },
-                ];
+      body: Obx(() {
+        if (controller.isLoading.value && controller.cartData.value == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-                return _buildCartItem(
-                  items[index]['name']!,
-                  items[index]['type']!,
-                  items[index]['price']!,
-                );
-              },
+        final items = controller.cartData.value?.items ?? [];
+
+        if (items.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 80.sp,
+                  color: Colors.grey.shade300,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'Your cart is empty',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16.sp,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
             ),
-          ),
-          _buildOrderSummary(),
-        ],
-      ),
+          );
+        }
+
+        return Column(
+          children: [
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => controller.getCart(),
+                child: ListView.separated(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 10.h,
+                  ),
+                  itemCount: items.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return _buildCartItem(item);
+                  },
+                ),
+              ),
+            ),
+            _buildOrderSummary(),
+          ],
+        );
+      }),
     );
   }
 
-  Widget _buildCartItem(String name, String type, String price) {
+  Widget _buildCartItem(CartItemModel item) {
+    String name = '';
+    String image = '';
+    String description = '';
+    String price = item.price ?? '0.00';
+
+    if (item.service != null) {
+      name = item.service?.name ?? 'Service';
+      image = item.service?.image ?? '';
+      description = item.service?.description ?? '';
+    } else if (item.bundle != null) {
+      name = item.bundle?.name ?? 'Bundle';
+      image = item.bundle?.image ?? '';
+      description = item.bundle?.description ?? '';
+    }
+
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
@@ -81,16 +115,25 @@ class CartScreen extends GetView<CartController> {
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image Placeholder
           Container(
-            width: 70.w,
-            height: 70.w,
+            width: 75.w,
+            height: 75.w,
             decoration: BoxDecoration(
               color: const Color(0xFFEEEEEE),
               borderRadius: BorderRadius.circular(12.r),
+              image: image.isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(image),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
-            child: Icon(Icons.image_outlined, color: Colors.grey, size: 30.sp),
+            child: image.isEmpty
+                ? Icon(Icons.image_outlined, color: Colors.grey, size: 30.sp)
+                : null,
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -104,89 +147,90 @@ class CartScreen extends GetView<CartController> {
                       child: Text(
                         name,
                         style: GoogleFonts.manrope(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xff1A2530),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Icon(
-                        Icons.delete_outline,
-                        color: Colors.red.shade400,
-                        size: 16.sp,
+                    GestureDetector(
+                      onTap: () => controller.deleteCartItem(item.id!),
+                      child: Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: SvgPicture.asset(
+                          ImagePaths.deleteIcon,
+                          width: 14.w,
+                          height: 14.w,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 4.h),
-                Text(
-                  type,
-                  style: GoogleFonts.manrope(
-                    fontSize: 12.sp,
-                    color: Colors.grey.shade600,
+                if (item.selectedAddons?.isNotEmpty ?? false) ...[
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Addons: ${item.selectedAddons!.map((e) => e.addon?.name).join(', ')}',
+                    style: GoogleFonts.manrope(
+                      fontSize: 11.sp,
+                      color: const Color(0xff579796),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                SizedBox(height: 8.h),
+                ],
+                SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      price,
+                      '\$$price',
                       style: GoogleFonts.manrope(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w800,
                         color: Colors.black,
                       ),
                     ),
                     Row(
                       children: [
-                        Container(
-                          width: 28.w,
-                          height: 28.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey.shade100,
+                        _buildQtyBtn(
+                          icon: Icons.remove,
+                          onTap: () => controller.updateQuantity(
+                            item.id!,
+                            (item.quantity ?? 0) - 1,
                           ),
-                          child: Center(
-                            child: Icon(
-                              Icons.remove,
-                              size: 16.sp,
-                              color: Colors.black54,
-                            ),
-                          ),
+                          isBlue: false,
                         ),
                         SizedBox(width: 12.w),
                         Text(
-                          '2',
+                          '${item.quantity ?? 0}',
                           style: GoogleFonts.manrope(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w700,
                             color: Colors.black,
                           ),
                         ),
                         SizedBox(width: 12.w),
-                        Container(
-                          width: 28.w,
-                          height: 28.w,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFADD8E6), // Light blue
+                        _buildQtyBtn(
+                          icon: Icons.add,
+                          onTap: () => controller.updateQuantity(
+                            item.id!,
+                            (item.quantity ?? 0) + 1,
                           ),
-                          child: Center(
-                            child: Icon(
-                              Icons.add,
-                              size: 16.sp,
-                              color: Colors.white,
-                            ),
-                          ),
+                          isBlue: true,
                         ),
                       ],
                     ),
@@ -196,6 +240,38 @@ class CartScreen extends GetView<CartController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQtyBtn({
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool isBlue,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 32.w,
+        height: 32.w,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isBlue ? const Color(0xffB5DEEF) : Colors.grey.shade100,
+          boxShadow: isBlue
+              ? [
+                  BoxShadow(
+                    color: const Color(0xffB5DEEF).withOpacity(0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Icon(
+          icon,
+          size: 18.sp,
+          color: isBlue ? Colors.white : Colors.black54,
+        ),
       ),
     );
   }
@@ -221,42 +297,51 @@ class CartScreen extends GetView<CartController> {
         top: false,
         child: Column(
           children: [
-            _buildSummaryRow('Subtotal', '\$38.50', isBold: false),
-            SizedBox(height: 12.h),
-            _buildSummaryRow('Service Fee', '\$2.50', isBold: false),
+            _buildSummaryRow(
+              'Subtotal',
+              '\$${controller.subTotal.toStringAsFixed(2)}',
+              isBold: false,
+            ),
+            // SizedBox(height: 12.h),
+            // _buildSummaryRow('Service Fee', '\$0.00', isBold: false),
             SizedBox(height: 12.h),
             _buildSummaryRow(
-              'Delivery',
-              'Free',
+              'Pickup & Delivery fee',
+              '${controller.cartData.value?.pickupAndDeliveryFee ?? 00}',
               isBold: false,
               isGreenText: true,
             ),
             SizedBox(height: 16.h),
             const Divider(color: Color(0xFFEEEEEE)),
             SizedBox(height: 16.h),
-            _buildSummaryRow('Total Amount', '\$41.00', isBold: true),
+            _buildSummaryRow(
+              'Total Amount',
+              '\$${controller.totalAmount.toStringAsFixed(2)}',
+              isBold: true,
+            ),
             SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
-              height: 50.h,
+              height: 55.h,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.toNamed(AppRoutes.CHECKOUT);
+                  Get.toNamed(AppRoutes.CHECKOUT, arguments: {
+                    'cartData': controller.cartData.value,
+                  });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(
-                    0xFFADD8E6,
-                  ), // Light blue checkout button
+                  backgroundColor: const Color(0xffB5DEEF),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                  elevation: 0,
+                  elevation: 4,
+                  shadowColor: const Color(0xffB5DEEF).withOpacity(0.4),
                 ),
                 child: Text(
                   'Checkout',
                   style: GoogleFonts.manrope(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w800,
                     color: Colors.white,
                   ),
                 ),
