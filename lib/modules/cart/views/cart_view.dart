@@ -325,7 +325,9 @@ class CartScreen extends GetView<CartController> {
               height: 55.h,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.toNamed(AppRoutes.CHECKOUT);
+                  Get.toNamed(AppRoutes.CHECKOUT, arguments: {
+                    'cartData': controller.cartData.value,
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffB5DEEF),

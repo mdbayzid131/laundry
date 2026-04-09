@@ -1,44 +1,70 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:laundry/data/models/cart_model.dart';
+import 'package:laundry/modules/profile/controllers/profile_controller.dart';
 
 class CheckoutController extends GetxController {
-  final count = 0.obs;
+  final ProfileController _profileController = Get.find<ProfileController>();
 
+  Rxn<CartData> cartData = Rxn<CartData>();
+  
   // Pickup Details
   var selectedDate = DateTime.now().add(const Duration(days: 1)).obs;
-  var selectedTimeSlot = '08:00 AM - 11:00 AM'.obs;
-  var address = '425 Park Avenue'.obs;
-  var aptSuite = 'Apt 12B'.obs;
-  var city = 'New York'.obs;
-  var state = 'NY'.obs;
-  var zipCode = '10022'.obs;
+  var selectedTime = TimeOfDay.now().obs;
+  
+  // Dynamic address from profile
+  var address = ''.obs;
+  var city = ''.obs;
+  var state = ''.obs;
+  var zipCode = ''.obs;
 
-  final List<String> storeHours = [
-    '08:00 AM - 11:00 AM',
-    '11:00 AM - 02:00 PM',
-    '02:00 PM - 05:00 PM',
-    '05:00 PM - 08:00 PM',
-  ];
+  @override
+  void onInit() {
+    super.onInit();
+    if (Get.arguments != null) {
+      cartData.value = Get.arguments['cartData'];
+    }
+    _setInitialAddress();
+  }
+
+  void _setInitialAddress() {
+    final defaultAddr = _profileController.addresses.firstWhereOrNull((addr) => addr.isDefault == true) 
+                        ?? (_profileController.addresses.isNotEmpty ? _profileController.addresses.first : null);
+    
+    if (defaultAddr != null) {
+      address.value = defaultAddr.streetAddress ?? '';
+      city.value = defaultAddr.city ?? '';
+      state.value = defaultAddr.state ?? '';
+      zipCode.value = defaultAddr.postalCode ?? '';
+    }
+  }
 
   String get formattedDate => DateFormat('MMMM dd, yyyy').format(selectedDate.value);
   String get formattedDay => DateFormat('EEEE').format(selectedDate.value);
-  String get fullAddress => "${aptSuite.value}, ${address.value}, ${city.value}, ${state.value} ${zipCode.value}";
+  String get formattedTime => selectedTime.value.format(Get.context!);
+  String get fullAddress => "${address.value}${city.value.isNotEmpty ? ', ${city.value}' : ''}${state.value.isNotEmpty ? ', ${state.value}' : ''} ${zipCode.value}";
 
-  void updatePickupDetails({
-    DateTime? date,
-    String? time,
-    String? addr,
-    String? apt,
-    String? cty,
-    String? st,
-    String? zip,
-  }) {
-    if (date != null) selectedDate.value = date;
-    if (time != null) selectedTimeSlot.value = time;
-    if (addr != null) address.value = addr;
-    if (apt != null) aptSuite.value = apt;
-    if (cty != null) city.value = cty;
-    if (st != null) state.value = st;
-    if (zip != null) zipCode.value = zip;
+  double get subTotal {
+    double total = 0;
+    final items = cartData.value?.items ?? [];
+    for (var item in items) {
+      total += double.tryParse(item.price ?? '0') ?? 0;
+    }
+    return total;
+  }
+
+  double get deliveryFee {
+    return double.tryParse(cartData.value?.pickupAndDeliveryFee ?? '0') ?? 0;
+  }
+
+  double get totalAmount => subTotal + deliveryFee;
+
+  void updatePickupDate(DateTime date) {
+    selectedDate.value = date;
+  }
+
+  void updatePickupTime(TimeOfDay time) {
+    selectedTime.value = time;
   }
 }

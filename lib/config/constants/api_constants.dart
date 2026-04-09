@@ -38,5 +38,5 @@ class ApiConstants {
 
   // Order Endpoints
   static const String myOrders = '/order/my-orders';
-
+  static const String checkout = '/order/checkout';
 }

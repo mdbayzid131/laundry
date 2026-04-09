@@ -151,123 +151,145 @@ class CheckoutView extends GetView<CheckoutController> {
   }
 
   Widget _buildOrderSummary() {
-    return Container(
-      padding: EdgeInsets.all(24.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Order Summary',
-                style: GoogleFonts.manrope(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
+    return Obx(() {
+      final cart = controller.cartData.value;
+      if (cart == null) return const SizedBox();
+
+      final items = cart.items ?? [];
+
+      return Container(
+        padding: EdgeInsets.all(24.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Order Summary',
+                  style: GoogleFonts.manrope(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1A2530),
+                  ),
                 ),
-              ),
-              Text(
-                '3 Items',
-                style: GoogleFonts.manrope(
-                  fontSize: 13.sp,
-                  color: Colors.black45,
+                Text(
+                  '${items.length} Items',
+                  style: GoogleFonts.manrope(
+                    fontSize: 13.sp,
+                    color: Colors.black45,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 24.h),
-          _buildSummaryItem(
-            ImagePaths.shirtIcon,
-            'Wash & Fold',
-            '5 piece',
-            '\$24.50',
-          ),
-          SizedBox(height: 20.h),
-          _buildSummaryItem(
-            ImagePaths.dryCleanIcon,
-            'Dry Cleaning',
-            '2 items',
-            '\$18.00',
-          ),
-          SizedBox(height: 20.h),
-          _buildSummaryItem(
-            ImagePaths.ironAndPressIcon,
-            'Iron & Press',
-            '3 items',
-            '\$9.00',
-          ),
-          SizedBox(height: 24.h),
-          const Divider(height: 1, color: Color(0xffF1F5F9)),
-          SizedBox(height: 20.h),
-          _buildSummaryRow('Subtotal', '\$51.50'),
-          SizedBox(height: 12.h),
-          _buildSummaryRow('Pickup & Delivery', '\$4.99'),
-          SizedBox(height: 12.h),
-          _buildSummaryRow('Discount (FIRST20)', '-\$10.30', isDiscount: true),
-          SizedBox(height: 20.h),
-          const Divider(height: 1, color: Color(0xffF1F5F9)),
-          SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total',
-                style: GoogleFonts.manrope(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: items.length,
+              separatorBuilder: (context, index) => SizedBox(height: 20.h),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                String name = '';
+                String image = '';
+                String subtitle = '${item.quantity} piece';
+
+                if (item.service != null) {
+                  name = item.service?.name ?? '';
+                  image = item.service?.image ?? '';
+                } else if (item.bundle != null) {
+                  name = item.bundle?.name ?? '';
+                  image = item.bundle?.image ?? '';
+                }
+
+                return _buildSummaryItem(
+                  image.isNotEmpty ? image : ImagePaths.shirtIcon,
+                  name,
+                  subtitle,
+                  '\$${item.price}',
+                  isUrl: image.isNotEmpty,
+                );
+              },
+            ),
+            SizedBox(height: 24.h),
+            const Divider(height: 1, color: Color(0xffF1F5F9)),
+            SizedBox(height: 20.h),
+            _buildSummaryRow('Subtotal', '\$${controller.subTotal.toStringAsFixed(2)}'),
+            SizedBox(height: 12.h),
+            _buildSummaryRow(
+              'Pickup & Delivery',
+              '\$${controller.deliveryFee.toStringAsFixed(2)}',
+            ),
+            SizedBox(height: 20.h),
+            const Divider(height: 1, color: Color(0xffF1F5F9)),
+            SizedBox(height: 20.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total',
+                  style: GoogleFonts.manrope(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1A2530),
+                  ),
                 ),
-              ),
-              Text(
-                '\$46.19',
-                style: GoogleFonts.manrope(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xff1A2530),
+                Text(
+                  '\$${controller.totalAmount.toStringAsFixed(2)}',
+                  style: GoogleFonts.manrope(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xff1A2530),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildSummaryItem(
-    String svgIcon,
+    String icon,
     String title,
     String subtitle,
-    String price,
-  ) {
+    String price, {
+    bool isUrl = false,
+  }) {
     return Row(
       children: [
         Container(
           width: 44.w,
           height: 44.w,
-          padding: EdgeInsets.all(10.w),
+          padding: isUrl ? EdgeInsets.zero : EdgeInsets.all(10.w),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(color: const Color(0xffF1F5F9)),
           ),
-          child: SvgPicture.asset(
-            svgIcon,
-            colorFilter: const ColorFilter.mode(
-              Color(0xff1A2530),
-              BlendMode.srcIn,
-            ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: isUrl
+                ? Image.network(icon, fit: BoxFit.cover)
+                : SvgPicture.asset(
+                    icon,
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xff1A2530),
+                      BlendMode.srcIn,
+                    ),
+                  ),
           ),
         ),
         SizedBox(width: 16.w),
@@ -383,7 +405,7 @@ class CheckoutView extends GetView<CheckoutController> {
           SizedBox(height: 20.h),
           Obx(() => _buildInfoRow(
                 Icons.access_time_filled,
-                controller.selectedTimeSlot.value,
+                controller.formattedTime,
                 'Pickup window',
               )),
           SizedBox(height: 20.h),
@@ -398,13 +420,8 @@ class CheckoutView extends GetView<CheckoutController> {
   }
 
   void _showPickupEditDialog(BuildContext context) {
-    final dateController = TextEditingController(text: controller.formattedDate);
-    final addressController = TextEditingController(text: controller.address.value);
-    final aptController = TextEditingController(text: controller.aptSuite.value);
-    final cityController = TextEditingController(text: controller.city.value);
-    final zipController = TextEditingController(text: controller.zipCode.value);
     var selectedDate = controller.selectedDate.value;
-    var selectedTime = controller.selectedTimeSlot.value;
+    var selectedTime = controller.selectedTime.value;
 
     showDialog(
       context: context,
@@ -474,19 +491,38 @@ class CheckoutView extends GetView<CheckoutController> {
                       if (picked != null) {
                         setDialogState(() {
                           selectedDate = picked;
-                          dateController.text = DateFormat('MMMM dd, yyyy').format(picked);
                         });
                       }
                     },
-                    child: IgnorePointer(
-                      child: _buildDialogField('Date', 'Select Date', controller: dateController, icon: Icons.calendar_today),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 14.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF9F9F9),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 20.sp,
+                            color: Colors.black45,
+                          ),
+                          SizedBox(width: 12.w),
+                          Text(
+                            DateFormat('MMMM dd, yyyy').format(selectedDate),
+                            style: GoogleFonts.manrope(fontSize: 14.sp),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 20.h),
 
-                  // Time Slot Field (Dropdown)
-                  Text(
-                    'Pickup Time Slot',
+                   Text(
+                    'Pickup Time',
                     style: GoogleFonts.manrope(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
@@ -494,45 +530,56 @@ class CheckoutView extends GetView<CheckoutController> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffF9F9F9),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: controller.storeHours.contains(selectedTime) ? selectedTime : controller.storeHours.first,
-                        isExpanded: true,
-                        icon: const Icon(Icons.access_time),
-                        items: controller.storeHours.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value, style: GoogleFonts.manrope(fontSize: 14.sp)),
+                  InkWell(
+                    onTap: () async {
+                      final TimeOfDay? picked = await showTimePicker(
+                        context: context,
+                        initialTime: selectedTime,
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: const ColorScheme.light(
+                                primary: Color(0xffB5DEEF),
+                                onPrimary: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                            ),
+                            child: child!,
                           );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          if (newValue != null) {
-                            setDialogState(() => selectedTime = newValue);
-                          }
                         },
+                      );
+                      if (picked != null) {
+                        setDialogState(() {
+                          selectedTime = picked;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 14.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF9F9F9),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 20.sp,
+                            color: Colors.black45,
+                          ),
+                          SizedBox(width: 12.w),
+                          Text(
+                            selectedTime.format(context),
+                            style: GoogleFonts.manrope(fontSize: 14.sp),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   SizedBox(height: 20.h),
-
-                  // Address Fields
-                  _buildDialogField('Street Address', 'Enter street address', controller: addressController),
-                  SizedBox(height: 16.h),
-                  Row(
-                    children: [
-                      Expanded(child: _buildDialogField('Apt/Suite', 'Apt 12B', controller: aptController)),
-                      SizedBox(width: 12.w),
-                      Expanded(child: _buildDialogField('City', 'New York', controller: cityController)),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildDialogField('Zip Code', '10022', controller: zipController, keyboardType: TextInputType.number),
 
                   SizedBox(height: 32.h),
                   SizedBox(
@@ -540,14 +587,8 @@ class CheckoutView extends GetView<CheckoutController> {
                     height: 52.h,
                     child: ElevatedButton(
                       onPressed: () {
-                        controller.updatePickupDetails(
-                          date: selectedDate,
-                          time: selectedTime,
-                          addr: addressController.text,
-                          apt: aptController.text,
-                          cty: cityController.text,
-                          zip: zipController.text,
-                        );
+                        controller.updatePickupDate(selectedDate);
+                        controller.updatePickupTime(selectedTime);
                         Get.back();
                       },
                       style: ElevatedButton.styleFrom(
@@ -672,7 +713,14 @@ class CheckoutView extends GetView<CheckoutController> {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () => Get.toNamed(AppRoutes.ORDER_ACKNOWLEDGMENT),
+        onPressed: () => Get.toNamed(AppRoutes.ORDER_ACKNOWLEDGMENT, arguments: {
+          'pickupDate': controller.selectedDate.value,
+          'pickupTime': controller.formattedTime,
+          'streetAddress': controller.address.value,
+          'city': controller.city.value,
+          'state': controller.state.value,
+          'zipCode': controller.zipCode.value,
+        }),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
