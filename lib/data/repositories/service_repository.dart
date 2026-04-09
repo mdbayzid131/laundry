@@ -30,4 +30,10 @@ class ServiceRepository {
       },
     );
   }
+
+  Future<Response> getStoreServicesByStoreId(String storeId) async {
+    return await _apiClient.getData(
+      ApiConstants.getStoreServiceByStoreId.replaceAll(':storeId', storeId),
+    );
+  }
 }

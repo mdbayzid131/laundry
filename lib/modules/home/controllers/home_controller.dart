@@ -8,6 +8,8 @@ import 'package:laundry/data/repositories/category_repository.dart';
 import 'package:laundry/data/repositories/banner_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:laundry/core/services/storage_service.dart';
+import 'package:laundry/config/constants/storage_constants.dart';
 
 enum LocationSelectionType { current, manual }
 
@@ -38,16 +40,21 @@ class HomeController extends GetxController {
     super.onInit();
     // Wait for first frame
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await getCurrentLocation();
-      loadInitialData();
+      Helpers.showLoadingDialog();
+      await getCurrentLocation(fetchInitialData: false);
+      await loadInitialData(showLoader: false);
+      Helpers.hideLoadingDialog();
     });
   }
 
-  Future<void> loadInitialData() async {
+  Future<void> loadInitialData({bool showLoader = true}) async {
+    if (showLoader) Helpers.showLoadingDialog();
     try {
       await Future.wait([getCategories(), getBanners(), getStoreServices()]);
     } catch (e) {
       Helpers.showDebugLog('Error loading initial data: $e');
+    } finally {
+      if (showLoader) Helpers.hideLoadingDialog();
     }
   }
 
@@ -101,7 +108,8 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> getCurrentLocation() async {
+  Future<void> getCurrentLocation({bool fetchInitialData = true}) async {
+    if (fetchInitialData) Helpers.showLoadingDialog();
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -131,9 +139,17 @@ class HomeController extends GetxController {
       lng.value = position.longitude;
       locationType.value = LocationSelectionType.current;
       currentAddress.value = "Current Location";
-      loadInitialData();
+      
+      StorageService.setDouble(StorageConstants.userLat, lat.value);
+      StorageService.setDouble(StorageConstants.userLng, lng.value);
+      
+      if (fetchInitialData) {
+        await loadInitialData(showLoader: false);
+      }
     } catch (e) {
       Helpers.showDebugLog('Error getting location: $e');
+    } finally {
+      if (fetchInitialData) Helpers.hideLoadingDialog();
     }
   }
 
@@ -156,6 +172,8 @@ class HomeController extends GetxController {
     lng.value = newLng;
     currentAddress.value = newAddress;
     locationType.value = LocationSelectionType.manual;
+    StorageService.setDouble(StorageConstants.userLat, lat.value);
+    StorageService.setDouble(StorageConstants.userLng, lng.value);
     loadInitialData();
   }
 }

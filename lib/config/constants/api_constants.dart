@@ -18,6 +18,7 @@ class ApiConstants {
   static const String profile = '/user/get-me';
   // Category Endpoints
   static const String category = '/category';
+  static const String getOperatorCategory = '/operatorcategory/:id';
   // Banner Endpoints
   static const String banner = '/banner';
 
@@ -39,4 +40,8 @@ class ApiConstants {
   // Order Endpoints
   static const String myOrders = '/order/my-orders';
   static const String checkout = '/order/checkout';
+
+  // Store Endpoints
+  static const String getStoreDetails = '/store/:id';
+  static const String getStoreServiceByStoreId = '/storeservice/store/:storeId';
 }

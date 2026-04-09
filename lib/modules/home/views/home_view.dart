@@ -465,127 +465,131 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   void _showLocationSelectionBottomSheet(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
     Get.bottomSheet(
-      Obx(() => Container(
-            padding: EdgeInsets.all(20.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 50.w,
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
+      Obx(
+        () => Container(
+          padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 50.w,
+                  height: 5.h,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
-                SizedBox(height: 20.h),
-                Text(
-                  'Select Location',
-                  style: GoogleFonts.manrope(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black,
-                  ),
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                'Select Location',
+                style: GoogleFonts.manrope(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black,
                 ),
-                SizedBox(height: 16.h),
-                
-                // Current Location Option
-                RadioListTile<LocationSelectionType>(
-                  value: LocationSelectionType.current,
-                  groupValue: controller.locationType.value,
-                  onChanged: (val) {
-                    controller.getCurrentLocation();
-                  },
-                  activeColor: AppTheme.primaryColor,
-                  contentPadding: EdgeInsets.zero,
-                  title: Row(
-                    children: [
-                      Icon(Icons.my_location, color: AppTheme.primaryColor, size: 20.sp),
+              ),
+              SizedBox(height: 16.h),
 
-                      SizedBox(width: 12.w),
-                      Text(
-                        'Current Location',
-                        style: GoogleFonts.manrope(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                  subtitle: Padding(
-                    padding: EdgeInsets.only(left: 32.w),
-                    child: Text('Use GPS for accurate location'),
-                  ),
-                ),
-                
-                Divider(height: 32.h),
-
-                // Manual Selection Option
-                RadioListTile<LocationSelectionType>(
-                  value: LocationSelectionType.manual,
-                  groupValue: controller.locationType.value,
-                  onChanged: (val) {
-                    Get.back(); // Close bottom sheet
-                    Get.toNamed(AppRoutes.MAP);
-                  },
-                  activeColor: AppTheme.primaryColor,
-                  contentPadding: EdgeInsets.zero,
-                  title: Row(
-                    children: [
-                      Icon(Icons.map, color: Colors.black54, size: 20.sp),
-                      SizedBox(width: 12.w),
-                      Text(
-                        'Choose from Map',
-                        style: GoogleFonts.manrope(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                  subtitle: Padding(
-                    padding: EdgeInsets.only(left: 32.w),
-                    child: Text('Select manually from map'),
-                  ),
-                ),
-                
-                SizedBox(height: 20.h),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Get.back(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryColor,
-                      padding: EdgeInsets.all(16.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
+              // Current Location Option
+              RadioListTile<LocationSelectionType>(
+                value: LocationSelectionType.current,
+                groupValue: controller.locationType.value,
+                onChanged: (val) {
+                  controller.getCurrentLocation();
+                },
+                activeColor: AppTheme.primaryColor,
+                contentPadding: EdgeInsets.zero,
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.my_location,
+                      color: AppTheme.primaryColor,
+                      size: 20.sp,
                     ),
-                    child: Text(
-                      'Confirm',
+
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Current Location',
                       style: GoogleFonts.manrope(
+                        fontWeight: FontWeight.w600,
                         fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
                       ),
+                    ),
+                  ],
+                ),
+                subtitle: Padding(
+                  padding: EdgeInsets.only(left: 32.w),
+                  child: Text('Use GPS for accurate location'),
+                ),
+              ),
+
+              Divider(height: 32.h),
+
+              // Manual Selection Option
+              RadioListTile<LocationSelectionType>(
+                value: LocationSelectionType.manual,
+                groupValue: controller.locationType.value,
+                onChanged: (val) {
+                  Get.back(); // Close bottom sheet
+                  Get.toNamed(AppRoutes.MAP);
+                },
+                activeColor: AppTheme.primaryColor,
+                contentPadding: EdgeInsets.zero,
+                title: Row(
+                  children: [
+                    Icon(Icons.map, color: Colors.black54, size: 20.sp),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Choose from Map',
+                      style: GoogleFonts.manrope(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: Padding(
+                  padding: EdgeInsets.only(left: 32.w),
+                  child: Text('Select manually from map'),
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    padding: EdgeInsets.all(16.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Confirm',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-                SizedBox(height: 10.h),
-              ],
-            ),
-          )),
+              ),
+              SizedBox(height: 10.h),
+            ],
+          ),
+        ),
+      ),
     );
   }
-
-
 
   Widget _buildHorizontalListSection(
     String title,
@@ -720,21 +724,39 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.manrope(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
+        GestureDetector(
+          onTap: () {
+            if (dataList.isNotEmpty && dataList.first.storeId != null) {
+              Get.toNamed(
+                AppRoutes.LAUNDRY_DETAILS,
+                arguments: {
+                  'storeId': dataList.first.storeId,
+                  'operatorId': dataList.first.service?.operatorId,
+                },
+              );
+            }
+            print(dataList.first.storeId);
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.manrope(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16.sp,
                   color: Colors.black87,
                 ),
-              ),
-              Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.black87),
-            ],
+              ],
+            ),
           ),
         ),
         SizedBox(height: 16.h),
@@ -749,7 +771,10 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
               return GestureDetector(
                 onTap: () => Get.toNamed(
                   AppRoutes.PRODUCT_DETAILS,
-                  arguments: {'serviceId': item.id},
+                  arguments: {
+                    'serviceId': item.id,
+                    "operatorId": item.service?.operatorId,
+                  },
                 ),
                 child: Container(
                   width: isLarge ? 300.w : 200.w,
