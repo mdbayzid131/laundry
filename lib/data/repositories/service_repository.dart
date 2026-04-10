@@ -31,9 +31,10 @@ class ServiceRepository {
     );
   }
 
-  Future<Response> getStoreServicesByStoreId(String storeId) async {
+  Future<Response> getStoreServicesByStoreId(String storeId, {Map<String, dynamic>? query}) async {
     return await _apiClient.getData(
       ApiConstants.getStoreServiceByStoreId.replaceAll(':storeId', storeId),
+      query: query,
     );
   }
 }

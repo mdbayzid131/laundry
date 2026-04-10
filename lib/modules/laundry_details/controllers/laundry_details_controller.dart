@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../../data/models/store_model.dart';
 import '../../../data/models/operator_category_model.dart';
 import '../../../data/models/storage-servies_model.dart';
+import '../../../data/models/store_bundles_model.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../data/repositories/store_repository.dart';
 import '../../../data/repositories/category_repository.dart';
@@ -27,6 +28,12 @@ class LaundryDetailsController extends GetxController {
   RxBool isLoadingServices = false.obs;
   RxList<StoreServiceItem> allStoreServices = <StoreServiceItem>[].obs;
 
+  RxBool isLoadingTabServices = false.obs;
+  RxList<StoreServiceItem> tabServices = <StoreServiceItem>[].obs;
+
+  RxBool isLoadingBundles = false.obs;
+  RxList<StoreBundleData> storeBundles = <StoreBundleData>[].obs;
+
   // Service Type Selection
   final isDelivery = true.obs;
 
@@ -35,13 +42,17 @@ class LaundryDetailsController extends GetxController {
 
   // Tab Selection
   final activeTab = 'Most Ordered'.obs;
-  final tabs = ['Most Ordered', 'Bundles', 'Extras', 'Fluff & Fold'];
+  final tabs = ['Most Ordered', 'Extras', 'Bundles'];
 
   List<StoreServiceItem> get filteredServices {
     if (selectedCategory.value.isEmpty) {
       return allStoreServices;
     }
-    return allStoreServices.where((service) => service.service?.categoryId == selectedCategory.value).toList();
+    return allStoreServices
+        .where(
+          (service) => service.service?.categoryId == selectedCategory.value,
+        )
+        .toList();
   }
 
   @override
@@ -52,6 +63,8 @@ class LaundryDetailsController extends GetxController {
         storeId = Get.arguments['storeId'];
         fetchStoreDetails();
         fetchStoreServices();
+        fetchStoreServicesbyPerams(activeTab.value);
+        fetchStoreBundles();
       }
       if (Get.arguments['operatorId'] != null) {
         operatorId = Get.arguments['operatorId'];
@@ -128,6 +141,58 @@ class LaundryDetailsController extends GetxController {
     }
   }
 
+
+
+
+
+
+  
+
+  Future<void> fetchStoreBundles() async {
+    if (storeId == null) return;
+    isLoadingBundles.value = true;
+    try {
+      final response = await _storeRepository.getStoreBundles(storeId!);
+      if (response.statusCode == 200 && response.data != null) {
+        final resModel = StoreBundleResponseModel.fromJson(response.data);
+        storeBundles.value = resModel.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching store bundles: $e');
+    } finally {
+      isLoadingBundles.value = false;
+    }
+  }
+
+  Future<void> fetchStoreServicesbyPerams(String type) async {
+    if (storeId == null) return;
+    
+    Map<String, dynamic> query = {};
+    if (type == 'Most Ordered') {
+      query['mostOrdered'] = true;
+    } else if (type == 'Extras') {
+      query['extra'] = true;
+    } else {
+      return; 
+    }
+
+    isLoadingTabServices.value = true;
+    try {
+      final response = await _serviceRepository.getStoreServicesByStoreId(
+        storeId!,
+        query: query,
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        final resModel = StoreServicesResponseModel.fromJson(response.data);
+        tabServices.value = resModel.data?.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching tab services: $e');
+    } finally {
+      isLoadingTabServices.value = false;
+    }
+  }
+
   void toggleService(bool delivery) {
     isDelivery.value = delivery;
   }
@@ -138,5 +203,8 @@ class LaundryDetailsController extends GetxController {
 
   void selectTab(String tab) {
     activeTab.value = tab;
+    if (tab == 'Most Ordered' || tab == 'Extras') {
+      fetchStoreServicesbyPerams(tab);
+    }
   }
 }

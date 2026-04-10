@@ -18,4 +18,10 @@ class StoreRepository {
       query: query.isNotEmpty ? query : null,
     );
   }
+
+  Future<Response> getStoreBundles(String storeId) async {
+    return await _apiClient.getData(
+      ApiConstants.getStoreBundleByStoreId.replaceAll(':storeId', storeId),
+    );
+  }
 }

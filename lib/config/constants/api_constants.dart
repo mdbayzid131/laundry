@@ -44,4 +44,5 @@ class ApiConstants {
   // Store Endpoints
   static const String getStoreDetails = '/store/:id';
   static const String getStoreServiceByStoreId = '/storeservice/store/:storeId';
+  static const String getStoreBundleByStoreId = '/storebundle/store/:storeId';
 }

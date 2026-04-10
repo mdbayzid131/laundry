@@ -92,7 +92,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                       ),
                       SizedBox(width: 12.w),
                       Text(
-                        'View cart ${controller.storeDetails.value!.count?.cartItems.toString()}',
+                        'View cart ${controller.storeDetails.value?.count?.cartItems.toString() ?? 0}',
                         style: GoogleFonts.manrope(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w800,
@@ -570,8 +570,8 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           return _buildPromotedCard(
             serviceItem.service?.name ?? '',
             serviceItem.service?.image ?? ImagePaths.op2,
-            '4.6 (5k+)',
-            '2.2 mi, 30 min',
+            "${serviceItem.avgRating.toString()} (${serviceItem.totalReviews.toString()})",
+            '${controller.storeDetails.value?.distanceMile?.toStringAsFixed(2) ?? '0'} mi, 30 min',
             '\$${serviceItem.service?.basePrice ?? '0'}/piece',
             'delivery fee on \$2.00',
           );
@@ -589,7 +589,14 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String delivery,
   ) {
     return GestureDetector(
-      onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS),
+      onTap: () => Get.toNamed(
+        AppRoutes.PRODUCT_DETAILS,
+        arguments: {
+          'storeId': controller.storeId,
+          'operatorId': controller.operatorId,
+        },
+      ),
+
       child: Container(
         margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
         decoration: BoxDecoration(
@@ -766,28 +773,43 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
   }
 
   Widget _buildServiceGrid() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 0.8,
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
-      mainAxisSpacing: 16.h,
-      crossAxisSpacing: 16.w,
-      children: [
-        _buildGridItem('Wash', ImagePaths.op4),
-        _buildGridItem('Wash', ImagePaths.op5),
-        _buildGridItem('Wash', ImagePaths.op6),
-        _buildGridItem('Wash', ImagePaths.op7),
-        _buildGridItem('Wash1', ImagePaths.op4),
-        _buildGridItem('Wash1', ImagePaths.op5),
-        _buildGridItem('Wash1', ImagePaths.op6),
-        _buildGridItem('Wash1', ImagePaths.op7),
-      ],
-    );
+    return Obx(() {
+      if (controller.isLoadingTabServices.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+      
+      final services = controller.tabServices;
+      if (services.isEmpty) return const SizedBox();
+
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: services.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          mainAxisSpacing: 16.h,
+          crossAxisSpacing: 16.w,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        itemBuilder: (context, index) {
+          final serviceItem = services[index];
+          final title = serviceItem.service?.name ?? '';
+          final image = serviceItem.service?.image ?? ImagePaths.op4;
+          final price = '\$${serviceItem.service?.basePrice ?? '0'}/piece';
+          
+          return _buildGridItem(title, image, price);
+        },
+      );
+    });
   }
 
-  Widget _buildGridItem(String title, String image) {
+  Widget _buildGridItem(String title, String image, String price) {
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS),
       child: Column(
@@ -797,11 +819,23 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child: Image.asset(
-                  image,
+                child: Container(
                   height: 140.h,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  color: const Color(0xffF1F5F9),
+                  child: image.startsWith('http')
+                      ? Image.network(
+                          image,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                            ImagePaths.op4,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Image.asset(
+                          image,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               Positioned(
@@ -850,8 +884,10 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
             ],
           ),
           Text(
-            '\$12.14/piece • \$2.00 fee',
+            price,
             style: GoogleFonts.manrope(fontSize: 10.sp, color: Colors.black45),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -859,33 +895,53 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
   }
 
   Widget _buildBundlesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Bundles'),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Text(
-            'Delivered right to my doorstep? Sign me up!',
-            style: GoogleFonts.manrope(fontSize: 12.sp, color: Colors.black45),
+    return Obx(() {
+      if (controller.isLoadingBundles.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            child: CircularProgressIndicator(),
           ),
-        ),
-        SizedBox(height: 20.h),
-        _buildBundleItem(
-          'The Signature',
-          'Full garment care. Dry clean plus press. Premium standard.',
-          ImagePaths.op8,
-        ),
-        _buildBundleItem(
-          'The Executive',
-          'Dress shirts, slacks, blazers. Ready for work without thinking about it.',
-          ImagePaths.op9,
-        ),
-      ],
-    );
+        );
+      }
+
+      final bundles = controller.storeBundles;
+      if (bundles.isEmpty) return const SizedBox();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Bundles'),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Text(
+              'Delivered right to my doorstep? Sign me up!',
+              style: GoogleFonts.manrope(
+                fontSize: 12.sp,
+                color: Colors.black45,
+              ),
+            ),
+          ),
+          SizedBox(height: 20.h),
+          ...bundles.map((bundleData) {
+            return _buildBundleItem(
+              bundleData.bundle?.name ?? '',
+              bundleData.bundle?.description ?? '',
+              bundleData.bundle?.image ?? ImagePaths.op8,
+              '\$${bundleData.bundle?.bundlePrice ?? '0'}',
+            );
+          }).toList(),
+        ],
+      );
+    });
   }
 
-  Widget _buildBundleItem(String title, String subtitle, String image) {
+  Widget _buildBundleItem(
+    String title,
+    String subtitle,
+    String image,
+    String price,
+  ) {
     return Container(
       margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
       padding: EdgeInsets.all(12.w),
@@ -914,6 +970,17 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                     fontSize: 12.sp,
                     color: Colors.black45,
                     height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  price,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xff1A2530),
                   ),
                 ),
               ],
