@@ -1,56 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/core/widgets/custom_back_button.dart';
 import 'package:laundry/core/widgets/custom_elevated_button.dart';
+import 'package:laundry/modules/profile/controllers/contact_support_controller.dart';
 
-class ContactSupportScreen extends StatefulWidget {
+class ContactSupportScreen extends GetView<ContactSupportController> {
   const ContactSupportScreen({super.key});
 
   @override
-  State<ContactSupportScreen> createState() => _ContactSupportScreenState();
-}
-
-class _ContactSupportScreenState extends State<ContactSupportScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController subjectController = TextEditingController();
-  final TextEditingController orderIdController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController messageController = TextEditingController();
-
-  @override
-  void dispose() {
-    subjectController.dispose();
-    orderIdController.dispose();
-    emailController.dispose();
-    messageController.dispose();
-    super.dispose();
-  }
-
-  void _sendMessage() {
-    if (_formKey.currentState!.validate()) {
-      // Handle send message logic here
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Message sent successfully!',
-            style: GoogleFonts.manrope(),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-      
-      // Clear form
-      subjectController.clear();
-      orderIdController.clear();
-      emailController.clear();
-      messageController.clear();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -149,7 +112,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 _buildLabel('Subject'),
                 SizedBox(height: 8.h),
                 _buildTextField(
-                  controller: subjectController,
+                  controller: controller.subjectController,
                   hintText: 'Type...',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -165,7 +128,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 _buildLabel('Order ID', isOptional: true),
                 SizedBox(height: 8.h),
                 _buildTextField(
-                  controller: orderIdController,
+                  controller: controller.orderIdController,
                   hintText: 'e.g. LL123456',
                 ),
 
@@ -175,7 +138,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 _buildLabel('Your Email'),
                 SizedBox(height: 8.h),
                 _buildTextField(
-                  controller: emailController,
+                  controller: controller.emailController,
                   hintText: 'john.doe@email.com',
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -195,7 +158,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 _buildLabel('Message'),
                 SizedBox(height: 8.h),
                 _buildTextField(
-                  controller: messageController,
+                  controller: controller.messageController,
                   hintText:
                       'Describe your issue or question in detail. The more information you provide, the better we can help you.',
                   maxLines: 6,
@@ -268,10 +231,16 @@ class _ContactSupportScreenState extends State<ContactSupportScreen> {
                 SizedBox(
                   width: double.infinity,
                   height: 54.h,
-                  child: CustomElevatedButton(  
-                    onPressed: _sendMessage,
-                    label: 'Send Message',
-                  ),
+                  child: Obx(() => CustomElevatedButton(  
+                    onPressed: controller.isLoading.value 
+                      ? null 
+                      : () {
+                          if (_formKey.currentState!.validate()) {
+                            controller.sendSupportMessage();
+                          }
+                        },
+                    label: controller.isLoading.value ? 'Sending...' : 'Send Message',
+                  )),
                 ),
 
                 SizedBox(height: 40.h),
