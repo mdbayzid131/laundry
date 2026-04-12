@@ -16,6 +16,7 @@ class ApiConstants {
 
   // User Profile Endpoints
   static const String profile = '/user/get-me';
+  static const String notificationPreferences = '/user/notification-preferences';
   // Category Endpoints
   static const String category = '/category';
   static const String getOperatorCategory = '/operatorcategory/:id';
@@ -53,4 +54,16 @@ class ApiConstants {
 
   // Support Endpoints
   static const String emailSupport = '/email-support';
+  static const String phoneSupport = '/support-phone';
+  static const String faq = '/faq';
+
+  // Favorite Endpoints
+  static const String myFavorites = '/favouriteservice/my-favourites';
+  static const String toggleFavorite = '/favouriteservice';
+
+  // Notification Endpoints
+  static const String myNotifications = '/notification/my-notifications';
+  static const String markAllRead = '/notification/mark-all-read';
+  static const String markSingleRead =
+      '/notification/:notificationId/mark-read';
 }

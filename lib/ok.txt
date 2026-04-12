@@ -1,14 +1,52 @@
 {
     "success": true,
-    "message": "Support email sent successfully",
-    "data": {
-        "id": "cmnv0snea0016tvi0qn7mme8h",
-        "userId": "cmnuzzhy3000ctvi0ye9gzxho",
-        "name": "bayazid",
-        "email": "mdbayazid131@gmail.com",
-        "orderId": "ORD-1775952601403",
-        "subject": "Some problem",
-        "message": "Hello Support",
-        "createdAt": "2026-04-12T00:23:11.987Z"
-    }
+    "message": "FAQs fetched successfully",
+    "meta": {
+        "total": 5,
+        "totalPage": 1,
+        "page": 1,
+        "limit": 10
+    },
+    "data": [
+        {
+            "id": "cmnw9nltj000mtvi4x28drtct",
+            "question": "What services do you provide?",
+            "answer": "We provide a range of digital services including web development, design, and marketing solutions.",
+            "isActive": true,
+            "createdAt": "2026-04-12T21:18:59.383Z",
+            "updatedAt": "2026-04-12T21:18:59.383Z"
+        },
+        {
+            "id": "cmnw9nltj000ntvi476a0u1lw",
+            "question": "How can I contact support?",
+            "answer": "You can contact our support team via email at support@example.com or through our contact form.",
+            "isActive": true,
+            "createdAt": "2026-04-12T21:18:59.383Z",
+            "updatedAt": "2026-04-12T21:18:59.383Z"
+        },
+        {
+            "id": "cmnw9nltj000otvi4nbzvswz7",
+            "question": "What is your refund policy?",
+            "answer": "Refunds are handled on a case-by-case basis. Please contact support for assistance.",
+            "isActive": true,
+            "createdAt": "2026-04-12T21:18:59.383Z",
+            "updatedAt": "2026-04-12T21:18:59.383Z"
+        },
+        {
+            "id": "cmnw9nltj000ptvi48uj5ag8u",
+            "question": "Do you offer custom solutions?",
+            "answer": "Yes, we specialize in providing customized solutions tailored to your business needs.",
+            "isActive": true,
+            "createdAt": "2026-04-12T21:18:59.383Z",
+            "updatedAt": "2026-04-12T21:18:59.383Z"
+        },
+        {
+            "id": "cmnw9nltj000qtvi43bm9uzvl",
+            "question": "How long does a project take?",
+            "answer": "Project timelines vary depending on complexity, but most projects are completed within 2–6 weeks.",
+            "isActive": true,
+            "createdAt": "2026-04-12T21:18:59.383Z",
+            "updatedAt": "2026-04-12T21:18:59.383Z"
+        }
+    ]
 }

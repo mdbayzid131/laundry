@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/data/models/favorites_model.dart';
 import '../controllers/favorite_controller.dart';
 
 class FavoriteView extends GetView<FavoriteController> {
@@ -54,35 +54,50 @@ class FavoriteView extends GetView<FavoriteController> {
         ),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          final items = [
-            {
-              'title': 'Premium Dress Shirt',
-              'category': 'Dry Clean',
-              'price': '\$18.00',
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.favoriteItems.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => controller.getFavorites(),
+            child: ListView(
+              children: [
+                SizedBox(height: Get.height * 0.3),
+                Center(
+                  child: Text(
+                    'No favorites found',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16.sp,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => controller.getFavorites(),
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            itemCount: controller.favoriteItems.length,
+            itemBuilder: (context, index) {
+              final FavoriteItem item = controller.favoriteItems[index];
+              return _buildFavoriteCard(item);
             },
-            {
-              'title': 'Queen Bedsheet Set',
-              'category': 'Dry Clean',
-              'price': '\$18.00',
-            },
-            {
-              'title': 'Denim Jeans',
-              'category': 'Wash & Fold',
-              'price': '\$18.00',
-            },
-          ];
-          final item = items[index];
-          return _buildFavoriteCard(item);
-        },
-      ),
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildFavoriteCard(Map<String, String> item) {
+  Widget _buildFavoriteCard(FavoriteItem favorite) {
+    final service = favorite.storeService?.service;
+    final store = favorite.storeService?.store;
+
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
       padding: EdgeInsets.all(12.w),
@@ -106,15 +121,21 @@ class FavoriteView extends GetView<FavoriteController> {
               width: 100.w,
               height: 100.h,
               color: const Color(0xffF2F2F2),
-              child: Image.asset(
-                ImagePaths.product1,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Icon(
-                  Icons.image_outlined,
-                  size: 40.sp,
-                  color: Colors.grey[400],
-                ),
-              ),
+              child: service?.image != null
+                  ? Image.network(
+                      service!.image!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Icon(
+                        Icons.image_outlined,
+                        size: 40.sp,
+                        color: Colors.grey[400],
+                      ),
+                    )
+                  : Icon(
+                      Icons.image_outlined,
+                      size: 40.sp,
+                      color: Colors.grey[400],
+                    ),
             ),
           ),
           SizedBox(width: 16.w),
@@ -129,7 +150,7 @@ class FavoriteView extends GetView<FavoriteController> {
                   children: [
                     Expanded(
                       child: Text(
-                        item['title']!,
+                        service?.name ?? 'Unknown Service',
                         style: GoogleFonts.manrope(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
@@ -139,30 +160,33 @@ class FavoriteView extends GetView<FavoriteController> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.all(6.w),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.favorite,
-                        size: 16.sp,
-                        color: Colors.black,
+                    GestureDetector(
+                      onTap: () => controller.toggleFavorite(favorite),
+                      child: Container(
+                        padding: EdgeInsets.all(6.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.favorite,
+                          size: 16.sp,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  item['category']!,
+                  service?.description ?? 'Unknown Store',
                   style: GoogleFonts.manrope(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
@@ -174,7 +198,7 @@ class FavoriteView extends GetView<FavoriteController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      item['price']!,
+                      '\$${service?.basePrice ?? '0.00'}',
                       style: GoogleFonts.manrope(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
