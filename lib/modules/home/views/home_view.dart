@@ -465,127 +465,126 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   void _showLocationSelectionBottomSheet(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
     Get.bottomSheet(
-      Obx(
-        () => Container(
-          padding: EdgeInsets.all(20.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 50.w,
-                  height: 5.h,
+      Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 50.w,
+                height: 5.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              'Select Location',
+              style: GoogleFonts.manrope(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w800,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 16.h),
+
+            // Current Location Option
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10.r),
+                    color: AppTheme.primaryColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.my_location,
+                    color: AppTheme.primaryColor,
+                    size: 20.sp,
                   ),
                 ),
-              ),
-              SizedBox(height: 20.h),
-              Text(
-                'Select Location',
-                style: GoogleFonts.manrope(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black,
+                title: Text(
+                  'Current Location',
+                  style: GoogleFonts.manrope(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16.sp,
+                  ),
                 ),
-              ),
-              SizedBox(height: 16.h),
-
-              // Current Location Option
-              RadioListTile<LocationSelectionType>(
-                value: LocationSelectionType.current,
-                groupValue: controller.locationType.value,
-                onChanged: (val) {
-                  controller.getCurrentLocation();
-                },
-                activeColor: AppTheme.primaryColor,
-                contentPadding: EdgeInsets.zero,
-                title: Row(
-                  children: [
-                    Icon(
-                      Icons.my_location,
+                subtitle: Text(
+                  'Use GPS for accurate location',
+                  style: GoogleFonts.manrope(
+                    fontSize: 12.sp,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                trailing: GestureDetector(
+                  onTap: () => controller.getCurrentLocation(),
+                  child: Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.refresh,
                       color: AppTheme.primaryColor,
                       size: 20.sp,
                     ),
-
-                    SizedBox(width: 12.w),
-                    Text(
-                      'Current Location',
-                      style: GoogleFonts.manrope(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                subtitle: Padding(
-                  padding: EdgeInsets.only(left: 32.w),
-                  child: Text('Use GPS for accurate location'),
-                ),
-              ),
-
-              Divider(height: 32.h),
-
-              // Manual Selection Option
-              RadioListTile<LocationSelectionType>(
-                value: LocationSelectionType.manual,
-                groupValue: controller.locationType.value,
-                onChanged: (val) {
-                  Get.back(); // Close bottom sheet
-                  Get.toNamed(AppRoutes.MAP);
+                onTap: () {
+                  controller.getCurrentLocation();
                 },
-                activeColor: AppTheme.primaryColor,
-                contentPadding: EdgeInsets.zero,
-                title: Row(
-                  children: [
-                    Icon(Icons.map, color: Colors.black54, size: 20.sp),
-                    SizedBox(width: 12.w),
-                    Text(
-                      'Choose from Map',
-                      style: GoogleFonts.manrope(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                subtitle: Padding(
-                  padding: EdgeInsets.only(left: 32.w),
-                  child: Text('Select manually from map'),
-                ),
               ),
+            ),
 
-              SizedBox(height: 20.h),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Get.back(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryColor,
-                    padding: EdgeInsets.all(16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
+            SizedBox(height: 24.h),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  padding: EdgeInsets.all(16.h),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                  child: Text(
-                    'Confirm',
-                    style: GoogleFonts.manrope(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
+                ),
+                child: Text(
+                  'Confirm',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
               ),
-              SizedBox(height: 10.h),
-            ],
-          ),
+            ),
+            SizedBox(height: 10.h),
+          ],
         ),
       ),
     );

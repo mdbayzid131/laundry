@@ -75,7 +75,8 @@ class _MapScreenState extends State<MapScreen> {
     _createMarkers();
   }
 
-  Future<void> _createMarkers() async {
+  void _createMarkers() {
+    markers.clear();
     for (var vendor in vendors) {
       markers.add(
         Marker(
@@ -87,12 +88,11 @@ class _MapScreenState extends State<MapScreen> {
             });
             _showVendorBottomSheet(vendor);
           },
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueBlue.sign,
-          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(199.2),
         ),
       );
     }
+    setState(() {});
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -182,7 +182,10 @@ class _MapScreenState extends State<MapScreen> {
             SizedBox(height: 16.h),
             Row(
               children: [
-                _buildInfoChip(icon: Icons.access_time, label: vendor.deliveryTime),
+                _buildInfoChip(
+                  icon: Icons.access_time,
+                  label: vendor.deliveryTime,
+                ),
                 SizedBox(width: 12.w),
                 _buildInfoChip(icon: Icons.location_on, label: vendor.distance),
               ],
@@ -200,7 +203,13 @@ class _MapScreenState extends State<MapScreen> {
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
-                    child: Text('View Details', style: GoogleFonts.manrope(fontWeight: FontWeight.w600, color: AppTheme.primaryColor)),
+                    child: Text(
+                      'View Details',
+                      style: GoogleFonts.manrope(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primaryColor,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(width: 12.w),
@@ -214,7 +223,13 @@ class _MapScreenState extends State<MapScreen> {
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
-                    child: Text('Select', style: GoogleFonts.manrope(fontWeight: FontWeight.w600, color: Colors.white)),
+                    child: Text(
+                      'Select',
+                      style: GoogleFonts.manrope(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -229,13 +244,23 @@ class _MapScreenState extends State<MapScreen> {
   Widget _buildInfoChip({required IconData icon, required String label}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(8.r)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16.sp, color: Colors.black54),
           SizedBox(width: 6.w),
-          Text(label, style: GoogleFonts.manrope(fontSize: 13.sp, fontWeight: FontWeight.w500, color: Colors.black87)),
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
         ],
       ),
     );
@@ -256,14 +281,6 @@ class _MapScreenState extends State<MapScreen> {
             mapToolbarEnabled: false,
             onCameraMove: (p) => _currentCameraPosition = p.target,
           ),
-          IgnorePointer(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 30.h),
-                child: Icon(Icons.location_on, color: AppTheme.primaryColor, size: 40.sp),
-              ),
-            ),
-          ),
           SafeArea(
             child: Padding(
               padding: EdgeInsets.all(16.w),
@@ -271,41 +288,23 @@ class _MapScreenState extends State<MapScreen> {
                 children: [
                   CircleAvatar(
                     backgroundColor: Colors.white,
-                    child: IconButton(icon: Icon(Icons.arrow_back, color: Colors.black), onPressed: () => Get.back()),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      onPressed: () => Get.back(),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
           Positioned(
-            bottom: 100.h,
+            bottom: 24.h,
             right: 16.w,
             child: FloatingActionButton(
               backgroundColor: Colors.white,
-              onPressed: () => mapController.animateCamera(CameraUpdate.newLatLng(_center)),
+              onPressed: () =>
+                  mapController.animateCamera(CameraUpdate.newLatLng(_center)),
               child: Icon(Icons.my_location, color: AppTheme.primaryColor),
-            ),
-          ),
-          Positioned(
-            bottom: 24.h,
-            left: 16.w,
-            right: 16.w,
-            child: ElevatedButton(
-              onPressed: () {
-                final HomeController hc = Get.find<HomeController>();
-                hc.updateLocation(
-                  _currentCameraPosition.latitude,
-                  _currentCameraPosition.longitude,
-                  "Selected Location (${_currentCameraPosition.latitude.toStringAsFixed(2)}, ${_currentCameraPosition.longitude.toStringAsFixed(2)})",
-                );
-                Get.back();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryColor,
-                padding: EdgeInsets.all(16.h),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-              ),
-              child: Text('Select this location', style: GoogleFonts.manrope(fontSize: 16.sp, fontWeight: FontWeight.w700, color: Colors.white)),
             ),
           ),
         ],
@@ -319,5 +318,15 @@ class VendorModel {
   final LatLng location;
   final double rating;
   final int reviews;
-  VendorModel({required this.id, required this.name, required this.location, required this.rating, required this.reviews, required this.deliveryTime, required this.distance, required this.logoUrl, required this.photoUrl});
+  VendorModel({
+    required this.id,
+    required this.name,
+    required this.location,
+    required this.rating,
+    required this.reviews,
+    required this.deliveryTime,
+    required this.distance,
+    required this.logoUrl,
+    required this.photoUrl,
+  });
 }
