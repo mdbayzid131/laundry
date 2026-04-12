@@ -37,4 +37,14 @@ class ServiceRepository {
       query: query,
     );
   }
+
+  Future<Response> submitReview(Map<String, dynamic> data) async {
+    return await _apiClient.postData(ApiConstants.review, data);
+  }
+
+  Future<Response> getStoreServiceReviews(String storeServiceId) async {
+    return await _apiClient.getData(
+      ApiConstants.getStoreServiceReviews.replaceAll(':storeServiceId', storeServiceId),
+    );
+  }
 }

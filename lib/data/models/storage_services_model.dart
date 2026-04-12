@@ -58,6 +58,8 @@ class StoreServiceData {
 
   final double? distanceMeters;
   final double? distanceMile;
+  final double? avgRating;
+  final int? totalReviews;
 
   StoreServiceData({
     this.id,
@@ -70,6 +72,8 @@ class StoreServiceData {
     this.store,
     this.distanceMeters,
     this.distanceMile,
+    this.avgRating,
+    this.totalReviews,
   });
 
   factory StoreServiceData.fromJson(Map<String, dynamic> json) {
@@ -90,6 +94,10 @@ class StoreServiceData {
       distanceMile: json['distanceMile'] != null
           ? double.tryParse(json['distanceMile'].toString())
           : null,
+      avgRating: json['avgRating'] != null
+          ? double.tryParse(json['avgRating'].toString())
+          : null,
+      totalReviews: json['totalReviews'],
     );
   }
 }

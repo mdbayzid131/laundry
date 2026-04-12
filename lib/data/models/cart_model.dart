@@ -54,7 +54,7 @@ class CartData {
               json['items'].map((x) => CartItemModel.fromJson(x)),
             )
           : [],
-      pickupAndDeliveryFee: json['pickupAndDeliveryFee'],
+      pickupAndDeliveryFee: json['pickupAndDeliveryFee']?.toString(),
     );
   }
 
@@ -109,7 +109,7 @@ class CartItemModel {
       serviceId: json['serviceId'],
       bundleId: json['bundleId'],
       quantity: json['quantity'],
-      price: json['price'],
+      price: json['price']?.toString(),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       service: json['service'] != null
@@ -178,7 +178,7 @@ class CartServiceModel {
       operatorId: json['operatorId'],
       categoryId: json['categoryId'],
       name: json['name'],
-      basePrice: json['basePrice'],
+      basePrice: json['basePrice']?.toString(),
       description: json['description'],
       image: json['image'],
       isActive: json['isActive'],
@@ -233,7 +233,7 @@ class CartBundleModel {
       name: json['name'],
       description: json['description'],
       image: json['image'],
-      bundlePrice: json['bundlePrice'],
+      bundlePrice: json['bundlePrice']?.toString(),
       isActive: json['isActive'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -312,7 +312,7 @@ class CartAddonModel {
       operatorId: json['operatorId'],
       name: json['name'],
       description: json['description'],
-      price: json['price'],
+      price: json['price']?.toString(),
       isActive: json['isActive'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],

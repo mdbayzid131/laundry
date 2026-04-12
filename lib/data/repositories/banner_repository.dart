@@ -9,4 +9,14 @@ class BannerRepository {
   Future<Response> getBanners() async {
     return await _apiClient.getData(ApiConstants.banner);
   }
+
+  Future<Response> getAds(double lat, double lng) async {
+    return await _apiClient.getData(
+      ApiConstants.ads,
+      query: {
+        'userLat': lat,
+        'userLng': lng,
+      },
+    );
+  }
 }

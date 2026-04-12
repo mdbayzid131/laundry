@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/themes/app_theme.dart';
+import 'package:laundry/data/models/steals_and_dals_model.dart';
 import 'package:laundry/modules/home/widget/promotion_banner.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
 import 'package:laundry/data/models/storage_services_model.dart';
@@ -37,27 +38,6 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
       'image': ImagePaths.op6,
       'info': 'Available now',
       'rating': '4.9 (500+) . 0.8 mi. 15 min',
-    },
-  ];
-
-  final List<Map<String, String>> _stealsAndDeals = [
-    {
-      'title': '30% Off Dry Clean',
-      'image': ImagePaths.op4,
-      'info': 'Limited Time Offer',
-      'rating': '4.5 (800+) . 2.5 mi. 30 min',
-    },
-    {
-      'title': 'Buy 1 Get 1 Wash',
-      'image': ImagePaths.op5,
-      'info': 'Weekly Special',
-      'rating': '4.6 (1k+) . 1.2 mi. 25 min',
-    },
-    {
-      'title': 'Free Pick-up',
-      'image': ImagePaths.op6,
-      'info': 'New Users Only',
-      'rating': '4.8 (300+) . 4.0 mi. 50 min',
     },
   ];
 
@@ -110,11 +90,19 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       SizedBox(height: 24.h),
 
                       // Steals & Deals Section
-                      _buildHorizontalListSection(
-                        'Steals & Deals',
-                        _stealsAndDeals,
-                        isLarge: true,
-                      ),
+                      Obx(() {
+                        if (controller.isLoadingAds.value) {
+                          return _buildServiceShimmer();
+                        }
+                        if (controller.ads.isEmpty) {
+                          return const SizedBox();
+                        }
+                        return buildDynamicAdsSection(
+                          'Steals & Deals',
+                          controller.ads,
+                          isLarge: true,
+                        );
+                      }),
 
                       SizedBox(height: 24.h),
 
@@ -768,13 +756,20 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             itemBuilder: (context, index) {
               final item = dataList[index];
               return GestureDetector(
-                onTap: () => Get.toNamed(
-                  AppRoutes.PRODUCT_DETAILS,
-                  arguments: {
-                    'serviceId': item.id,
-                    "operatorId": item.service?.operatorId,
-                  },
-                ),
+                onTap: () {
+                  Get.toNamed(
+                    AppRoutes.PRODUCT_DETAILS,
+                    arguments: {
+                      'serviceId': item.id,
+                      "operatorId": item.service?.operatorId,
+                      "categoryId": item.service?.categoryId,
+                    },
+                  );
+                  // ignore: avoid_print
+                  print(
+                    'serviceId: ${item.id}, operatorId: ${item.service?.operatorId}, categoryId: ${item.service?.categoryId}',
+                  );
+                },
                 child: Container(
                   width: isLarge ? 300.w : 200.w,
                   margin: EdgeInsets.only(right: 16.w),
@@ -838,7 +833,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                           SizedBox(width: 4.w),
                           Flexible(
                             child: Text(
-                              "4.6 (5k+) . ${item.distanceMile?.toStringAsFixed(1) ?? '2.2'} mi. 30 min",
+                              "${item.avgRating ?? 4.6} (${item.totalReviews ?? 5}) . ${item.distanceMile?.toStringAsFixed(1) ?? '2.2'} mi. 30 min",
                               style: GoogleFonts.manrope(
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.w600,
@@ -856,7 +851,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       Row(
                         children: [
                           Text(
-                            "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '12.14'}/lb",
+                            "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '00.00'}",
                             style: GoogleFonts.manrope(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w800,
@@ -864,18 +859,18 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                             ),
                           ),
                           SizedBox(width: 12.w),
-                          Flexible(
-                            child: Text(
-                              "delivery fee on .\$4.99",
-                              style: GoogleFonts.manrope(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                          // Flexible(
+                          //   child: Text(
+                          //     "delivery fee on .\$4.99",
+                          //     style: GoogleFonts.manrope(
+                          //       fontSize: 13.sp,
+                          //       fontWeight: FontWeight.w600,
+                          //       color: Colors.black,
+                          //     ),
+                          //     maxLines: 1,
+                          //     overflow: TextOverflow.ellipsis,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
@@ -890,4 +885,165 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
   }
 
   /// We removed _buildMobileCleanersSection as it was unused and replaced.
+
+  Widget buildDynamicAdsSection(
+    String title,
+    List<AdData> dataList, {
+    bool isLarge = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: GestureDetector(
+            //     onTap: () {
+            //  Get.toNamed(
+            //         AppRoutes.LAUNDRY_DETAILS,
+            //         arguments: {
+            //           'storeId': dataList.first.store?.id,
+            //           'operatorId': dataList.first.operatorId,
+            //         },
+            //       );
+            //     },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.manrope(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                // Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.black87),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 16.h),
+        SizedBox(
+          height: isLarge ? 280.h : 230.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemCount: dataList.length,
+            itemBuilder: (context, index) {
+              final item = dataList[index];
+              final itemName = item.serviceName ?? item.bundleName ?? '';
+              final itemImage = item.serviceImage ?? item.bundleImage ?? '';
+              final rating = item.avgRating ?? 0.0;
+              final reviews = item.totalReviewCount ?? 0;
+              final distance = item.distanceMile != null
+                  ? '${item.distanceMile!.toStringAsFixed(1)} mi'
+                  : '';
+
+              return GestureDetector(
+                onTap: () {
+                  if (item.id != null) {
+                    print(item.id);
+                    print(item.operatorId);
+                    print(item.service?.categoryId);
+                    Get.toNamed(
+                      AppRoutes.PRODUCT_DETAILS,
+                      arguments: {
+                        'serviceId': item.storeServiceId,
+                        'operatorId': item.operatorId,
+                        'categoryId': item.service?.categoryId,
+                      },
+                    );
+                  }
+                },
+                child: Container(
+                  width: isLarge ? 300.w : 200.w,
+                  margin: EdgeInsets.only(right: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image Container
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Container(
+                          height: isLarge ? 170.h : 140.h,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: itemImage.isNotEmpty
+                              ? Image.network(
+                                  itemImage,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => Icon(
+                                    Icons.image_outlined,
+                                    size: 40.sp,
+                                    color: Colors.grey[400],
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.image_outlined,
+                                  size: 40.sp,
+                                  color: Colors.grey[400],
+                                ),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+
+                      // Availability & Favorite
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            item.status ?? 'Available',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Icon(
+                            Icons.favorite_border,
+                            size: 18.sp,
+                            color: Colors.black45,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+
+                      // Title
+                      Text(
+                        itemName,
+                        style: GoogleFonts.manrope(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 4.h),
+
+                      // Rating & Distance/Time
+                      Row(
+                        children: [
+                          Icon(Icons.star, size: 14.sp, color: Colors.black87),
+                          SizedBox(width: 4.w),
+                          Text(
+                            '$rating ($reviews+) . $distance',
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }

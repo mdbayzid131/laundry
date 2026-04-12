@@ -65,7 +65,11 @@ import '../../modules/cart/views/cart_view.dart';
 import '../../modules/checkout/bindings/checkout_binding.dart';
 import '../../modules/checkout/views/checkout_view.dart';
 import '../../modules/membership/bindings/membership_binding.dart';
-import '../../modules/membership/views/membership_view.dart';
+import 'package:laundry/modules/membership/views/membership_view.dart';
+import 'package:laundry/modules/review/bindings/review_binding.dart';
+import 'package:laundry/modules/review/views/review_view.dart';
+import 'package:laundry/modules/review/bindings/all_reviews_binding.dart';
+import 'package:laundry/modules/review/views/all_reviews_view.dart';
 
 class AppRoutes {
   static const String SPLASH = '/splash';
@@ -106,6 +110,8 @@ class AppRoutes {
   static const String CHANGE_PASSWORD = '/change-password';
   static const String LOCK = '/lock';
   static const String TRACK_ORDER = '/track-order';
+  static const String RATE_REVIEW = '/rate-review';
+  static const String ALL_REVIEWS = '/all-reviews';
 }
 
 final pages = [
@@ -323,5 +329,15 @@ final pages = [
     name: AppRoutes.TRACK_ORDER,
     page: () => const TrackOrderView(),
     binding: TrackOrderBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.RATE_REVIEW,
+    page: () => const ReviewView(),
+    binding: ReviewBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.ALL_REVIEWS,
+    page: () => const AllReviewsView(),
+    binding: AllReviewsBinding(),
   ),
 ];

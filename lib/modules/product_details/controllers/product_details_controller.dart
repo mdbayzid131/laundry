@@ -3,6 +3,10 @@ import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/single_service_details_model.dart';
 import 'package:laundry/data/repositories/cart_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
+import 'package:laundry/data/models/storage_services_model.dart';
+import 'package:laundry/core/services/storage_service.dart';
+import 'package:laundry/config/constants/storage_constants.dart';
+import '../../home/controllers/home_controller.dart';
 
 class ProductDetailsController extends GetxController {
   final ServiceRepository _serviceRepository = Get.find<ServiceRepository>();
@@ -10,7 +14,9 @@ class ProductDetailsController extends GetxController {
 
   RxBool isLoading = false.obs;
   RxBool isAddingToCart = false.obs;
+  RxBool isLoadingRelatedServices = false.obs;
   Rxn<StoreServiceDetailsData> serviceDetails = Rxn<StoreServiceDetailsData>();
+  RxList<StoreServiceData> relatedServices = <StoreServiceData>[].obs;
 
   // Product details state
   final RxDouble basePrice = 0.0.obs;
@@ -23,8 +29,12 @@ class ProductDetailsController extends GetxController {
   void onInit() {
     super.onInit();
     final args = Get.arguments;
+    print("ProductDetailsController onInit. Args: $args");
     if (args != null && args['serviceId'] != null) {
       getServiceDetails();
+    }
+    if (args != null && args['categoryId'] != null) {
+      getRelatedServices();
     }
   }
 
@@ -120,6 +130,60 @@ class ProductDetailsController extends GetxController {
       Helpers.showCustomSnackBar('Could not add item to cart', isError: true);
     } finally {
       isAddingToCart.value = false;
+    }
+  }
+
+  Future<void> getRelatedServices() async {
+    final args = Get.arguments;
+    print("Fetching related services. CategoryId: ${args?['categoryId']}");
+    if (args == null || args['categoryId'] == null) return;
+
+    String categoryId = args['categoryId'];
+    isLoadingRelatedServices.value = true;
+
+    double? lat = await StorageService.getDouble(StorageConstants.userLat);
+    double? lng = await StorageService.getDouble(StorageConstants.userLng);
+
+    if (lat == null || lng == null || lat == 0.0 || lng == 0.0) {
+      if (Get.isRegistered<HomeController>()) {
+        final homeCtrl = Get.find<HomeController>();
+        lat = homeCtrl.lat.value;
+        lng = homeCtrl.lng.value;
+        print("Using location from HomeController: $lat, $lng");
+      }
+    } else {
+      print("Using location from Storage: $lat, $lng");
+    }
+
+    print(
+      "Requesting related services for categoryId: $categoryId at ($lat, $lng)",
+    );
+
+    try {
+      final response = await _serviceRepository.getStoreServices(
+        lat ?? 0.0,
+        lng ?? 0.0,
+        categoryId,
+        '', // searchTerm
+      );
+
+      print("Related services response status: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        final resModel = StoreServiceResponseModel.fromJson(response.data);
+        relatedServices.value = resModel.data ?? [];
+        print("Fetched ${relatedServices.length} related services");
+
+        // Remove current service from related services if present
+        if (args['serviceId'] != null) {
+          relatedServices.removeWhere(
+            (element) => element.id == args['serviceId'],
+          );
+        }
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching related services: $e');
+    } finally {
+      isLoadingRelatedServices.value = false;
     }
   }
 }

@@ -37,24 +37,34 @@ class CartScreen extends GetView<CartController> {
         final items = controller.cartData.value?.items ?? [];
 
         if (items.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 80.sp,
-                  color: Colors.grey.shade300,
+          return RefreshIndicator(
+            onRefresh: () => controller.getCart(),
+            color: Theme.of(context).primaryColor,
+            backgroundColor: Colors.white,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.shopping_cart_outlined,
+                      size: 80.sp,
+                      color: Colors.grey.shade300,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'Your cart is empty',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16.sp,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 16.h),
-                Text(
-                  'Your cart is empty',
-                  style: GoogleFonts.manrope(
-                    fontSize: 16.sp,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         }
@@ -64,6 +74,8 @@ class CartScreen extends GetView<CartController> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () => controller.getCart(),
+                color: Theme.of(context).primaryColor,
+                backgroundColor: Colors.white,
                 child: ListView.separated(
                   padding: EdgeInsets.symmetric(
                     horizontal: 20.w,

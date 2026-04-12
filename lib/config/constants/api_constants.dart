@@ -21,6 +21,7 @@ class ApiConstants {
   static const String getOperatorCategory = '/operatorcategory/:id';
   // Banner Endpoints
   static const String banner = '/banner';
+  static const String ads = '/ad';
 
   // Service Endpoints
   static const String getStoreService = '/storeservice';
@@ -45,6 +46,10 @@ class ApiConstants {
   static const String getStoreDetails = '/store/:id';
   static const String getStoreServiceByStoreId = '/storeservice/store/:storeId';
   static const String getStoreBundleByStoreId = '/storebundle/store/:storeId';
+
+  // Review Endpoints
+  static const String review = '/review';
+  static const String getStoreServiceReviews = '/review/store-service/:storeServiceId';
 
   // Support Endpoints
   static const String emailSupport = '/email-support';

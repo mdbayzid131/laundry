@@ -4,6 +4,7 @@ import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/banner_model.dart';
 import 'package:laundry/data/models/category_model.dart';
 import 'package:laundry/data/models/storage_services_model.dart';
+import 'package:laundry/data/models/steals_and_dals_model.dart';
 import 'package:laundry/data/repositories/category_repository.dart';
 import 'package:laundry/data/repositories/banner_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
@@ -26,6 +27,9 @@ class HomeController extends GetxController {
 
   RxBool isLoadingServices = false.obs;
   RxList<StoreServiceData> services = <StoreServiceData>[].obs;
+
+  RxBool isLoadingAds = false.obs;
+  RxList<AdData> ads = <AdData>[].obs;
 
   // New Variables for Location & Search
   RxDouble lat = 0.0.obs;
@@ -50,7 +54,12 @@ class HomeController extends GetxController {
   Future<void> loadInitialData({bool showLoader = true}) async {
     if (showLoader) Helpers.showLoadingDialog();
     try {
-      await Future.wait([getCategories(), getBanners(), getStoreServices()]);
+      await Future.wait([
+        getCategories(),
+        getBanners(),
+        getStoreServices(),
+        getAds(),
+      ]);
     } catch (e) {
       Helpers.showDebugLog('Error loading initial data: $e');
     } finally {
@@ -105,6 +114,21 @@ class HomeController extends GetxController {
       Helpers.showDebugLog('Error fetching services: $e');
     } finally {
       isLoadingServices.value = false;
+    }
+  }
+
+  Future<void> getAds() async {
+    isLoadingAds.value = true;
+    try {
+      final response = await _bannerRepository.getAds(lat.value, lng.value);
+      if (response.statusCode == 200) {
+        final adsResponse = AdsResponseModel.fromJson(response.data);
+        ads.value = adsResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching ads: $e');
+    } finally {
+      isLoadingAds.value = false;
     }
   }
 

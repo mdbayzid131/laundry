@@ -574,6 +574,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
             '${controller.storeDetails.value?.distanceMile?.toStringAsFixed(2) ?? '0'} mi, 30 min',
             '\$${serviceItem.service?.basePrice ?? '0'}/piece',
             'delivery fee on \$2.00',
+            serviceId: serviceItem.serviceId,
           );
         }).toList(),
       );
@@ -586,14 +587,16 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String rating,
     String info,
     String price,
-    String delivery,
-  ) {
+    String delivery, {
+    String? serviceId,
+  }) {
     return GestureDetector(
       onTap: () => Get.toNamed(
         AppRoutes.PRODUCT_DETAILS,
         arguments: {
           'storeId': controller.storeId,
           'operatorId': controller.operatorId,
+          "categoryId": controller.selectedCategory.value,
         },
       ),
 
@@ -637,13 +640,16 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                 Positioned(
                   top: 12.h,
                   right: 12.w,
-                  child: Container(
-                    padding: EdgeInsets.all(8.w),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
+                  child: GestureDetector(
+                    onTap: () => controller.addToCart(serviceId: serviceId!),
+                    child: Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.add, size: 20.sp, color: Colors.black),
                     ),
-                    child: Icon(Icons.add, size: 20.sp, color: Colors.black),
                   ),
                 ),
               ],
@@ -782,7 +788,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           ),
         );
       }
-      
+
       final services = controller.tabServices;
       if (services.isEmpty) return const SizedBox();
 
@@ -802,16 +808,33 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           final title = serviceItem.service?.name ?? '';
           final image = serviceItem.service?.image ?? ImagePaths.op4;
           final price = '\$${serviceItem.service?.basePrice ?? '0'}/piece';
-          
-          return _buildGridItem(title, image, price);
+
+          return _buildGridItem(
+            title,
+            image,
+            price,
+            serviceId: serviceItem.serviceId,
+          );
         },
       );
     });
   }
 
-  Widget _buildGridItem(String title, String image, String price) {
+  Widget _buildGridItem(
+    String title,
+    String image,
+    String price, {
+    String? serviceId,
+  }) {
     return GestureDetector(
-      onTap: () => Get.toNamed(AppRoutes.PRODUCT_DETAILS),
+      onTap: () => Get.toNamed(
+        AppRoutes.PRODUCT_DETAILS,
+        arguments: {
+          'storeId': controller.storeId,
+          'operatorId': controller.operatorId,
+          "categoryId": controller.selectedCategory.value,
+        },
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -827,27 +850,25 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                       ? Image.network(
                           image,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
-                            ImagePaths.op4,
-                            fit: BoxFit.cover,
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Image.asset(ImagePaths.op4, fit: BoxFit.cover),
                         )
-                      : Image.asset(
-                          image,
-                          fit: BoxFit.cover,
-                        ),
+                      : Image.asset(image, fit: BoxFit.cover),
                 ),
               ),
               Positioned(
                 top: 8.h,
                 right: 8.w,
-                child: Container(
-                  padding: EdgeInsets.all(6.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+                child: GestureDetector(
+                  onTap: () => controller.addToCart(serviceId: serviceId!),
+                  child: Container(
+                    padding: EdgeInsets.all(6.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.shopping_cart_outlined, size: 16.sp),
                   ),
-                  child: Icon(Icons.shopping_cart_outlined, size: 16.sp),
                 ),
               ),
             ],
@@ -929,6 +950,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
               bundleData.bundle?.description ?? '',
               bundleData.bundle?.image ?? ImagePaths.op8,
               '\$${bundleData.bundle?.bundlePrice ?? '0'}',
+              bundleId: bundleData.bundleId,
             );
           }).toList(),
         ],
@@ -940,8 +962,9 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String title,
     String subtitle,
     String image,
-    String price,
-  ) {
+    String price, {
+    String? bundleId,
+  }) {
     return Container(
       margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
       padding: EdgeInsets.all(12.w),
@@ -1010,14 +1033,17 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                   ),
           ),
           SizedBox(width: 12.w),
-          Container(
-            padding: EdgeInsets.all(6.w),
-            decoration: BoxDecoration(
-              color: const Color(0xffF9F9F9),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black.withOpacity(0.05)),
+          GestureDetector(
+            onTap: () => controller.addToCart(bundleId: bundleId),
+            child: Container(
+              padding: EdgeInsets.all(6.w),
+              decoration: BoxDecoration(
+                color: const Color(0xffF9F9F9),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black.withOpacity(0.05)),
+              ),
+              child: Icon(Icons.add, size: 20.sp),
             ),
-            child: Icon(Icons.add, size: 20.sp),
           ),
         ],
       ),

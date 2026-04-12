@@ -7,6 +7,7 @@ import '../../../core/utils/helpers.dart';
 import '../../../data/repositories/store_repository.dart';
 import '../../../data/repositories/category_repository.dart';
 import '../../../data/repositories/service_repository.dart';
+import '../../../data/repositories/cart_repository.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../config/constants/storage_constants.dart';
 import '../../home/controllers/home_controller.dart';
@@ -15,8 +16,10 @@ class LaundryDetailsController extends GetxController {
   final StoreRepository _storeRepository = Get.find<StoreRepository>();
   final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
   final ServiceRepository _serviceRepository = Get.find<ServiceRepository>();
+  final CartRepository _cartRepository = Get.find<CartRepository>();
 
   RxBool isLoading = false.obs;
+  RxBool isAddingToCart = false.obs;
   Rx<StoreDetailsData?> storeDetails = Rx<StoreDetailsData?>(null);
   String? storeId;
   String? operatorId;
@@ -205,6 +208,32 @@ class LaundryDetailsController extends GetxController {
     activeTab.value = tab;
     if (tab == 'Most Ordered' || tab == 'Extras') {
       fetchStoreServicesbyPerams(tab);
+    }
+  }
+
+  Future<void> addToCart({String? serviceId, String? bundleId}) async {
+    if (serviceId == null && bundleId == null) return;
+
+    isAddingToCart.value = true;
+    try {
+      final response = await _cartRepository.addToCart(
+        serviceId: serviceId,
+        bundleId: bundleId,
+        quantity: 1,
+        addonIds: [],
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Helpers.showCustomSnackBar(
+          'Item added to cart successfully',
+          isError: false,
+        );
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error adding to cart: $e');
+      Helpers.showCustomSnackBar('Could not add item to cart', isError: true);
+    } finally {
+      isAddingToCart.value = false;
     }
   }
 }

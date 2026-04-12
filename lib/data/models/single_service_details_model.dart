@@ -3,15 +3,9 @@ class StoreServiceDetailsResponseModel {
   final String? message;
   final StoreServiceDetailsData? data;
 
-  StoreServiceDetailsResponseModel({
-    this.success,
-    this.message,
-    this.data,
-  });
+  StoreServiceDetailsResponseModel({this.success, this.message, this.data});
 
-  factory StoreServiceDetailsResponseModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory StoreServiceDetailsResponseModel.fromJson(Map<String, dynamic> json) {
     return StoreServiceDetailsResponseModel(
       success: json['success'],
       message: json['message'],
@@ -22,11 +16,7 @@ class StoreServiceDetailsResponseModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'message': message,
-      'data': data?.toJson(),
-    };
+    return {'success': success, 'message': message, 'data': data?.toJson()};
   }
 }
 
@@ -244,8 +234,7 @@ class ServiceAddonModel {
       addonId: json['addonId'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      addon:
-          json['addon'] != null ? AddonModel.fromJson(json['addon']) : null,
+      addon: json['addon'] != null ? AddonModel.fromJson(json['addon']) : null,
     );
   }
 
@@ -412,6 +401,7 @@ class ReviewModel {
   final String? operatorReply;
   final String? createdAt;
   final String? updatedAt;
+  final UserModel? user;
 
   ReviewModel({
     this.id,
@@ -424,6 +414,7 @@ class ReviewModel {
     this.operatorReply,
     this.createdAt,
     this.updatedAt,
+    this.user,
   });
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
@@ -438,6 +429,7 @@ class ReviewModel {
       operatorReply: json['operatorReply'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
+      user: json['user'] != null ? UserModel.fromJson(json['user']) : null,
     );
   }
 
@@ -453,27 +445,44 @@ class ReviewModel {
       'operatorReply': operatorReply,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'user': user?.toJson(),
     };
+  }
+}
+
+class UserModel {
+  final String? id;
+  final String? name;
+  final String? email;
+  final String? avatar;
+
+  UserModel({this.id, this.name, this.email, this.avatar});
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      avatar: json['avatar'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'email': email, 'avatar': avatar};
   }
 }
 
 class ReviewCountModel {
   final int? reviews;
 
-  ReviewCountModel({
-    this.reviews,
-  });
+  ReviewCountModel({this.reviews});
 
   factory ReviewCountModel.fromJson(Map<String, dynamic> json) {
-    return ReviewCountModel(
-      reviews: json['reviews'],
-    );
+    return ReviewCountModel(reviews: json['reviews']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'reviews': reviews,
-    };
+    return {'reviews': reviews};
   }
 }
 

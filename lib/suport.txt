@@ -1,0 +1,65 @@
+{
+    "success": true,
+    "message": "Ad fetched successfully",
+    "meta": {
+        "total": 1,
+        "page": 1,
+        "limit": 10
+    },
+    "data": [
+        {
+            "id": "cmnwc27j00005tv70t25xdxk2",
+            "operatorId": "cmnutb2ab0007tvew8qk3ajso",
+            "subscriptionId": "cmnw0fwyh000gtv5gpet7we93",
+            "status": "ACTIVE",
+            "createdAt": "2026-04-12T22:26:19.932Z",
+            "storeBundleId": null,
+            "storeServiceId": "cmnuu11iy0005tvxs3qmkb7ak",
+            "serviceName": "Was and dry",
+            "serviceImage": "http://10.10.7.111:5000/image/bien-arts-n4x0vqrqwkk-unsplash-1775941867254.jpg",
+            "bundleName": null,
+            "bundleImage": null,
+            "operator": {
+                "id": "cmnutb2ab0007tvew8qk3ajso",
+                "user": {
+                    "name": "Anarul Islam updated",
+                    "avatar": null
+                }
+            },
+            "store": {
+                "id": "cmnuu01250004tvxsmgf99l7d",
+                "operatorId": "cmnutb2ab0007tvew8qk3ajso",
+                "name": "Next Crazy Store",
+                "logo": "http://10.10.7.111:5000/image/427732921a5a9dfb6c68f19babeb054847b5d66f-1775941978961.png",
+                "banner": "http://10.10.7.111:5000/banner/f9497b5eb0394b675ed7834bb1cfb1b8bdb29422-1775941978964.png",
+                "address": "123 Main Street",
+                "country": "Bangladesh",
+                "state": "Dhaka",
+                "city": "Kaliganj",
+                "postalCode": "1234",
+                "lat": 23.8456,
+                "lng": 90.1681,
+                "isActive": true,
+                "createdAt": "2026-04-11T21:12:58.974",
+                "updatedAt": "2026-04-11T21:12:58.974"
+            },
+            "service": {
+                "id": "cmnutxmvf0001tvxs9o9bwn06",
+                "operatorId": "cmnutb2ab0007tvew8qk3ajso",
+                "categoryId": "cmnuq925o0005tvjo474sn41l",
+                "name": "Was and dry",
+                "basePrice": 200,
+                "description": "Wash and clean",
+                "image": "http://10.10.7.111:5000/image/bien-arts-n4x0vqrqwkk-unsplash-1775941867254.jpg",
+                "isActive": true,
+                "createdAt": "2026-04-11T21:11:07.275",
+                "updatedAt": "2026-04-11T21:11:07.275"
+            },
+            "bundle": null,
+            "avgRating": 5,
+            "totalReviewCount": 3,
+            "distance_meters": 1100241.99132311,
+            "distanceMile": 683.6603771254738
+        }
+    ]
+}

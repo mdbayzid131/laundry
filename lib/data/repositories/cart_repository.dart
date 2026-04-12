@@ -7,17 +7,23 @@ class CartRepository {
   final ApiClient _apiClient = Get.find();
 
   Future<Response> addToCart({
-    required String serviceId,
+    String? serviceId,
+    String? bundleId,
     required int quantity,
-    required List<String> addonIds,
+    List<String>? addonIds,
   }) async {
+    Map<String, dynamic> body = {'quantity': quantity};
+
+    if (bundleId != null && bundleId.isNotEmpty) {
+      body['bundleId'] = bundleId;
+    } else {
+      body['serviceId'] = serviceId;
+      body['addonIds'] = addonIds ?? [];
+    }
+
     return await _apiClient.postData(
       ApiConstants.addToCart,
-      {
-        'serviceId': serviceId,
-        'quantity': quantity,
-        'addonIds': addonIds,
-      },
+      body,
     );
   }
 

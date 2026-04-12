@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/core/widgets/custom_back_button.dart';
+import 'package:laundry/data/models/storage_services_model.dart';
 import '../controllers/product_details_controller.dart';
 
 class ProductDetailsView extends GetView<ProductDetailsController> {
@@ -86,15 +88,8 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
                         _buildRelatedServices(),
 
                         // Customer Reviews Section
-                        if (controller
-                                .serviceDetails
-                                .value
-                                ?.reviews
-                                ?.isNotEmpty ??
-                            false) ...[
-                          SizedBox(height: 40.h),
-                          _buildCustomerReviews(),
-                        ],
+                        SizedBox(height: 40.h),
+                        _buildCustomerReviews(),
 
                         // SizedBox(height: 32.h),
                         // _buildConfirmButton(),
@@ -273,57 +268,65 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
   Widget _buildVendorSection() {
     return Obx(() {
       final store = controller.serviceDetails.value?.store;
-      return Container(
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: Colors.black.withOpacity(0.05)),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 20.r,
-              backgroundColor: Colors.blue.shade50,
-              backgroundImage: store?.logo != null
-                  ? NetworkImage(store!.logo!)
-                  : null,
-              child: store?.logo == null
-                  ? Text(store?.name?.substring(0, 1) ?? 'V')
-                  : null,
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    store?.name ?? 'Vendor',
-                    style: GoogleFonts.manrope(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xff1A2530),
-                    ),
-                  ),
-                  Text(
-                    store?.isActive == true ? 'Available' : 'Unavailable',
-                    style: GoogleFonts.manrope(
-                      fontSize: 12.sp,
-                      color: store?.isActive == true
-                          ? Colors.green
-                          : Colors.red,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+      return GestureDetector(
+        onTap: () {
+          Get.toNamed(
+            AppRoutes.LAUNDRY_DETAILS,
+            arguments: {'storeId': store?.id, 'operatorId': store?.operatorId},
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(color: Colors.black.withOpacity(0.05)),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20.r,
+                backgroundColor: Colors.blue.shade50,
+                backgroundImage: store?.logo != null
+                    ? NetworkImage(store!.logo!)
+                    : null,
+                child: store?.logo == null
+                    ? Text(store?.name?.substring(0, 1) ?? 'V')
+                    : null,
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 16.sp,
-              color: Colors.black26,
-            ),
-          ],
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      store?.name ?? 'Vendor',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xff1A2530),
+                      ),
+                    ),
+                    Text(
+                      store?.isActive == true ? 'Available' : 'Unavailable',
+                      style: GoogleFonts.manrope(
+                        fontSize: 12.sp,
+                        color: store?.isActive == true
+                            ? Colors.green
+                            : Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16.sp,
+                color: Colors.black26,
+              ),
+            ],
+          ),
         ),
       );
     });
@@ -620,105 +623,153 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
   }
 
   Widget _buildRelatedServices() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    return Obx(() {
+      if (controller.isLoadingRelatedServices.value) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.link_rounded, size: 20.sp, color: Colors.black26),
-            SizedBox(width: 8.w),
             _buildServiceHeader('Related Services'),
+            const Center(child: CircularProgressIndicator()),
           ],
-        ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            children: [
-              _buildRelatedCard('Wash', ImagePaths.op3),
-              _buildRelatedCard('Wash', ImagePaths.op4),
-              _buildRelatedCard('Wash', ImagePaths.op5),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+        );
+      }
 
-  Widget _buildRelatedCard(String title, String image) {
-    return Container(
-      width: 160.w,
-      margin: EdgeInsets.only(right: 16.w),
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
+      if (controller.relatedServices.isEmpty) {
+        return const SizedBox();
+      }
+
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12.r),
-                child: Image.asset(
-                  image,
-                  height: 100.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                bottom: 8.h,
-                right: 8.w,
-                child: Container(
-                  padding: EdgeInsets.all(4.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(Icons.shopping_cart_outlined, size: 14.sp),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            title,
-            style: GoogleFonts.manrope(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 4.h),
           Row(
             children: [
-              Icon(Icons.star, size: 10.sp, color: Colors.black),
-              Text(
-                ' 4.6 (5k+)',
-                style: GoogleFonts.manrope(
-                  fontSize: 9.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              Icon(Icons.link_rounded, size: 20.sp, color: Colors.black26),
+              SizedBox(width: 8.w),
+              _buildServiceHeader('Related Services'),
             ],
           ),
-          Text(
-            '\$12.14/piece',
-            style: GoogleFonts.manrope(
-              fontSize: 10.sp,
-              color: Colors.black45,
-              fontWeight: FontWeight.w700,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: controller.relatedServices.map((item) {
+                return _buildRelatedCard(item);
+              }).toList(),
             ),
           ),
         ],
+      );
+    });
+  }
+
+  Widget _buildRelatedCard(StoreServiceData item) {
+    final title = item.service?.name ?? 'Service';
+    final image = item.service?.image ?? '';
+    final price = item.service?.basePrice ?? '0';
+    final rating = item.avgRating ?? 4.8;
+    final reviews = item.totalReviews ?? 0;
+
+    return GestureDetector(
+      onTap: () {
+        Get.offNamed(
+          AppRoutes.PRODUCT_DETAILS,
+          arguments: {
+            'serviceId': item.id,
+            'operatorId': item.service?.operatorId,
+            'categoryId': item.service?.categoryId,
+          },
+          preventDuplicates: false,
+        );
+      },
+      child: Container(
+        width: 160.w,
+        margin: EdgeInsets.only(right: 16.w),
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: image.isNotEmpty
+                      ? Image.network(
+                          image,
+                          height: 100.h,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Image.asset(
+                            ImagePaths.op3,
+                            height: 100.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Image.asset(
+                          ImagePaths.op3,
+                          height: 100.h,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+                Positioned(
+                  bottom: 8.h,
+                  right: 8.w,
+                  child: Container(
+                    padding: EdgeInsets.all(4.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.shopping_cart_outlined, size: 14.sp),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.manrope(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Row(
+              children: [
+                Icon(Icons.star, size: 10.sp, color: Colors.black),
+                Text(
+                  ' $rating ($reviews+)',
+                  style: GoogleFonts.manrope(
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              '\$$price/piece',
+              style: GoogleFonts.manrope(
+                fontSize: 10.sp,
+                color: Colors.black45,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -739,7 +790,14 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
               ),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Get.toNamed(
+                  AppRoutes.RATE_REVIEW,
+                  arguments: {
+                    'storeServiceId': controller.serviceDetails.value?.id,
+                  },
+                );
+              },
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                 decoration: BoxDecoration(
@@ -778,39 +836,92 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
         SizedBox(height: 24.h),
         Obx(() {
           final reviews = controller.serviceDetails.value?.reviews ?? [];
+          if (reviews.isEmpty) {
+            return Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: Colors.black.withOpacity(0.05)),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.rate_review_outlined,
+                    size: 40.sp,
+                    color: const Color(0xffB5DEEF),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    'No reviews yet',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xff1A2530),
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    'Be the first to share your experience with this service!',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(
+                      fontSize: 12.sp,
+                      color: Colors.black38,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
           return Column(
-            children: reviews.take(2).map((review) {
-              return _buildReviewItem(
-                'User ${review.userId?.substring(0, 4)}',
-                review.comment ?? '',
-                'Posted ${review.createdAt?.substring(0, 10)}',
-                ImagePaths.op6, // Placeholder avatar
-                review.rating ?? 5,
-              );
-            }).toList(),
+            children: [
+              ...reviews.take(2).map((review) {
+                return _buildReviewItem(
+                  review.user?.name ?? 'User',
+                  review.comment ?? '',
+                  'Posted ${review.createdAt?.substring(0, 10)}',
+                  review.user?.avatar ?? '',
+                  review.rating ?? 5,
+                );
+              }),
+              if (reviews.length > 1) ...[
+                SizedBox(height: 16.h),
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed(
+                      AppRoutes.ALL_REVIEWS,
+                      arguments: {
+                        'storeServiceId': controller.serviceDetails.value?.id,
+                      },
+                    );
+                  },
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'See all reviews',
+                          style: GoogleFonts.manrope(
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black45,
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 20.sp,
+                          color: Colors.black45,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
           );
         }),
-        SizedBox(height: 16.h),
-        Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'See all reviews',
-                style: GoogleFonts.manrope(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black45,
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 20.sp,
-                color: Colors.black45,
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -827,7 +938,12 @@ class ProductDetailsView extends GetView<ProductDetailsController> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(radius: 20.r, backgroundImage: AssetImage(avatar)),
+          CircleAvatar(
+            radius: 20.r,
+            backgroundImage: avatar.isNotEmpty
+                ? NetworkImage(avatar)
+                : AssetImage(ImagePaths.op6) as ImageProvider,
+          ),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
