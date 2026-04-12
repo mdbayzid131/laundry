@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/modules/profile/controllers/faq_controller.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
@@ -18,26 +20,9 @@ class HelpSupportScreen extends StatefulWidget {
 class _HelpSupportScreenState extends State<HelpSupportScreen> {
   int? expandedIndex;
 
-  final List<FAQItem> faqs = [
-    FAQItem(
-      question: 'How do I track my order?',
-      answer:
-          'You can track your order in real-time through the app. Go to "My Orders" and tap on your active order to see pickup and delivery status.',
-    ),
-    FAQItem(
-      question: 'What if my clothes are damaged?',
-      answer:
-          'Yes! You can reschedule up to 2 hours before your pickup time. Just go to your order and tap "Reschedule."',
-    ),
-    FAQItem(
-      question: 'How do refunds work?',
-      answer:
-          'Refunds are processed back to your original payment method within 3-5 business days after approval.',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final faqController = Get.find<FaqController>();
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
@@ -152,13 +137,33 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                 SizedBox(height: 16.h),
 
                 // FAQ Items
-                ...List.generate(
-                  faqs.length,
-                  (index) => Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: _buildFAQItem(index),
-                  ),
-                ),
+                Obx(() {
+                  if (faqController.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (faqController.faqsList.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No FAQs found',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14.sp,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    children: List.generate(
+                      faqController.faqsList.length,
+                      (index) => Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: _buildFAQItem(index, faqController),
+                      ),
+                    ),
+                  );
+                }),
 
                 SizedBox(height: 40.h),
               ],
@@ -269,8 +274,8 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
     );
   }
 
-  Widget _buildFAQItem(int index) {
-    final faq = faqs[index];
+  Widget _buildFAQItem(int index, FaqController controller) {
+    final faq = controller.faqsList[index];
     final isExpanded = expandedIndex == index;
 
     return Container(
@@ -300,7 +305,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      faq.question,
+                      faq.question ?? '',
                       style: GoogleFonts.manrope(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w600,
@@ -324,7 +329,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
               child: Text(
-                faq.answer,
+                faq.answer ?? '',
                 style: GoogleFonts.manrope(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w400,
@@ -338,11 +343,4 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
       ),
     );
   }
-}
-
-class FAQItem {
-  final String question;
-  final String answer;
-
-  FAQItem({required this.question, required this.answer});
 }

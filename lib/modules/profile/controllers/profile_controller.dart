@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:laundry/core/services/api_checker.dart';
 import 'package:laundry/core/utils/helpers.dart';
+import 'package:laundry/data/models/notifecation_preferences_model.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../config/routes/app_pages.dart';
 import '../../../data/repositories/user_repository.dart';
@@ -18,12 +20,21 @@ class ProfileController extends GetxController {
   final RxBool isAddressLoading = false.obs;
   final RxString updateAddressId = ''.obs;
 
+  // Notification Preferences
+  final Rxn<NotificationPreferenceData> notificationPreference =
+      Rxn<NotificationPreferenceData>();
+  final RxBool pushNotifications = true.obs;
+  final RxBool smsUpdates = false.obs;
+  final RxBool emailReceipts = true.obs;
+  final RxBool isNotifLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getProfile();
       getAddresses();
+      getNotificationPreferences();
     });
   }
 
@@ -32,6 +43,7 @@ class ProfileController extends GetxController {
     try {
       if (showDialog) Helpers.showLoadingDialog();
       final response = await _userRepository.getProfile();
+      ApiChecker.checkGetApi(response);
       if (response.statusCode == 200) {
         final profileResponse = UserProfileResponseModel.fromJson(
           response.data,
@@ -60,6 +72,7 @@ class ProfileController extends GetxController {
     isAddressLoading.value = true;
     try {
       final response = await _addressRepository.getAddresses();
+      ApiChecker.checkGetApi(response);
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['data'];
         addresses.value = data
@@ -77,6 +90,7 @@ class ProfileController extends GetxController {
     isAddressLoading.value = true;
     try {
       final response = await _addressRepository.updateAddress(id, data);
+      ApiChecker.checkGetApi(response);
       Helpers.showDebugLog('Update Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
         if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
@@ -102,6 +116,7 @@ class ProfileController extends GetxController {
     updateAddressId.value = address.id ?? '';
     try {
       final response = await _addressRepository.setDefaultAddress(address.id!);
+      ApiChecker.checkGetApi(response);
       if (response.statusCode == 200) {
         getAddresses();
         Helpers.showCustomSnackBar('Default address updated', isError: false);
@@ -117,6 +132,7 @@ class ProfileController extends GetxController {
     isAddressLoading.value = true;
     try {
       final response = await _addressRepository.createAddress(data);
+      ApiChecker.checkGetApi(response);
       Helpers.showDebugLog('Create Status Code: ${response.statusCode}');
       if (response.statusCode == 201 || response.statusCode == 200) {
         if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
@@ -142,6 +158,7 @@ class ProfileController extends GetxController {
     isAddressLoading.value = true;
     try {
       final response = await _addressRepository.deleteAddress(id);
+      ApiChecker.checkGetApi(response);
       if (response.statusCode == 200 || response.statusCode == 204) {
         if (Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
           Get.back();
@@ -159,6 +176,65 @@ class ProfileController extends GetxController {
       return false;
     } finally {
       isAddressLoading.value = false;
+    }
+  }
+
+  // Notification Preferences Management
+  Future<void> getNotificationPreferences() async {
+    isNotifLoading.value = true;
+    try {
+      final response = await _userRepository.getNotificationPreferences();
+      ApiChecker.checkGetApi(response);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = NotificationPreferenceModel.fromJson(response.data);
+        notificationPreference.value = data.data;
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching notification preferences: $e');
+    } finally {
+      isNotifLoading.value = false;
+    }
+  }
+
+  Future<void> updateNotificationPreference({
+    bool? push,
+    bool? sms,
+    bool? email,
+  }) async {
+    try {
+      final oldData = notificationPreference.value;
+
+      // Update ui immediately
+      notificationPreference.value = NotificationPreferenceData(
+        id: oldData?.id,
+        userId: oldData?.userId,
+        createdAt: oldData?.createdAt,
+        updatedAt: oldData?.updatedAt,
+        push: push ?? oldData?.push,
+        sms: sms ?? oldData?.sms,
+        email: email ?? oldData?.email,
+      );
+
+      final body = {
+        'push': notificationPreference.value?.push,
+        'sms': notificationPreference.value?.sms,
+        'email': notificationPreference.value?.email,
+      };
+
+      final response = await _userRepository.updateNotificationPreferences(
+        body,
+      );
+
+      ApiChecker.checkWriteApi(response);
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        // Fallback
+        notificationPreference.value = oldData;
+        getNotificationPreferences();
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error updating notification preferences: $e');
+      getNotificationPreferences();
     }
   }
 }

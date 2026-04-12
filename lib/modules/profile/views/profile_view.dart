@@ -80,7 +80,8 @@ class _ProfileViewState extends State<ProfileView> {
 
                 // SizedBox(height: 24.h),
                 _buildPaymentMethodsSection(),
-
+                
+                //notification
                 SizedBox(height: 12.h),
                 _buildNotificationsSection(),
 
@@ -422,12 +423,8 @@ class _ProfileViewState extends State<ProfileView> {
 
   // Notifications Section:
 
-  // Class কে StatefulWidget এ convert করুন এবং এই variables add করুন:
-  bool pushNotifications = true;
-  bool smsUpdates = true;
-  bool emailReceipts = false;
-
   Widget _buildNotificationsSection() {
+    final controller = Get.find<ProfileController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -440,58 +437,60 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ),
         SizedBox(height: 12.h),
-        Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8.r,
-                offset: Offset(0, 2.h),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _buildNotificationToggle(
-                title: 'Push Notifications',
-                subtitle: 'Order updates and reminders',
-                value: pushNotifications,
-                onChanged: (val) => setState(() => pushNotifications = val),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.h),
-                child: Divider(
-                  thickness: 1.h,
-                  height: 1.h,
-                  color: Colors.black12,
+        Obx(() {
+          return Container(
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8.r,
+                  offset: Offset(0, 2.h),
                 ),
-              ),
-              _buildNotificationToggle(
-                title: 'SMS Updates',
-                subtitle: 'Delivery status via text',
-                value: smsUpdates,
-                onChanged: (val) => setState(() => smsUpdates = val),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.h),
-                child: Divider(
-                  thickness: 1.h,
-                  height: 1.h,
-                  color: Colors.black12,
+              ],
+            ),
+            child: Column(
+              children: [
+                _buildNotificationToggle(
+                  title: 'Push Notifications',
+                  subtitle: 'Order updates and reminders',
+                  value: controller.notificationPreference.value?.push ?? true,
+                  onChanged: (val) => controller.updateNotificationPreference(push: val),
                 ),
-              ),
-              _buildNotificationToggle(
-                title: 'Email Receipts',
-                subtitle: 'Order confirmations and invoices',
-                value: emailReceipts,
-                onChanged: (val) => setState(() => emailReceipts = val),
-              ),
-            ],
-          ),
-        ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: Divider(
+                    thickness: 1.h,
+                    height: 1.h,
+                    color: Colors.black12,
+                  ),
+                ),
+                _buildNotificationToggle(
+                  title: 'SMS Updates',
+                  subtitle: 'Delivery status via text',
+                  value: controller.notificationPreference.value?.sms ?? true,
+                  onChanged: (val) => controller.updateNotificationPreference(sms: val),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: Divider(
+                    thickness: 1.h,
+                    height: 1.h,
+                    color: Colors.black12,
+                  ),
+                ),
+                _buildNotificationToggle(
+                  title: 'Email Receipts',
+                  subtitle: 'Order confirmations and invoices',
+                  value: controller.notificationPreference.value?.email ?? true,
+                  onChanged: (val) => controller.updateNotificationPreference(email: val),
+                ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }

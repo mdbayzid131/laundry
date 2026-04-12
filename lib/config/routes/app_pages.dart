@@ -5,6 +5,7 @@ import 'package:laundry/modules/auth_lock/view/lock_screen.dart';
 import 'package:laundry/modules/bottom_nab_bar/bindings/bottom_nab_bar_binding.dart';
 import 'package:laundry/modules/bottom_nab_bar/views/bottom_nab_bar_view.dart';
 import 'package:get/get.dart';
+import 'package:laundry/modules/notifications/views/notifications_deatials_view.dart';
 import 'package:laundry/modules/onboarding/binding/onboarding_binding.dart';
 import 'package:laundry/modules/onboarding/view/onboarding_screen.dart';
 import 'package:laundry/modules/profile/bindings/help_support_binding.dart';
@@ -12,6 +13,7 @@ import 'package:laundry/modules/profile/views/contact_support_screen.dart';
 import 'package:laundry/modules/profile/views/help_support_screen.dart';
 import 'package:laundry/modules/profile/views/live_chat_screen.dart';
 import 'package:laundry/modules/profile/views/phone_support_screen.dart';
+import 'package:laundry/modules/profile/bindings/phone_support_binding.dart';
 import 'package:laundry/modules/favorite/views/favorite_view.dart';
 import 'package:laundry/modules/favorite/bindings/favorite_binding.dart';
 import 'package:laundry/modules/order_tracking/views/order_tracking_view.dart';
@@ -106,6 +108,7 @@ class AppRoutes {
   static const String CHANGE_PASSWORD = '/change-password';
   static const String LOCK = '/lock';
   static const String TRACK_ORDER = '/track-order';
+  static const String NOTIFICATION_DETAILS = '/notification-details';
 }
 
 final pages = [
@@ -200,7 +203,7 @@ final pages = [
   GetPage(
     name: AppRoutes.PHONE_SUPPORT,
     page: () => const PhoneSupportScreen(),
-    binding: HelpSupportBinding(),
+    binding: PhoneSupportBinding(),
     // middlewares: [AuthMiddleware()],
   ),
   GetPage(
@@ -323,5 +326,10 @@ final pages = [
     name: AppRoutes.TRACK_ORDER,
     page: () => const TrackOrderView(),
     binding: TrackOrderBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.NOTIFICATION_DETAILS,
+    page: () => NotificationDetailsView(notification: Get.arguments,),
+    binding: NotificationsBinding(),
   ),
 ];

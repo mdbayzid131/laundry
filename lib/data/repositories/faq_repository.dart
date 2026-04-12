@@ -1,61 +1,15 @@
-class FaqModel {
-  final bool? success;
-  final String? message;
-  final Meta? meta;
-  final List<FaqItem>? data;
+import 'package:dio/dio.dart';
+import 'package:laundry/config/constants/api_constants.dart';
+import 'package:laundry/core/services/api_client.dart';
+import 'package:get/get.dart' hide Response;
 
-  FaqModel({
-    this.success,
-    this.message,
-    this.meta,
-    this.data,
-  });
+class FaqRepository {
+  final ApiClient apiClient = Get.find<ApiClient>();
 
-  factory FaqModel.fromJson(Map<String, dynamic> json) {
-    return FaqModel(
-      success: json['success'],
-      message: json['message'],
-      meta: json['meta'] != null ? Meta.fromJson(json['meta']) : null,
-      data: json['data'] != null
-          ? List<FaqItem>.from(
-          json['data'].map((x) => FaqItem.fromJson(x)))
-          : [],
+  Future<Response> getFaqs() async {
+    return await apiClient.getData(
+      ApiConstants.faq,
+      query: {'page': 1, 'limit': 1000},
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    "success": success,
-    "message": message,
-    "meta": meta?.toJson(),
-    "data": data?.map((e) => e.toJson()).toList(),
-  };
-}
-class Meta {
-  final int? total;
-  final int? totalPage;
-  final int? page;
-  final int? limit;
-
-  Meta({
-    this.total,
-    this.totalPage,
-    this.page,
-    this.limit,
-  });
-
-  factory Meta.fromJson(Map<String, dynamic> json) {
-    return Meta(
-      total: json['total'],
-      totalPage: json['totalPage'],
-      page: json['page'],
-      limit: json['limit'],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "total": total,
-    "totalPage": totalPage,
-    "page": page,
-    "limit": limit,
-  };
 }
