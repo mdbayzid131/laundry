@@ -11,6 +11,9 @@ import 'package:laundry/modules/home/controllers/home_controller.dart';
 import 'package:laundry/data/models/storage_services_model.dart';
 import 'package:laundry/data/models/category_model.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:laundry/data/models/past_order_model.dart';
+import 'package:laundry/modules/favorite/controllers/favorite_controller.dart';
+import 'package:laundry/data/models/favorites_model.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
   const LaundryHomeScreen({super.key});
@@ -20,27 +23,6 @@ class LaundryHomeScreen extends StatefulWidget {
 }
 
 class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
-  final List<Map<String, String>> _pastOrders = [
-    {
-      'title': 'Wash & Fold',
-      'image': ImagePaths.op4,
-      'info': 'Available Today 9:30 AM',
-      'rating': '4.8 (2k+) . 1.5 mi. 20 min',
-    },
-    {
-      'title': 'Dry Cleaning',
-      'image': ImagePaths.op5,
-      'info': 'Pickup tomorrow 10:00 AM',
-      'rating': '4.7 (1.2k+) . 3.0 mi. 45 min',
-    },
-    {
-      'title': 'Premium Ironing',
-      'image': ImagePaths.op6,
-      'info': 'Available now',
-      'rating': '4.9 (500+) . 0.8 mi. 15 min',
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
@@ -82,10 +64,18 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       SizedBox(height: 24.h),
 
                       // Our Past Orders Section
-                      _buildHorizontalListSection(
-                        'Your Past Orders',
-                        _pastOrders,
-                      ),
+                      Obx(() {
+                        if (controller.isLoadingPastOrders.value) {
+                          return _buildServiceShimmer();
+                        }
+                        if (controller.pastOrders.isEmpty) {
+                          return const SizedBox();
+                        }
+                        return _buildPastOrdersSection(
+                          'Your Past Orders',
+                          controller.pastOrders,
+                        );
+                      }),
 
                       SizedBox(height: 24.h),
 
@@ -578,9 +568,9 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     );
   }
 
-  Widget _buildHorizontalListSection(
+  Widget _buildPastOrdersSection(
     String title,
-    List<Map<String, String>> dataList, {
+    List<MyOrderData> dataList, {
     bool isLarge = false,
   }) {
     return Column(
@@ -605,17 +595,33 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: isLarge ? 280.h : 230.h,
+          height: isLarge ? 280.h : 250.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               final item = dataList[index];
+              final firstItem =
+                  item.orderItems != null && item.orderItems!.isNotEmpty
+                  ? item.orderItems!.first
+                  : null;
+
               return GestureDetector(
-                onTap: () => Get.toNamed(
-                  AppRoutes.PRODUCT_DETAILS,
-                ), // TODO: pass actual routes?
+                onTap: () {
+                  if (firstItem?.storeServiceId != null) {
+                    Get.toNamed(
+                      AppRoutes.PRODUCT_DETAILS,
+                      arguments: {
+                        'serviceId': firstItem!.storeServiceId,
+                        "operatorId":
+                            firstItem.storeService?.service?.operatorId,
+                        "categoryId":
+                            firstItem.storeService?.service?.categoryId,
+                      },
+                    );
+                  }
+                },
                 child: Container(
                   width: isLarge ? 300.w : 200.w,
                   margin: EdgeInsets.only(right: 16.w),
@@ -629,65 +635,82 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                           height: isLarge ? 170.h : 140.h,
                           width: double.infinity,
                           color: Colors.grey[200],
-                          child: Image.asset(
-                            // Using dummy images from constants
-                            item['image'] ?? ImagePaths.product1,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Icon(
-                              Icons.image_outlined,
-                              size: 40.sp,
-                              color: Colors.grey[400],
-                            ),
-                          ),
+                          child: firstItem?.storeService?.service?.image != null
+                              ? Image.network(
+                                  firstItem!.storeService!.service!.image!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Icon(
+                                    Icons.image_outlined,
+                                    size: 40.sp,
+                                    color: Colors.grey[400],
+                                  ),
+                                )
+                              : Image.asset(
+                                  ImagePaths.product1,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => Icon(
+                                    Icons.image_outlined,
+                                    size: 40.sp,
+                                    color: Colors.grey[400],
+                                  ),
+                                ),
                         ),
                       ),
                       SizedBox(height: 12.h),
 
-                      // Availability & Favorite
+                      // Service Name
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              firstItem?.serviceName ?? 'Laundry Order',
+                              style: GoogleFonts.manrope(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+
+                      // Price & Status
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            item['info'] ?? '',
+                            '৳ ${item.totalAmount ?? '0'}',
                             style: GoogleFonts.manrope(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black54,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black87,
                             ),
                           ),
-                          Icon(
-                            Icons.favorite_border,
-                            size: 18.sp,
-                            color: Colors.black45,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Title
-                      Text(
-                        item['title'] ?? '',
-                        style: GoogleFonts.manrope(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Rating & Distance/Time
-                      Row(
-                        children: [
-                          Icon(Icons.star, size: 14.sp, color: Colors.black87),
-                          SizedBox(width: 4.w),
-                          Text(
-                            item['rating'] ?? '',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 4.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: (item.status?.toLowerCase() == 'completed')
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.orange.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: Text(
+                              item.status ?? 'Pending',
+                              style: GoogleFonts.manrope(
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    (item.status?.toLowerCase() == 'completed')
+                                    ? Colors.green
+                                    : Colors.orange,
+                              ),
                             ),
                           ),
                         ],
@@ -748,7 +771,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: isLarge ? 320.h : 280.h,
+          height: isLarge ? 320.h : 300.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -802,6 +825,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       ),
                       SizedBox(height: 12.h),
 
+                      // Name & Favorite
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -811,67 +835,72 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                               style: GoogleFonts.manrope(
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.black,
+                                color: Colors.black87,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          Icon(
-                            Icons.favorite_border,
-                            size: 24.sp,
-                            color: Colors.black45,
+                          Obx(() {
+                            final favoriteController =
+                                Get.find<FavoriteController>();
+                            final isFavorite = favoriteController.favoriteItems
+                                .any((f) => f.storeServiceId == item.id);
+                            return GestureDetector(
+                              onTap: () {
+                                favoriteController.toggleFavorite(
+                                  FavoriteItem(storeServiceId: item.id),
+                                );
+                              },
+                              child: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                size: 28.sp,
+                                color: isFavorite
+                                    ? Colors.black
+                                    : Colors.black45,
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                      SizedBox(height: 6.h),
+
+                      // Rating, Distance & Time
+                      Row(
+                        children: [
+                          Icon(Icons.star, size: 14.sp, color: Colors.black87),
+                          SizedBox(width: 4.w),
+                          Text(
+                            "${item.avgRating ?? 4.6} (${item.totalReviews ?? 5})",
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            ". ${item.distanceMile?.toStringAsFixed(1) ?? '2.2'} mi . 20 min",
+                            style: GoogleFonts.manrope(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54,
+                            ),
                           ),
                         ],
                       ),
                       SizedBox(height: 8.h),
 
-                      // Rating, Distance, Time
-                      Row(
-                        children: [
-                          Icon(Icons.star, size: 16.sp, color: Colors.black),
-                          SizedBox(width: 4.w),
-                          Flexible(
-                            child: Text(
-                              "${item.avgRating ?? 4.6} (${item.totalReviews ?? 5}) . ${item.distanceMile?.toStringAsFixed(1) ?? '2.2'} mi. 30 min",
-                              style: GoogleFonts.manrope(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 12.h),
-
-                      // Price & Delivery Fee
-                      Row(
-                        children: [
-                          Text(
-                            "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '00.00'}",
-                            style: GoogleFonts.manrope(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          // Flexible(
-                          //   child: Text(
-                          //     "delivery fee on .\$4.99",
-                          //     style: GoogleFonts.manrope(
-                          //       fontSize: 13.sp,
-                          //       fontWeight: FontWeight.w600,
-                          //       color: Colors.black,
-                          //     ),
-                          //     maxLines: 1,
-                          //     overflow: TextOverflow.ellipsis,
-                          //   ),
-                          // ),
-                        ],
+                      // Price
+                      Text(
+                        "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '00.00'}",
+                        style: GoogleFonts.manrope(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black87,
+                        ),
                       ),
                     ],
                   ),
@@ -924,7 +953,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: isLarge ? 280.h : 230.h,
+          height: isLarge ? 320.h : 280.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -987,55 +1016,131 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                       ),
                       SizedBox(height: 12.h),
 
-                      // Availability & Favorite
+                      // Title & Favorite
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            item.status ?? 'Available',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black54,
+                          Expanded(
+                            child: Text(
+                              itemName,
+                              style: GoogleFonts.manrope(
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          Icon(
-                            Icons.favorite_border,
-                            size: 18.sp,
-                            color: Colors.black45,
+                          SizedBox(width: 8.w),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 3.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Text(
+                              item.status ?? 'Available',
+                              style: GoogleFonts.manrope(
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
                           ),
+                          SizedBox(width: 8.w),
+                          Obx(() {
+                            final favoriteController =
+                                Get.find<FavoriteController>();
+                            final isFavorite = favoriteController.favoriteItems
+                                .any(
+                                  (f) =>
+                                      f.storeServiceId == item.storeServiceId,
+                                );
+                            return GestureDetector(
+                              onTap: () {
+                                favoriteController.toggleFavorite(
+                                  FavoriteItem(
+                                    storeServiceId: item.storeServiceId,
+                                  ),
+                                );
+                              },
+                              child: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                size: 26.sp,
+                                color: isFavorite
+                                    ? Colors.black
+                                    : Colors.black45,
+                              ),
+                            );
+                          }),
                         ],
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 6.h),
 
-                      // Title
-                      Text(
-                        itemName,
-                        style: GoogleFonts.manrope(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black87,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Rating & Distance/Time
+                      // Rating & Distance
                       Row(
                         children: [
                           Icon(Icons.star, size: 14.sp, color: Colors.black87),
                           SizedBox(width: 4.w),
                           Text(
-                            '$rating ($reviews+) . $distance',
+                            "$rating ($reviews) . $distance . 30 min",
                             style: GoogleFonts.manrope(
                               fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '00.00'}",
+                            style: GoogleFonts.manrope(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w800,
                               color: Colors.black87,
                             ),
                           ),
                         ],
                       ),
+                      SizedBox(height: 8.h),
+
+                      // // Price & Status Badge
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Text(
+                      //       "\$${item.service?.basePrice?.toStringAsFixed(2) ?? '00.00'}",
+                      //       style: GoogleFonts.manrope(
+                      //         fontSize: 15.sp,
+                      //         fontWeight: FontWeight.w800,
+                      //         color: Colors.black87,
+                      //       ),
+                      //     ),
+                      //     Container(
+                      //       padding: EdgeInsets.symmetric(
+                      //         horizontal: 8.w,
+                      //         vertical: 3.h,
+                      //       ),
+                      //       decoration: BoxDecoration(
+                      //         color: AppTheme.primaryColor.withOpacity(0.1),
+                      //         borderRadius: BorderRadius.circular(12.r),
+                      //       ),
+                      //       child: Text(
+                      //         item.status ?? 'Available',
+                      //         style: GoogleFonts.manrope(
+                      //           fontSize: 10.sp,
+                      //           fontWeight: FontWeight.w700,
+                      //           color: AppTheme.primaryColor,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),

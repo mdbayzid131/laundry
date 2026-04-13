@@ -162,24 +162,10 @@ class FavoriteView extends GetView<FavoriteController> {
                     ),
                     GestureDetector(
                       onTap: () => controller.toggleFavorite(favorite),
-                      child: Container(
-                        padding: EdgeInsets.all(6.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.favorite,
-                          size: 16.sp,
-                          color: Colors.black,
-                        ),
+                      child: Icon(
+                        Icons.favorite,
+                        size: 26.sp,
+                        color: Colors.black,
                       ),
                     ),
                   ],

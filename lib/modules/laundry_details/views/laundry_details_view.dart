@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:laundry/config/constants/image_paths.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/core/widgets/custom_back_button.dart';
+import 'package:laundry/modules/favorite/controllers/favorite_controller.dart';
+import 'package:laundry/data/models/favorites_model.dart';
 import '../controllers/laundry_details_controller.dart';
 
 class LaundryDetailsView extends GetView<LaundryDetailsController> {
@@ -814,6 +816,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
             image,
             price,
             serviceId: serviceItem.serviceId,
+            storeServiceId: serviceItem.id,
           );
         },
       );
@@ -825,6 +828,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String image,
     String price, {
     String? serviceId,
+    String? storeServiceId,
   }) {
     return GestureDetector(
       onTap: () => Get.toNamed(
@@ -884,11 +888,26 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const Icon(
-                Icons.favorite_border,
-                size: 18,
-                color: Colors.black26,
-              ),
+              Obx(() {
+                final favoriteController = Get.find<FavoriteController>();
+                final isFavorite = favoriteController.favoriteItems.any(
+                  (f) => f.storeServiceId == storeServiceId,
+                );
+                return GestureDetector(
+                  onTap: () {
+                    if (storeServiceId != null) {
+                      favoriteController.toggleFavorite(
+                        FavoriteItem(storeServiceId: storeServiceId),
+                      );
+                    }
+                  },
+                  child: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    size: 18,
+                    color: isFavorite ? Colors.black : Colors.black26,
+                  ),
+                );
+              }),
             ],
           ),
           SizedBox(height: 4.h),

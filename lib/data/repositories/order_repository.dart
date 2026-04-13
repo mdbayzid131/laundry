@@ -13,7 +13,14 @@ class OrderRepository {
     );
   }
 
-  Future<Response> getMyOrders({int page = 1, int limit = 10}) async {
-    return await _apiClient.getData(ApiConstants.myOrders, query: {'page': page, 'limit': limit},);
+  Future<Response> getMyOrders({int page = 1, int limit = 10, bool? pastOrders}) async {
+    final Map<String, dynamic> query = {'page': page, 'limit': limit};
+    if (pastOrders != null) {
+      query['pastOrders'] = pastOrders;
+    }
+    return await _apiClient.getData(
+      ApiConstants.myOrders,
+      query: query,
+    );
   }
 }

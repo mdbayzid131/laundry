@@ -8,6 +8,8 @@ import 'package:laundry/data/models/steals_and_dals_model.dart';
 import 'package:laundry/data/repositories/category_repository.dart';
 import 'package:laundry/data/repositories/banner_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
+import 'package:laundry/data/repositories/order_repository.dart';
+import 'package:laundry/data/models/past_order_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:laundry/core/services/storage_service.dart';
 import 'package:laundry/config/constants/storage_constants.dart';
@@ -18,6 +20,7 @@ class HomeController extends GetxController {
   final CategoryRepository _categoryRepository = Get.find<CategoryRepository>();
   final BannerRepository _bannerRepository = Get.find<BannerRepository>();
   final ServiceRepository _serviceRepository = Get.find<ServiceRepository>();
+  final OrderRepository _orderRepository = Get.find<OrderRepository>();
 
   RxBool isLoadingCategories = false.obs;
   RxList<CategoryData> categories = <CategoryData>[].obs;
@@ -30,6 +33,9 @@ class HomeController extends GetxController {
 
   RxBool isLoadingAds = false.obs;
   RxList<AdData> ads = <AdData>[].obs;
+
+  RxBool isLoadingPastOrders = false.obs;
+  RxList<MyOrderData> pastOrders = <MyOrderData>[].obs;
 
   // New Variables for Location & Search
   RxDouble lat = 0.0.obs;
@@ -59,6 +65,7 @@ class HomeController extends GetxController {
         getBanners(),
         getStoreServices(),
         getAds(),
+        getPastOrders(),
       ]);
     } catch (e) {
       Helpers.showDebugLog('Error loading initial data: $e');
@@ -129,6 +136,21 @@ class HomeController extends GetxController {
       Helpers.showDebugLog('Error fetching ads: $e');
     } finally {
       isLoadingAds.value = false;
+    }
+  }
+
+  Future<void> getPastOrders() async {
+    isLoadingPastOrders.value = true;
+    try {
+      final response = await _orderRepository.getMyOrders(pastOrders: true);
+      if (response.statusCode == 200) {
+        final ordersResponse = MyOrdersResponseModel.fromJson(response.data);
+        pastOrders.value = ordersResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching past orders: $e');
+    } finally {
+      isLoadingPastOrders.value = false;
     }
   }
 

@@ -58,9 +58,14 @@ class FavoriteController extends GetxController {
 
         // Optimistically remove from list if status is REMOVED or simply refresh
         if (response.data['data']?['status'] == 'REMOVED') {
-          favoriteItems.removeWhere((element) => element.id == item.id);
+          favoriteItems.removeWhere((element) =>
+              (item.storeServiceId != null &&
+                  element.storeServiceId == item.storeServiceId) ||
+              (item.serviceId != null && element.serviceId == item.serviceId) ||
+              (item.storeBundleId != null &&
+                  element.storeBundleId == item.storeBundleId));
         } else {
-          getFavorites(); // Refresh to be sure
+          getFavorites(); // Refresh to get the full data for the new favorite
         }
       } 
     } catch (e) {
