@@ -148,10 +148,7 @@ class TrackOrderView extends GetView<TrackOrderController> {
           SizedBox(height: 4.h),
           Text(
             'Placed on $formattedDate',
-            style: GoogleFonts.manrope(
-              fontSize: 14.sp,
-              color: Colors.black45,
-            ),
+            style: GoogleFonts.manrope(fontSize: 14.sp, color: Colors.black45),
           ),
           SizedBox(height: 20.h),
           _buildSummaryRow('Service Type', serviceType),
@@ -174,10 +171,7 @@ class TrackOrderView extends GetView<TrackOrderController> {
       children: [
         Text(
           label,
-          style: GoogleFonts.manrope(
-            fontSize: 14.sp,
-            color: Colors.black45,
-          ),
+          style: GoogleFonts.manrope(fontSize: 14.sp, color: Colors.black45),
         ),
         Text(
           value,
@@ -192,111 +186,166 @@ class TrackOrderView extends GetView<TrackOrderController> {
   }
 
   Widget _buildOrderProgress(Order order) {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Order Progress',
-                style: GoogleFonts.manrope(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
-                ),
+    return Obx(() {
+      if (controller.isCancelled.value || controller.isRefunded.value) {
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(20.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    controller.isCancelled.value
+                        ? Icons.cancel
+                        : Icons.money_off,
+                    color: Colors.red,
+                    size: 24.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    controller.isCancelled.value
+                        ? 'Order Cancelled'
+                        : 'Order Refunded',
+                    style: GoogleFonts.manrope(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12.h),
               Text(
-                'Add Pickup Address',
+                controller.isCancelled.value
+                    ? 'Your order has been cancelled and cannot be processed further.'
+                    : 'Your order has been refunded. It may take a few days to reflect on your account.',
                 style: GoogleFonts.manrope(
-                  fontSize: 12.sp,
-                  color: Colors.black45,
+                  fontSize: 14.sp,
+                  color: Colors.black54,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 24.h),
-          _buildStep(
-            index: 0,
-            title: 'Order Confirmed',
-            time: 'Jan 15, 10:30 AM',
-            icon: Icons.check,
-            isLast: false,
-          ),
-          _buildStep(
-            index: 1,
-            title: 'Picked Up',
-            time: 'Jan 15, 2:15 PM',
-            icon: Icons.local_shipping_outlined,
-            isLast: false,
-          ),
-          _buildStep(
-            index: 2,
-            title: 'In Process',
-            subTitle: 'Your items are being cleaned',
-            icon: Icons.sync,
-            isLast: false,
-          ),
-          _buildStep(
-            index: 3,
-            title: 'Schedule pick up & delivery',
-            icon: Icons.access_time,
-            isLast: false,
-          ),
-          _buildStep(
-            index: 4,
-            title: 'Out for Delivery',
-            subTitle: 'Pending',
-            icon: Icons.delivery_dining_outlined,
-            isLast: false,
-          ),
-          _buildStep(
-            index: 5,
-            title: 'Delivered',
-            subTitle: 'Pending',
-            icon: Icons.home_outlined,
-            isLast: true,
-          ),
-          SizedBox(height: 20.h),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 14.h),
-            decoration: BoxDecoration(
-              color: const Color(0xffB5DEEF),
-              borderRadius: BorderRadius.circular(12.r),
+        );
+      }
+
+      return Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(Icons.access_time, color: Colors.white, size: 20.sp),
-                SizedBox(width: 8.w),
                 Text(
-                  'Schedule pick up & delivery',
+                  'Order Progress',
                   style: GoogleFonts.manrope(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1A2530),
+                  ),
+                ),
+                Text(
+                  'Track Timeline',
+                  style: GoogleFonts.manrope(
+                    fontSize: 12.sp,
+                    color: Colors.black45,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+            SizedBox(height: 24.h),
+            _buildStep(
+              index: 0,
+              title: 'Pending',
+              subTitle: 'Awaiting confirmation',
+              icon: Icons.hourglass_empty,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 1,
+              title: 'Processing',
+              subTitle: 'Order is being verified',
+              icon: Icons.sync,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 2,
+              title: 'Out for Pickup',
+              subTitle: 'Driver is on the way',
+              icon: Icons.directions_car_outlined,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 3,
+              title: 'Picked Up',
+              subTitle: 'Order collected by driver',
+              icon: Icons.local_mall_outlined,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 4,
+              title: 'Received by Store',
+              subTitle: 'Safely arrived at facility',
+              icon: Icons.storefront_outlined,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 5,
+              title: 'In Progress',
+              subTitle: 'Items are being cleaned',
+              icon: Icons.local_laundry_service_outlined,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 6,
+              title: 'Ready for Delivery',
+              subTitle: 'Cleaning complete, awaiting dispatch',
+              icon: Icons.check_box_outlined,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 7,
+              title: 'Out for Delivery',
+              subTitle: 'Driver is heading to you',
+              icon: Icons.delivery_dining_outlined,
+              isLast: false,
+            ),
+            _buildStep(
+              index: 8,
+              title: 'Delivered',
+              subTitle: 'Order completed successfully',
+              icon: Icons.home_outlined,
+              isLast: true,
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildStep({
@@ -309,7 +358,7 @@ class TrackOrderView extends GetView<TrackOrderController> {
   }) {
     return Obx(() {
       final isActive = controller.currentStep.value >= index;
-      
+
       return SizedBox(
         height: 75.h,
         child: Row(
@@ -321,21 +370,19 @@ class TrackOrderView extends GetView<TrackOrderController> {
                   width: 40.w,
                   height: 40.w,
                   decoration: BoxDecoration(
-                    color: isActive ? const Color(0xffB5DEEF) : const Color(0xffE5E7EB),
+                    color: isActive
+                        ? const Color(0xffB5DEEF)
+                        : const Color(0xffE5E7EB),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 20.sp,
-                  ),
+                  child: Icon(icon, color: Colors.white, size: 20.sp),
                 ),
                 if (!isLast)
                   Expanded(
                     child: Container(
                       width: 2.w,
-                      color: controller.currentStep.value > index 
-                          ? const Color(0xffB5DEEF) 
+                      color: controller.currentStep.value > index
+                          ? const Color(0xffB5DEEF)
                           : const Color(0xffE5E7EB),
                     ),
                   ),
@@ -351,7 +398,9 @@ class TrackOrderView extends GetView<TrackOrderController> {
                     style: GoogleFonts.manrope(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w700,
-                      color: isActive ? const Color(0xff1A2530) : Colors.black45,
+                      color: isActive
+                          ? const Color(0xff1A2530)
+                          : Colors.black45,
                     ),
                   ),
                   if (time != null) ...[

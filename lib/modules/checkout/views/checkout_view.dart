@@ -205,12 +205,12 @@ class CheckoutView extends GetView<CheckoutController> {
                 String image = '';
                 String subtitle = '${item.quantity} piece';
 
-                if (item.service != null) {
-                  name = item.service?.name ?? '';
-                  image = item.service?.image ?? '';
-                } else if (item.bundle != null) {
-                  name = item.bundle?.name ?? '';
-                  image = item.bundle?.image ?? '';
+                if (item.storeService != null) {
+                  name = item.storeService?.service?.name ?? '';
+                  image = item.storeService?.service?.image ?? '';
+                } else if (item.storeBundle != null) {
+                  name = item.storeBundle?.bundle?.name ?? '';
+                  image = item.storeBundle?.bundle?.image ?? '';
                 }
 
                 return _buildSummaryItem(

@@ -5,6 +5,9 @@ class TrackOrderController extends GetxController {
   final order = Rxn<Order>();
   final currentStep = 0.obs;
 
+  final isCancelled = false.obs;
+  final isRefunded = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -17,28 +20,41 @@ class TrackOrderController extends GetxController {
   void _calculateCurrentStep() {
     if (order.value == null) return;
     final status = order.value!.status?.toUpperCase() ?? '';
-    
+
+    isCancelled.value = status == 'CANCELLED';
+    isRefunded.value = status == 'REFUNDED';
+
     switch (status) {
       case 'PENDING':
         currentStep.value = 0;
         break;
-      case 'PICKED_UP':
+      case 'PROCESSING':
         currentStep.value = 1;
         break;
-      case 'PROCESSING':
+      case 'OUT_FOR_PICKUP':
         currentStep.value = 2;
         break;
-      case 'READY_FOR_DELIVERY':
+      case 'PICKED_UP':
         currentStep.value = 3;
         break;
-      case 'OUT_FOR_DELIVERY':
+      case 'RECEIVED_BY_STORE':
         currentStep.value = 4;
         break;
-      case 'COMPLETED':
+      case 'IN_PROGRESS':
         currentStep.value = 5;
         break;
+      case 'READY_FOR_DELIVERY':
+        currentStep.value = 6;
+        break;
+      case 'OUT_FOR_DELIVERY':
+        currentStep.value = 7;
+        break;
+      case 'DELIVERED':
+      case 'COMPLETED': // Some fallback
+        currentStep.value = 8;
+        break;
       default:
-        currentStep.value = 0;
+        currentStep.value = 0; // Or whatever fallback
     }
   }
 }

@@ -8,6 +8,7 @@ import '../../../config/routes/app_pages.dart';
 import '../../../data/repositories/user_repository.dart';
 import '../../../data/repositories/address_repository.dart';
 import '../../../data/models/user_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends GetxController {
   final AuthService _authService = Get.find();
@@ -55,6 +56,61 @@ class ProfileController extends GetxController {
     } finally {
       if (showDialog) Helpers.hideLoadingDialog();
       isLoading.value = false;
+    }
+  }
+
+  Future<void> updateProfileImage(ImageSource source) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: source,
+        imageQuality: 70, // compress image
+      );
+
+      if (image != null && userData.value?.id != null) {
+        Helpers.showLoadingDialog();
+        final response = await _userRepository.updateProfileImage(
+          userData.value!.id!,
+          image.path,
+        );
+        Helpers.hideLoadingDialog();
+        
+        ApiChecker.checkWriteApi(response);
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          Helpers.showCustomSnackBar('Profile image updated successfully', isError: false);
+          // Refresh profile data to get the new image URL
+          getProfile();
+        }
+      }
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Helpers.hideLoadingDialog();
+      Helpers.showCustomSnackBar('Failed to update image', isError: true);
+      Helpers.showDebugLog(e.toString());
+    }
+  }
+
+  Future<void> updateProfileInfo(String name, String phone) async {
+    if (userData.value?.id == null) return;
+    
+    Helpers.showLoadingDialog();
+    try {
+      final body = {
+        'name': name,
+        'phone': phone,
+      };
+      final response = await _userRepository.updateProfileInfo(userData.value!.id!, body);
+      Helpers.hideLoadingDialog();
+      
+      ApiChecker.checkWriteApi(response);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (Get.isDialogOpen ?? false) Get.back();
+        Helpers.showCustomSnackBar('Profile updated successfully', isError: false);
+        getProfile(); // Refresh profile data
+      }
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Helpers.hideLoadingDialog();
+      Helpers.showCustomSnackBar('Failed to update profile', isError: true);
+      Helpers.showDebugLog(e.toString());
     }
   }
 

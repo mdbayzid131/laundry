@@ -103,14 +103,14 @@ class CartScreen extends GetView<CartController> {
     String description = '';
     String price = item.price ?? '0.00';
 
-    if (item.service != null) {
-      name = item.service?.name ?? 'Service';
-      image = item.service?.image ?? '';
-      description = item.service?.description ?? '';
-    } else if (item.bundle != null) {
-      name = item.bundle?.name ?? 'Bundle';
-      image = item.bundle?.image ?? '';
-      description = item.bundle?.description ?? '';
+    if (item.storeService != null) {
+      name = item.storeService?.service?.name ?? 'Service';
+      image = item.storeService?.service?.image ?? '';
+      description = item.storeService?.service?.description ?? '';
+    } else if (item.storeBundle != null) {
+      name = item.storeBundle?.bundle?.name ?? 'Bundle';
+      image = item.storeBundle?.bundle?.image ?? '';
+      description = item.storeBundle?.bundle?.description ?? '';
     }
 
     return Container(
@@ -337,9 +337,10 @@ class CartScreen extends GetView<CartController> {
               height: 55.h,
               child: ElevatedButton(
                 onPressed: () {
-                  Get.toNamed(AppRoutes.CHECKOUT, arguments: {
-                    'cartData': controller.cartData.value,
-                  });
+                  Get.toNamed(
+                    AppRoutes.CHECKOUT,
+                    arguments: {'cartData': controller.cartData.value},
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffB5DEEF),

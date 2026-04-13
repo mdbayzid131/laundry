@@ -114,7 +114,7 @@ class ProductDetailsController extends GetxController {
           .toList();
 
       final response = await _cartRepository.addToCart(
-        serviceId: serviceDetails.value!.serviceId!,
+        storeServiceId: serviceDetails.value!.id!,
         quantity: quantity.value,
         addonIds: addonIds,
       );

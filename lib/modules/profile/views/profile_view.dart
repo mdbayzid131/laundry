@@ -6,6 +6,7 @@ import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/data/models/user_model.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:image_picker/image_picker.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends StatefulWidget {
@@ -79,8 +80,8 @@ class _ProfileViewState extends State<ProfileView> {
                 _buildSavedAddressesSection(),
 
                 // SizedBox(height: 24.h),
-                _buildPaymentMethodsSection(),
-                
+                // _buildPaymentMethodsSection(),
+
                 //notification
                 SizedBox(height: 12.h),
                 _buildNotificationsSection(),
@@ -142,16 +143,19 @@ class _ProfileViewState extends State<ProfileView> {
                 Positioned(
                   right: 0,
                   bottom: 0,
-                  child: Container(
-                    padding: EdgeInsets.all(6.w),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.camera_alt_outlined,
-                      size: 20.sp,
-                      color: const Color(0xFF4A90E2),
+                  child: GestureDetector(
+                    onTap: _showImagePickerOptions,
+                    child: Container(
+                      padding: EdgeInsets.all(6.w),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.camera_alt_outlined,
+                        size: 20.sp,
+                        color: const Color(0xFF4A90E2),
+                      ),
                     ),
                   ),
                 ),
@@ -181,6 +185,70 @@ class _ProfileViewState extends State<ProfileView> {
         ),
       );
     });
+  }
+
+  void _showImagePickerOptions() {
+    final ProfileController controller = Get.find<ProfileController>();
+    Get.bottomSheet(
+      Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Update Profile Image',
+              style: GoogleFonts.manrope(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            ListTile(
+              leading: Icon(
+                Icons.camera_alt,
+                color: AppTheme.primaryColor,
+                size: 28.sp,
+              ),
+              title: Text(
+                'Take a Photo',
+                style: GoogleFonts.manrope(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () {
+                Get.back();
+                controller.updateProfileImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.photo_library,
+                color: AppTheme.primaryColor,
+                size: 28.sp,
+              ),
+              title: Text(
+                'Choose from Gallery',
+                style: GoogleFonts.manrope(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () {
+                Get.back();
+                controller.updateProfileImage(ImageSource.gallery);
+              },
+            ),
+            SizedBox(height: 20.h),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
@@ -258,7 +326,7 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: _showEditProfilePopup,
                   child: Text(
                     'Edit',
                     style: GoogleFonts.manrope(
@@ -280,6 +348,148 @@ class _ProfileViewState extends State<ProfileView> {
         ),
       );
     });
+  }
+
+  void _showEditProfilePopup() {
+    final ProfileController controller = Get.find<ProfileController>();
+    final user = controller.userData.value;
+    if (user == null) return;
+
+    final nameController = TextEditingController(text: user.name);
+    final phoneController = TextEditingController(text: user.phone);
+    final emailController = TextEditingController(text: user.email);
+
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(24.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Edit Profile',
+                      style: GoogleFonts.manrope(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xff1A2530),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Get.back(),
+                      child: Icon(
+                        Icons.close,
+                        size: 24.sp,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24.h),
+                _buildPopupTextField('Full Name', nameController),
+                SizedBox(height: 16.h),
+                _buildPopupTextField('Phone Number', phoneController),
+                SizedBox(height: 16.h),
+                _buildPopupTextField(
+                  'Email Address (Locked)',
+                  emailController,
+                  isLocked: true,
+                ),
+                SizedBox(height: 32.h),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xffB5DEEF),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      controller.updateProfileInfo(
+                        nameController.text,
+                        phoneController.text,
+                      );
+                    },
+                    child: Text(
+                      'Save Changes',
+                      style: GoogleFonts.manrope(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPopupTextField(
+    String label,
+    TextEditingController controller, {
+    bool isLocked = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xff1A2530),
+          ),
+        ),
+        SizedBox(height: 8.h),
+        TextField(
+          controller: controller,
+          readOnly: isLocked,
+          style: GoogleFonts.manrope(
+            color: isLocked ? Colors.grey : Colors.black87,
+            fontSize: 15.sp,
+          ),
+          decoration: InputDecoration(
+            fillColor: isLocked ? const Color(0xffF1F5F9) : Colors.white,
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 14.h,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xffE2E8F0)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xffE2E8F0)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              borderSide: const BorderSide(color: Color(0xffB5DEEF)),
+            ),
+            suffixIcon: isLocked
+                ? Icon(Icons.lock_outline, color: Colors.grey, size: 20.sp)
+                : null,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildInfoField(String label, String value) {
@@ -457,7 +667,8 @@ class _ProfileViewState extends State<ProfileView> {
                   title: 'Push Notifications',
                   subtitle: 'Order updates and reminders',
                   value: controller.notificationPreference.value?.push ?? true,
-                  onChanged: (val) => controller.updateNotificationPreference(push: val),
+                  onChanged: (val) =>
+                      controller.updateNotificationPreference(push: val),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -471,7 +682,8 @@ class _ProfileViewState extends State<ProfileView> {
                   title: 'SMS Updates',
                   subtitle: 'Delivery status via text',
                   value: controller.notificationPreference.value?.sms ?? true,
-                  onChanged: (val) => controller.updateNotificationPreference(sms: val),
+                  onChanged: (val) =>
+                      controller.updateNotificationPreference(sms: val),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -485,7 +697,8 @@ class _ProfileViewState extends State<ProfileView> {
                   title: 'Email Receipts',
                   subtitle: 'Order confirmations and invoices',
                   value: controller.notificationPreference.value?.email ?? true,
-                  onChanged: (val) => controller.updateNotificationPreference(email: val),
+                  onChanged: (val) =>
+                      controller.updateNotificationPreference(email: val),
                 ),
               ],
             ),

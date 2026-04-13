@@ -11,11 +11,10 @@ class OrderHistoryController extends GetxController {
   final tabs = [
     'All Orders',
     'Pending',
-    'Picked up',
     'Processing',
-    'Ready for delivery',
     'Completed',
     'Cancelled',
+    'Refunded',
   ];
 
   final isLoading = false.obs;

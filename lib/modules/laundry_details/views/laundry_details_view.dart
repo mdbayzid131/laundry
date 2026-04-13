@@ -576,7 +576,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
             '${controller.storeDetails.value?.distanceMile?.toStringAsFixed(2) ?? '0'} mi, 30 min',
             '\$${serviceItem.service?.basePrice ?? '0'}/piece',
             'delivery fee on \$2.00',
-            serviceId: serviceItem.serviceId,
+            storeServiceId: serviceItem.id,
           );
         }).toList(),
       );
@@ -590,7 +590,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String info,
     String price,
     String delivery, {
-    String? serviceId,
+    String? storeServiceId,
   }) {
     return GestureDetector(
       onTap: () => Get.toNamed(
@@ -643,7 +643,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                   top: 12.h,
                   right: 12.w,
                   child: GestureDetector(
-                    onTap: () => controller.addToCart(serviceId: serviceId!),
+                    onTap: () => controller.addToCart(storeServiceId: storeServiceId!),
                     child: Container(
                       padding: EdgeInsets.all(8.w),
                       decoration: const BoxDecoration(
@@ -864,7 +864,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
                 top: 8.h,
                 right: 8.w,
                 child: GestureDetector(
-                  onTap: () => controller.addToCart(serviceId: serviceId!),
+                  onTap: () => controller.addToCart(storeServiceId: storeServiceId!),
                   child: Container(
                     padding: EdgeInsets.all(6.w),
                     decoration: const BoxDecoration(
@@ -969,7 +969,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
               bundleData.bundle?.description ?? '',
               bundleData.bundle?.image ?? ImagePaths.op8,
               '\$${bundleData.bundle?.bundlePrice ?? '0'}',
-              bundleId: bundleData.bundleId,
+              storeBundleId: bundleData.id,
             );
           }).toList(),
         ],
@@ -982,7 +982,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
     String subtitle,
     String image,
     String price, {
-    String? bundleId,
+    String? storeBundleId,
   }) {
     return Container(
       margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 16.h),
@@ -1053,7 +1053,7 @@ class LaundryDetailsView extends GetView<LaundryDetailsController> {
           ),
           SizedBox(width: 12.w),
           GestureDetector(
-            onTap: () => controller.addToCart(bundleId: bundleId),
+            onTap: () => controller.addToCart(storeBundleId: storeBundleId),
             child: Container(
               padding: EdgeInsets.all(6.w),
               decoration: BoxDecoration(

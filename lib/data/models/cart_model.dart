@@ -3,11 +3,7 @@ class CartResponseModel {
   final String? message;
   final CartData? data;
 
-  CartResponseModel({
-    this.success,
-    this.message,
-    this.data,
-  });
+  CartResponseModel({this.success, this.message, this.data});
 
   factory CartResponseModel.fromJson(Map<String, dynamic> json) {
     return CartResponseModel(
@@ -18,11 +14,7 @@ class CartResponseModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'message': message,
-      'data': data?.toJson(),
-    };
+    return {'success': success, 'message': message, 'data': data?.toJson()};
   }
 }
 
@@ -74,14 +66,14 @@ class CartItemModel {
   final String? cartId;
   final String? storeId;
   final String? operatorId;
-  final String? serviceId;
-  final String? bundleId;
+  final String? storeServiceId;
+  final String? storeBundleId;
   final int? quantity;
   final String? price;
   final String? createdAt;
   final String? updatedAt;
-  final CartServiceModel? service;
-  final CartBundleModel? bundle;
+  final CartStoreServiceModel? storeService;
+  final CartStoreBundleModel? storeBundle;
   final List<SelectedAddonModel>? selectedAddons;
 
   CartItemModel({
@@ -89,14 +81,14 @@ class CartItemModel {
     this.cartId,
     this.storeId,
     this.operatorId,
-    this.serviceId,
-    this.bundleId,
+    this.storeServiceId,
+    this.storeBundleId,
     this.quantity,
     this.price,
     this.createdAt,
     this.updatedAt,
-    this.service,
-    this.bundle,
+    this.storeService,
+    this.storeBundle,
     this.selectedAddons,
   });
 
@@ -106,23 +98,21 @@ class CartItemModel {
       cartId: json['cartId'],
       storeId: json['storeId'],
       operatorId: json['operatorId'],
-      serviceId: json['serviceId'],
-      bundleId: json['bundleId'],
+      storeServiceId: json['storeServiceId'],
+      storeBundleId: json['storeBundleId'],
       quantity: json['quantity'],
       price: json['price']?.toString(),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      service: json['service'] != null
-          ? CartServiceModel.fromJson(json['service'])
+      storeService: json['storeService'] != null
+          ? CartStoreServiceModel.fromJson(json['storeService'])
           : null,
-      bundle: json['bundle'] != null
-          ? CartBundleModel.fromJson(json['bundle'])
+      storeBundle: json['storeBundle'] != null
+          ? CartStoreBundleModel.fromJson(json['storeBundle'])
           : null,
       selectedAddons: json['selectedAddons'] != null
           ? List<SelectedAddonModel>.from(
-              json['selectedAddons'].map(
-                (x) => SelectedAddonModel.fromJson(x),
-              ),
+              json['selectedAddons'].map((x) => SelectedAddonModel.fromJson(x)),
             )
           : [],
     );
@@ -134,15 +124,107 @@ class CartItemModel {
       'cartId': cartId,
       'storeId': storeId,
       'operatorId': operatorId,
-      'serviceId': serviceId,
-      'bundleId': bundleId,
+      'storeServiceId': storeServiceId,
+      'storeBundleId': storeBundleId,
       'quantity': quantity,
       'price': price,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
-      'service': service?.toJson(),
-      'bundle': bundle?.toJson(),
+      'storeService': storeService?.toJson(),
+      'storeBundle': storeBundle?.toJson(),
       'selectedAddons': selectedAddons?.map((x) => x.toJson()).toList(),
+    };
+  }
+}
+
+class CartStoreServiceModel {
+  final String? id;
+  final String? storeId;
+  final String? serviceId;
+  final bool? isActive;
+  final String? createdAt;
+  final String? updatedAt;
+  final CartServiceModel? service;
+
+  CartStoreServiceModel({
+    this.id,
+    this.storeId,
+    this.serviceId,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+    this.service,
+  });
+
+  factory CartStoreServiceModel.fromJson(Map<String, dynamic> json) {
+    return CartStoreServiceModel(
+      id: json['id'],
+      storeId: json['storeId'],
+      serviceId: json['serviceId'],
+      isActive: json['isActive'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      service: json['service'] != null
+          ? CartServiceModel.fromJson(json['service'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'storeId': storeId,
+      'serviceId': serviceId,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'service': service?.toJson(),
+    };
+  }
+}
+
+class CartStoreBundleModel {
+  final String? id;
+  final String? storeId;
+  final String? bundleId;
+  final bool? isActive;
+  final String? createdAt;
+  final String? updatedAt;
+  final CartBundleModel? bundle;
+
+  CartStoreBundleModel({
+    this.id,
+    this.storeId,
+    this.bundleId,
+    this.isActive,
+    this.createdAt,
+    this.updatedAt,
+    this.bundle,
+  });
+
+  factory CartStoreBundleModel.fromJson(Map<String, dynamic> json) {
+    return CartStoreBundleModel(
+      id: json['id'],
+      storeId: json['storeId'],
+      bundleId: json['bundleId'],
+      isActive: json['isActive'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      bundle: json['bundle'] != null
+          ? CartBundleModel.fromJson(json['bundle'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'storeId': storeId,
+      'bundleId': bundleId,
+      'isActive': isActive,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'bundle': bundle?.toJson(),
     };
   }
 }
@@ -260,11 +342,7 @@ class SelectedAddonModel {
   final String? addonId;
   final CartAddonModel? addon;
 
-  SelectedAddonModel({
-    this.cartItemId,
-    this.addonId,
-    this.addon,
-  });
+  SelectedAddonModel({this.cartItemId, this.addonId, this.addon});
 
   factory SelectedAddonModel.fromJson(Map<String, dynamic> json) {
     return SelectedAddonModel(

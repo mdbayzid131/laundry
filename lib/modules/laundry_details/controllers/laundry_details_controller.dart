@@ -211,14 +211,14 @@ class LaundryDetailsController extends GetxController {
     }
   }
 
-  Future<void> addToCart({String? serviceId, String? bundleId}) async {
-    if (serviceId == null && bundleId == null) return;
+  Future<void> addToCart({String? storeServiceId, String? storeBundleId}) async {
+    if (storeServiceId == null && storeBundleId == null) return;
 
     isAddingToCart.value = true;
     try {
       final response = await _cartRepository.addToCart(
-        serviceId: serviceId,
-        bundleId: bundleId,
+        storeServiceId: storeServiceId,
+        storeBundleId: storeBundleId,
         quantity: 1,
         addonIds: [],
       );

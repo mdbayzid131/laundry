@@ -159,20 +159,17 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
       case 'PENDING':
         statusColor = Colors.orange;
         break;
-      case 'PICKED_UP':
-        statusColor = Colors.blue;
-        break;
       case 'PROCESSING':
         statusColor = Colors.purple;
-        break;
-      case 'READY_FOR_DELIVERY':
-        statusColor = Colors.cyan;
         break;
       case 'COMPLETED':
         statusColor = Colors.green;
         break;
       case 'CANCELLED':
         statusColor = Colors.red;
+        break;
+      case 'REFUNDED':
+        statusColor = Colors.orange;
         break;
       default:
         statusColor = Colors.grey;
@@ -300,7 +297,8 @@ class OrderHistoryView extends GetView<OrderHistoryController> {
               ),
               SizedBox(width: 8.w),
               GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.TRACK_ORDER, arguments: order),
+                onTap: () =>
+                    Get.toNamed(AppRoutes.TRACK_ORDER, arguments: order),
                 child: Text(
                   'View Details',
                   style: GoogleFonts.manrope(

@@ -68,47 +68,46 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                     ),
                   ),
                   SizedBox(height: 20.h),
-                  _buildPaymentCard(
-                    id: 'card',
-                    icon: Icon(
-                      Icons.credit_card,
-                      size: 24.sp,
-                    ),
-                    title: 'Credit / Debit Card',
-                    subtitle: 'Visa, Mastercard, Amex',
-                    iconBgColor: const Color(0xffB5DEEF).withOpacity(0.6),
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildPaymentCard(
-                    id: 'apple',
-                    icon: Icon(
-                      Icons.apple,
-                      size: 24.sp,
-                      color: Colors.white,
-                    ),
-                    title: 'Apple Pay',
-                    subtitle: 'Fast & secure',
-                    iconBgColor: Colors.black,
-                    iconColor: Colors.white,
-                  ),
-                  SizedBox(height: 16.h),
-                  _buildPaymentCard(
-                    id: 'google',
-                    icon: SvgPicture.asset(
-                      ImagePaths.googleIcon,
-                      width: 24.sp,
-                      height: 24.sp,
-                    ),
-                    title: 'Google Pay',
-                    subtitle: 'Quick checkout',
-                    iconBgColor: Colors.white,
-                    border: Border.all(color: const Color(0xffF3F4F6)),
-                  ),
-                  SizedBox(height: 16.h),
+                  // _buildPaymentCard(
+                  //   id: 'card',
+                  //   icon: Icon(
+                  //     Icons.credit_card,
+                  //     size: 24.sp,
+                  //   ),
+                  //   title: 'Credit / Debit Card',
+                  //   subtitle: 'Visa, Mastercard, Amex',
+                  //   iconBgColor: const Color(0xffB5DEEF).withOpacity(0.6),
+                  // ),
+                  // SizedBox(height: 16.h),
+                  // _buildPaymentCard(
+                  //   id: 'apple',
+                  //   icon: Icon(
+                  //     Icons.apple,
+                  //     size: 24.sp,
+                  //     color: Colors.white,
+                  //   ),
+                  //   title: 'Apple Pay',
+                  //   subtitle: 'Fast & secure',
+                  //   iconBgColor: Colors.black,
+                  //   iconColor: Colors.white,
+                  // ),
+                  // SizedBox(height: 16.h),
+                  // _buildPaymentCard(
+                  //   id: 'google',
+                  //   icon: SvgPicture.asset(
+                  //     ImagePaths.googleIcon,
+                  //     width: 24.sp,
+                  //     height: 24.sp,
+                  //   ),
+                  //   title: 'Google Pay',
+                  //   subtitle: 'Quick checkout',
+                  //   iconBgColor: Colors.white,
+                  //   border: Border.all(color: const Color(0xffF3F4F6)),
+                  // ),
+                  // SizedBox(height: 16.h),
                   _buildPaymentCard(
                     id: 'stripe',
                     icon: Container(
-                      
                       padding: EdgeInsets.all(8.sp),
                       decoration: BoxDecoration(
                         color: const Color(0xff6366f1),
@@ -148,7 +147,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
           _stepLine(true),
           _stepItem(Icons.check, 'Address', true),
           _stepLine(true),
-          _stepItem(null, '3', false, label: 'Payment', isCurrent: true),
+          _stepItem(Icons.check, '3', true, label: 'Payment'),
           _stepLine(false),
           _stepItem(null, '4', false, label: 'Confirm', isLast: true),
         ],
@@ -165,7 +164,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
     bool isLast = false,
   }) {
     final themeColor = (isCompleted || isCurrent)
-        ? const Color(0xffD3D3D3)
+        ? const Color(0xffB5DEEF)
         : const Color(0xffE5E7EB);
     final iconColor = isCompleted ? Colors.white : Colors.grey.shade400;
 
@@ -197,7 +196,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                 ? FontWeight.w500
                 : FontWeight.w400,
             color: (isCompleted || isCurrent)
-                ? Colors.grey.shade400
+                ? const Color(0xffB5DEEF)
                 : Colors.grey.shade300,
           ),
         ),
@@ -210,7 +209,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
       child: Container(
         height: 1.5.h,
         margin: EdgeInsets.only(bottom: 25.h, left: 8.w, right: 8.w),
-        color: const Color(0xffE5E7EB),
+        color: isActive ? const Color(0xffB5DEEF) : const Color(0xffE5E7EB),
       ),
     );
   }
@@ -255,7 +254,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
                   borderRadius: BorderRadius.circular(12.r),
                   border: border,
                 ),
-                child:icon,
+                child: icon,
               ),
               SizedBox(width: 16.w),
               Expanded(
@@ -317,7 +316,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () => Get.toNamed(AppRoutes.CARD_PAYMENT),
+        onPressed: () => controller.payNow(),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -326,7 +325,7 @@ class PaymentMethodView extends GetView<PaymentMethodController> {
           ),
         ),
         child: Text(
-          'Confirm',
+          'Pay Now',
           style: GoogleFonts.manrope(
             fontSize: 16.sp,
             fontWeight: FontWeight.w700,
