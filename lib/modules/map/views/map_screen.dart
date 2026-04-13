@@ -5,6 +5,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:get/get.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
+import 'package:laundry/data/models/storage_services_model.dart';
+import 'package:laundry/config/constants/image_paths.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -14,79 +17,47 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+  final HomeController homeController = Get.find<HomeController>();
   late GoogleMapController mapController;
-  Set<Marker> markers = {};
-  VendorModel? selectedVendor;
+  Set<Marker> markers = <Marker>{};
 
   static const LatLng _center = LatLng(45.5152, -122.6784);
   LatLng _currentCameraPosition = _center;
-
-  // Sample vendor data
-  final List<VendorModel> vendors = [
-    VendorModel(
-      id: '1',
-      name: 'Fresh Clean Laundry',
-      location: const LatLng(45.5230, -122.6765),
-      rating: 4.8,
-      reviews: 256,
-      deliveryTime: '2-4 hours',
-      distance: '0.5 miles',
-      logoUrl: 'assets/icons/dry_clean.svg',
-      photoUrl: 'assets/dummy_image/op1.png',
-    ),
-    VendorModel(
-      id: '2',
-      name: 'QuickWash Express',
-      location: const LatLng(45.5100, -122.6900),
-      rating: 4.5,
-      reviews: 182,
-      deliveryTime: '3-5 hours',
-      distance: '0.7 miles',
-      logoUrl: 'assets/icons/iron_and_press.svg',
-      photoUrl: 'assets/dummy_image/op2.png',
-    ),
-    VendorModel(
-      id: '3',
-      name: 'Pearl District Cleaners',
-      location: const LatLng(45.5260, -122.6820),
-      rating: 4.9,
-      reviews: 412,
-      deliveryTime: '1-3 hours',
-      distance: '0.3 miles',
-      logoUrl: 'assets/icons/shirt_svg.svg',
-      photoUrl: 'assets/dummy_image/op3.png',
-    ),
-    VendorModel(
-      id: '4',
-      name: 'Portland Laundry Co',
-      location: const LatLng(45.5050, -122.6650),
-      rating: 4.6,
-      reviews: 298,
-      deliveryTime: '2-4 hours',
-      distance: '0.9 miles',
-      logoUrl: 'assets/icons/dry_clean.svg',
-      photoUrl: 'assets/dummy_image/op4.jpg',
-    ),
-  ];
 
   @override
   void initState() {
     super.initState();
     _createMarkers();
+    ever(homeController.services, (_) => _createMarkers());
   }
 
   void _createMarkers() {
     markers.clear();
-    for (var vendor in vendors) {
+    
+    // Group by storeId to avoid duplicate markers for the same store
+    final Map<String, StoreServiceData> uniqueStores = {};
+    for (var serviceItem in homeController.services) {
+      if (serviceItem.store != null && serviceItem.store?.id != null) {
+        if (!uniqueStores.containsKey(serviceItem.store!.id)) {
+           uniqueStores[serviceItem.store!.id!] = serviceItem;
+        }
+      }
+    }
+
+    if (uniqueStores.isNotEmpty && homeController.lat.value != 0.0) {
+      _currentCameraPosition = LatLng(homeController.lat.value, homeController.lng.value);
+    }
+
+    for (var serviceItem in uniqueStores.values) {
+      final store = serviceItem.store;
+      if (store == null || store.lat == null || store.lng == null) continue;
+      
       markers.add(
         Marker(
-          markerId: MarkerId(vendor.id),
-          position: vendor.location,
+          markerId: MarkerId(store.id!),
+          position: LatLng(store.lat!, store.lng!),
           onTap: () {
-            setState(() {
-              selectedVendor = vendor;
-            });
-            _showVendorBottomSheet(vendor);
+            _showVendorBottomSheet(serviceItem);
           },
           icon: BitmapDescriptor.defaultMarkerWithHue(199.2),
         ),
@@ -97,9 +68,20 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    if (homeController.lat.value != 0.0) {
+      mapController.animateCamera(CameraUpdate.newLatLngZoom(
+          LatLng(homeController.lat.value, homeController.lng.value), 13.0));
+    }
   }
 
-  void _showVendorBottomSheet(VendorModel vendor) {
+  void _showVendorBottomSheet(StoreServiceData vendor) {
+    final store = vendor.store;
+    final String photoUrl = store?.logo ?? store?.banner ?? '';
+    final String name = store?.name ?? 'Unknown Store';
+    final String rating = vendor.avgRating?.toStringAsFixed(1) ?? '4.8';
+    final String reviews = vendor.totalReviews?.toString() ?? '5k+';
+    final String distance = vendor.distanceMile != null ? '${vendor.distanceMile!.toStringAsFixed(1)} mi' : 'N/A';
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -131,10 +113,13 @@ class _MapScreenState extends State<MapScreen> {
                   height: 60.w,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
-                    image: DecorationImage(
-                      image: AssetImage(vendor.photoUrl),
-                      fit: BoxFit.cover,
-                    ),
+                    color: Colors.black12,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: photoUrl.isNotEmpty
+                        ? Image.network(photoUrl, fit: BoxFit.cover, errorBuilder: (_,__,___) => Image.asset(ImagePaths.op1, fit: BoxFit.cover))
+                        : Image.asset(ImagePaths.op1, fit: BoxFit.cover),
                   ),
                 ),
                 SizedBox(width: 12.w),
@@ -143,7 +128,7 @@ class _MapScreenState extends State<MapScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        vendor.name,
+                        name,
                         style: GoogleFonts.manrope(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w700,
@@ -156,7 +141,7 @@ class _MapScreenState extends State<MapScreen> {
                           Icon(Icons.star, color: Colors.amber, size: 16.sp),
                           SizedBox(width: 4.w),
                           Text(
-                            vendor.rating.toString(),
+                            rating,
                             style: GoogleFonts.manrope(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
@@ -165,7 +150,7 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                           SizedBox(width: 8.w),
                           Text(
-                            '(${vendor.reviews} reviews)',
+                            '($reviews reviews)',
                             style: GoogleFonts.manrope(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.w400,
@@ -184,10 +169,10 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 _buildInfoChip(
                   icon: Icons.access_time,
-                  label: vendor.deliveryTime,
+                  label: '30 mins',
                 ),
                 SizedBox(width: 12.w),
-                _buildInfoChip(icon: Icons.location_on, label: vendor.distance),
+                _buildInfoChip(icon: Icons.location_on, label: distance),
               ],
             ),
             SizedBox(height: 24.h),
@@ -195,7 +180,10 @@ class _MapScreenState extends State<MapScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Get.toNamed(AppRoutes.LAUNDRY_DETAILS, arguments: {'storeId': store?.id, 'operatorId': store?.operatorId});
+                    },
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 14.h),
                       side: BorderSide(color: AppTheme.primaryColor),
@@ -215,7 +203,10 @@ class _MapScreenState extends State<MapScreen> {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Get.toNamed(AppRoutes.LAUNDRY_DETAILS, arguments: {'storeId': store?.id, 'operatorId': store?.operatorId});
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
                       padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -302,8 +293,14 @@ class _MapScreenState extends State<MapScreen> {
             right: 16.w,
             child: FloatingActionButton(
               backgroundColor: Colors.white,
-              onPressed: () =>
-                  mapController.animateCamera(CameraUpdate.newLatLng(_center)),
+              onPressed: () {
+                if (homeController.lat.value != 0.0) {
+                  mapController.animateCamera(CameraUpdate.newLatLng(
+                      LatLng(homeController.lat.value, homeController.lng.value)));
+                } else {
+                  mapController.animateCamera(CameraUpdate.newLatLng(_center));
+                }
+              },
               child: Icon(Icons.my_location, color: AppTheme.primaryColor),
             ),
           ),
@@ -311,22 +308,4 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
-}
-
-class VendorModel {
-  final String id, name, deliveryTime, distance, logoUrl, photoUrl;
-  final LatLng location;
-  final double rating;
-  final int reviews;
-  VendorModel({
-    required this.id,
-    required this.name,
-    required this.location,
-    required this.rating,
-    required this.reviews,
-    required this.deliveryTime,
-    required this.distance,
-    required this.logoUrl,
-    required this.photoUrl,
-  });
 }
