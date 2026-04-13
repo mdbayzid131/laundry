@@ -206,12 +206,10 @@ class NotificationsView extends GetView<NotificationsController> {
                     children: [
                       Expanded(
                         child: Text(
-                          isRead
-                              ? (notification.title ?? '').toLowerCase()
-                              : (notification.title ?? '').toUpperCase(),
+                          notification.title ?? '',
                           style: GoogleFonts.manrope(
                             fontSize: 15.sp,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: isRead ? FontWeight.normal : FontWeight.w700,
                             color: const Color(0xff1A2530),
                           ),
                           maxLines: 1,
@@ -223,31 +221,27 @@ class NotificationsView extends GetView<NotificationsController> {
                         style: GoogleFonts.manrope(
                           fontSize: 12.sp,
                           color: Colors.black38,
+                          fontWeight: isRead ? FontWeight.normal : FontWeight.w700,
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    isRead
-                        ? (notification.message ?? '').toLowerCase()
-                        : (notification.message ?? '').toUpperCase(),
+                    notification.message ?? '',
                     style: GoogleFonts.manrope(
                       fontSize: 13.sp,
                       color: Colors.black54,
+                      fontWeight: isRead ? FontWeight.normal : FontWeight.w700,
                       height: 1.4,
                     ),
                   ),
                   SizedBox(height: 12.h),
                   Text(
-                    isRead
-                        ? (notification.type?.replaceAll('_', ' ') ?? 'Update')
-                              .toLowerCase()
-                        : (notification.type?.replaceAll('_', ' ') ?? 'Update')
-                              .toUpperCase(),
+                    notification.type?.replaceAll('_', ' ') ?? 'Update',
                     style: GoogleFonts.manrope(
                       fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: isRead ? FontWeight.normal : FontWeight.w700,
                       color: _getColorForType(notification.type),
                     ),
                   ),
