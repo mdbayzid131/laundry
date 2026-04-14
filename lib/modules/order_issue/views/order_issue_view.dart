@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -74,13 +75,7 @@ class OrderIssueView extends GetView<OrderIssueController> {
                 hintText: 'Type here...',
                 maxLines: 4,
               ),
-              SizedBox(height: 24.h),
-              _buildLabel('Submit Claim'),
-              SizedBox(height: 12.h),
-              _buildTextField(
-                controller: controller.submitClaimController,
-                hintText: 'Type here...',
-              ),
+
               SizedBox(height: 24.h),
               _buildLabel('Upload Photo'),
               SizedBox(height: 12.h),
@@ -143,35 +138,41 @@ class OrderIssueView extends GetView<OrderIssueController> {
   Widget _buildUploadSection() {
     return GestureDetector(
       onTap: () => controller.pickFile(),
-      child: Container(
-        height: 120.h,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: const Color(0xffD1D1D1),
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.photo_library_outlined,
-              size: 32.sp,
-              color: Colors.white,
-            ),
-            SizedBox(height: 8.h),
-            Obx(
-              () => Text(
-                controller.selectedFileName.value.isEmpty
-                    ? 'Select File'
-                    : controller.selectedFileName.value,
-                style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+      child: Obx(
+        () => Container(
+          height: 120.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xffD1D1D1),
+            borderRadius: BorderRadius.circular(16.r),
+            image: controller.selectedImagePath.value.isNotEmpty
+                ? DecorationImage(
+                    image: FileImage(File(controller.selectedImagePath.value)),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          child: controller.selectedImagePath.value.isEmpty
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.photo_library_outlined,
+                      size: 32.sp,
+                      color: Colors.white,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Select File',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                )
+              : null,
         ),
       ),
     );

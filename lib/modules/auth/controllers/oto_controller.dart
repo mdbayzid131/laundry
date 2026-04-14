@@ -67,11 +67,14 @@ class OtpController extends GetxController {
       ApiChecker.checkWriteApi(response);
       if (response.statusCode == 200 || response.statusCode == 201) {
         Helpers.showCustomSnackBar('Verification successful', isError: false);
-        
+
         if (isForgotPassword) {
           final resetToken = response.data['data']['resetToken'];
           // Ensure we have AppRoutes imported if we use SET_NEW_PASSWORD.
-          Get.toNamed(AppRoutes.SET_NEW_PASSWORD, arguments: {'resetToken': resetToken, 'email': email});
+          Get.toNamed(
+            AppRoutes.SET_NEW_PASSWORD,
+            arguments: {'resetToken': resetToken, 'email': email},
+          );
         } else {
           _authService.handleAuthResponse(response);
           Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
@@ -87,13 +90,13 @@ class OtpController extends GetxController {
   Future<void> resendOtp() async {
     try {
       isLoading.value = true;
-      
+
       if (isForgotPassword) {
         await _authService.forgotPassword(email);
       } else {
         await _authService.resendOtp(email);
       }
-      
+
       Helpers.showCustomSnackBar('OTP resent successfully', isError: false);
       startTimer();
     } catch (e) {

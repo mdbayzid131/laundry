@@ -23,6 +23,10 @@ class _MapScreenState extends State<MapScreen> {
 
   static const LatLng _center = LatLng(45.5152, -122.6784);
   LatLng _currentCameraPosition = _center;
+  final TextEditingController _searchController = TextEditingController();
+  bool _isMapCreated = false;
+
+  static const String _mapStyle = '';
 
   @override
   void initState() {
@@ -31,27 +35,36 @@ class _MapScreenState extends State<MapScreen> {
     ever(homeController.services, (_) => _createMarkers());
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   void _createMarkers() {
     markers.clear();
-    
+
     // Group by storeId to avoid duplicate markers for the same store
     final Map<String, StoreServiceData> uniqueStores = {};
     for (var serviceItem in homeController.services) {
       if (serviceItem.store != null && serviceItem.store?.id != null) {
         if (!uniqueStores.containsKey(serviceItem.store!.id)) {
-           uniqueStores[serviceItem.store!.id!] = serviceItem;
+          uniqueStores[serviceItem.store!.id!] = serviceItem;
         }
       }
     }
 
     if (uniqueStores.isNotEmpty && homeController.lat.value != 0.0) {
-      _currentCameraPosition = LatLng(homeController.lat.value, homeController.lng.value);
+      _currentCameraPosition = LatLng(
+        homeController.lat.value,
+        homeController.lng.value,
+      );
     }
 
     for (var serviceItem in uniqueStores.values) {
       final store = serviceItem.store;
       if (store == null || store.lat == null || store.lng == null) continue;
-      
+
       markers.add(
         Marker(
           markerId: MarkerId(store.id!),
@@ -64,14 +77,117 @@ class _MapScreenState extends State<MapScreen> {
       );
     }
     setState(() {});
+
+    // If map is already created, center on markers
+    if (uniqueStores.isNotEmpty && markers.isNotEmpty && _isMapCreated) {
+      _fitAllMarkers();
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    if (homeController.lat.value != 0.0) {
-      mapController.animateCamera(CameraUpdate.newLatLngZoom(
-          LatLng(homeController.lat.value, homeController.lng.value), 13.0));
+    _isMapCreated = true;
+
+    if (markers.isNotEmpty) {
+      _fitAllMarkers();
+    } else if (homeController.lat.value != 0.0) {
+      mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(homeController.lat.value, homeController.lng.value),
+          14.0,
+        ),
+      );
     }
+  }
+
+  void _fitAllMarkers() {
+    if (markers.isEmpty) return;
+
+    double? minLat, maxLat, minLng, maxLng;
+
+    for (var marker in markers) {
+      if (minLat == null || marker.position.latitude < minLat)
+        minLat = marker.position.latitude;
+      if (maxLat == null || marker.position.latitude > maxLat)
+        maxLat = marker.position.latitude;
+      if (minLng == null || marker.position.longitude < minLng)
+        minLng = marker.position.longitude;
+      if (maxLng == null || marker.position.longitude > maxLng)
+        maxLng = marker.position.longitude;
+    }
+
+    mapController.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(minLat!, minLng!),
+          northeast: LatLng(maxLat!, maxLng!),
+        ),
+        80.w,
+      ),
+    );
+  }
+
+  void _onSearch(String value) {
+    if (value.isEmpty) return;
+
+    final query = value.toLowerCase();
+    StoreServiceData? found;
+
+    for (var serviceItem in homeController.services) {
+      if (serviceItem.store?.name?.toLowerCase().contains(query) ?? false) {
+        found = serviceItem;
+        break;
+      }
+    }
+
+    if (found != null && found.store?.lat != null && found.store?.lng != null) {
+      mapController.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(found.store!.lat!, found.store!.lng!),
+          16.0,
+        ),
+      );
+      _showVendorBottomSheet(found);
+    }
+  }
+
+  Widget _buildSearchBar() {
+    return Positioned(
+      top: 50.h,
+      left: 20.w,
+      right: 20.w,
+      child: Container(
+        height: 55.h,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: TextField(
+          controller: _searchController,
+          onSubmitted: _onSearch,
+          decoration: InputDecoration(
+            hintText: 'Search LaundryLink....',
+            hintStyle: GoogleFonts.manrope(
+              fontSize: 16.sp,
+              color: Colors.black38,
+            ),
+            prefixIcon: Icon(Icons.search, color: Colors.black38, size: 22.sp),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 20.w,
+              vertical: 15.h,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _showVendorBottomSheet(StoreServiceData vendor) {
@@ -80,8 +196,10 @@ class _MapScreenState extends State<MapScreen> {
     final String name = store?.name ?? 'Unknown Store';
     final String rating = vendor.avgRating?.toStringAsFixed(1) ?? '4.8';
     final String reviews = vendor.totalReviews?.toString() ?? '5k+';
-    final String distance = vendor.distanceMile != null ? '${vendor.distanceMile!.toStringAsFixed(1)} mi' : 'N/A';
-    
+    final String distance = vendor.distanceMile != null
+        ? '${vendor.distanceMile!.toStringAsFixed(1)} mi'
+        : 'N/A';
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -118,7 +236,12 @@ class _MapScreenState extends State<MapScreen> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12.r),
                     child: photoUrl.isNotEmpty
-                        ? Image.network(photoUrl, fit: BoxFit.cover, errorBuilder: (_,__,___) => Image.asset(ImagePaths.op1, fit: BoxFit.cover))
+                        ? Image.network(
+                            photoUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                Image.asset(ImagePaths.op1, fit: BoxFit.cover),
+                          )
                         : Image.asset(ImagePaths.op1, fit: BoxFit.cover),
                   ),
                 ),
@@ -167,10 +290,7 @@ class _MapScreenState extends State<MapScreen> {
             SizedBox(height: 16.h),
             Row(
               children: [
-                _buildInfoChip(
-                  icon: Icons.access_time,
-                  label: '30 mins',
-                ),
+                _buildInfoChip(icon: Icons.access_time, label: '30 mins'),
                 SizedBox(width: 12.w),
                 _buildInfoChip(icon: Icons.location_on, label: distance),
               ],
@@ -182,7 +302,13 @@ class _MapScreenState extends State<MapScreen> {
                   child: OutlinedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Get.toNamed(AppRoutes.LAUNDRY_DETAILS, arguments: {'storeId': store?.id, 'operatorId': store?.operatorId});
+                      Get.toNamed(
+                        AppRoutes.LAUNDRY_DETAILS,
+                        arguments: {
+                          'storeId': store?.id,
+                          'operatorId': store?.operatorId,
+                        },
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -205,7 +331,13 @@ class _MapScreenState extends State<MapScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Get.toNamed(AppRoutes.LAUNDRY_DETAILS, arguments: {'storeId': store?.id, 'operatorId': store?.operatorId});
+                      Get.toNamed(
+                        AppRoutes.LAUNDRY_DETAILS,
+                        arguments: {
+                          'storeId': store?.id,
+                          'operatorId': store?.operatorId,
+                        },
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryColor,
@@ -264,39 +396,39 @@ class _MapScreenState extends State<MapScreen> {
         children: [
           GoogleMap(
             onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(target: _center, zoom: 13.0),
+            padding: EdgeInsets.only(top: 120.h, bottom: 200.h),
+            initialCameraPosition: CameraPosition(target: _center, zoom: 12.0),
             markers: markers,
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            mapToolbarEnabled: false,
+            zoomControlsEnabled: true,
+            mapToolbarEnabled: true,
             onCameraMove: (p) => _currentCameraPosition = p.target,
+            minMaxZoomPreference: const MinMaxZoomPreference(2, 21),
+            compassEnabled: true,
+            rotateGesturesEnabled: true,
+            scrollGesturesEnabled: true,
+            tiltGesturesEnabled: true,
+            zoomGesturesEnabled: true,
           ),
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed: () => Get.back(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildSearchBar(),
           Positioned(
-            bottom: 24.h,
+            bottom: 120.h,
             right: 16.w,
             child: FloatingActionButton(
               backgroundColor: Colors.white,
               onPressed: () {
                 if (homeController.lat.value != 0.0) {
-                  mapController.animateCamera(CameraUpdate.newLatLng(
-                      LatLng(homeController.lat.value, homeController.lng.value)));
+                  mapController.animateCamera(
+                    CameraUpdate.newLatLng(
+                      LatLng(
+                        homeController.lat.value,
+                        homeController.lng.value,
+                      ),
+                    ),
+                  );
+                } else if (markers.isNotEmpty) {
+                  _fitAllMarkers();
                 } else {
                   mapController.animateCamera(CameraUpdate.newLatLng(_center));
                 }

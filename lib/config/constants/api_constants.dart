@@ -42,6 +42,7 @@ class ApiConstants {
   // Order Endpoints
   static const String myOrders = '/order/my-orders';
   static const String checkout = '/order/checkout';
+  static const String orderIssue = '/order-issue';
 
   // Store Endpoints
   static const String getStoreDetails = '/store/:id';

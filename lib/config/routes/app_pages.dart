@@ -28,6 +28,10 @@ import 'package:laundry/modules/order_history/views/order_history_view.dart';
 import 'package:laundry/modules/order_history/bindings/order_history_binding.dart';
 import 'package:laundry/modules/order_issue/views/order_issue_view.dart';
 import 'package:laundry/modules/order_issue/bindings/order_issue_binding.dart';
+import 'package:laundry/modules/my_issues/views/my_issues_view.dart';
+import 'package:laundry/modules/my_issues/bindings/my_issues_binding.dart';
+import 'package:laundry/modules/my_issues/views/issue_details_view.dart';
+import 'package:laundry/modules/my_issues/bindings/issue_details_binding.dart';
 import 'package:laundry/modules/order_status/views/order_status_view.dart';
 import 'package:laundry/modules/order_status/bindings/order_status_binding.dart';
 import 'package:laundry/modules/pickup_address/views/pickup_address_view.dart';
@@ -99,6 +103,8 @@ class AppRoutes {
   static const String CARD_PAYMENT = '/card-payment';
   static const String ORDER_HISTORY = '/order-history';
   static const String ORDER_ISSUE = '/order-issue';
+  static const String MY_ISSUES = '/my-issues';
+  static const String ISSUE_DETAILS = '/issue-details';
   static const String ORDER_STATUS = '/order-status';
   static const String PICKUP_ADDRESS = '/pickup-address';
   static const String PRIVACY_SECURITY = '/privacy-security';
@@ -258,6 +264,18 @@ final pages = [
     name: AppRoutes.ORDER_ISSUE,
     page: () => const OrderIssueView(),
     binding: OrderIssueBinding(),
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.MY_ISSUES,
+    page: () => const MyIssuesView(),
+    binding: MyIssuesBinding(),
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.ISSUE_DETAILS,
+    page: () => const IssueDetailsView(),
+    binding: IssueDetailsBinding(),
     middlewares: [AuthMiddleware()],
   ),
   GetPage(

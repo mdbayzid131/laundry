@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/data/models/order_model.dart';
 import '../controllers/track_order_controller.dart';
 
@@ -30,6 +31,9 @@ class TrackOrderView extends GetView<TrackOrderController> {
               SizedBox(height: 20.h),
               _buildCurrentStatusCard(),
               SizedBox(height: 20.h),
+              _buildOrderIssueCard(order.id ?? ''),
+              SizedBox(height: 20.h),
+
               _buildHelpCard(),
               SizedBox(height: 30.h),
             ],
@@ -135,7 +139,10 @@ class TrackOrderView extends GetView<TrackOrderController> {
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
-                  status,
+                  ['DELIVERED', 'CANCELLED', 'REFUNDED'].contains(status)
+                      ? status[0].toUpperCase() +
+                            status.substring(1).toLowerCase()
+                      : 'In Progress',
                   style: GoogleFonts.manrope(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
@@ -155,11 +162,11 @@ class TrackOrderView extends GetView<TrackOrderController> {
           SizedBox(height: 12.h),
           _buildSummaryRow('Items', '$itemsCount pieces'),
           SizedBox(height: 12.h),
-          _buildSummaryRow(
-            'Estimated Delivery',
-            'Today, 6:00 PM',
-            valueColor: const Color(0xff2563EB),
-          ),
+          // _buildSummaryRow(
+          //   'Estimated Delivery',
+          //   'Today, 6:00 PM',
+          //   valueColor: const Color(0xff2563EB),
+          // ),
         ],
       ),
     );
@@ -472,56 +479,118 @@ class TrackOrderView extends GetView<TrackOrderController> {
   }
 
   Widget _buildHelpCard() {
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.HELP_SUPPORT),
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Need Help?',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1A2530),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Contact our support team',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    color: Colors.black45,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: const Color(0xffF9F9F9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.headset_mic_outlined,
+                color: const Color(0xff1A2530),
+                size: 24.sp,
+              ),
+            ),
+          ],
+        ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Need Help?',
-                style: GoogleFonts.manrope(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff1A2530),
-                ),
-              ),
-              SizedBox(height: 4.h),
-              Text(
-                'Contact our support team',
-                style: GoogleFonts.manrope(
-                  fontSize: 14.sp,
-                  color: Colors.black45,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: const Color(0xffF9F9F9),
-              shape: BoxShape.circle,
+    );
+  }
+
+  Widget _buildOrderIssueCard(String orderId) {
+    return GestureDetector(
+      onTap: () =>
+          Get.toNamed(AppRoutes.ORDER_ISSUE, arguments: {'orderId': orderId}),
+      child: Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-            child: Icon(
-              Icons.headset_mic_outlined,
-              color: const Color(0xff1A2530),
-              size: 24.sp,
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Order Issue',
+                  style: GoogleFonts.manrope(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff1A2530),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  'Report damaged product and issue',
+                  style: GoogleFonts.manrope(
+                    fontSize: 14.sp,
+                    color: Colors.black45,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: const Color(0xffF9F9F9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.report_problem_outlined,
+                color: const Color(0xff1A2530),
+                size: 24.sp,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

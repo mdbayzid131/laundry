@@ -113,28 +113,28 @@ class PrivacySecurityView extends GetView<PrivacySecurityController> {
               ]),
               SizedBox(height: 24.h),
 
-              // Saved Payment Methods Section
-              _buildSectionHeader(Icons.credit_card, 'Saved Payment Methods'),
-              SizedBox(height: 16.h),
-              Obx(
-                () => _buildSettingsCard(
-                  controller.savedPayments.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final payment = entry.value;
-                    return Column(
-                      children: [
-                        _buildPaymentTile(
-                          payment,
-                          () => controller.removePayment(index),
-                        ),
-                        if (index < controller.savedPayments.length - 1)
-                          _buildDivider(),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-              SizedBox(height: 24.h),
+              // // Saved Payment Methods Section
+              // _buildSectionHeader(Icons.credit_card, 'Saved Payment Methods'),
+              // SizedBox(height: 16.h),
+              // Obx(
+              //   () => _buildSettingsCard(
+              //     controller.savedPayments.asMap().entries.map((entry) {
+              //       final index = entry.key;
+              //       final payment = entry.value;
+              //       return Column(
+              //         children: [
+              //           _buildPaymentTile(
+              //             payment,
+              //             () => controller.removePayment(index),
+              //           ),
+              //           if (index < controller.savedPayments.length - 1)
+              //             _buildDivider(),
+              //         ],
+              //       );
+              //     }).toList(),
+              //   ),
+              // ),
+              // SizedBox(height: 24.h),
 
               // Legal Information Section
               _buildSectionHeader(

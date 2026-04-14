@@ -6,10 +6,10 @@ import 'package:laundry/core/utils/helpers.dart';
 
 class SetNewPassController extends GetxController {
   final AuthService _authService = Get.find();
-  
+
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  
+
   late final String resetToken;
   late final String email;
   final isLoading = false.obs;
@@ -40,8 +40,11 @@ class SetNewPassController extends GetxController {
     hasMinLength.value = text.length >= 8;
     hasUppercase.value = text.contains(RegExp(r'[A-Z]'));
     // Checks for number OR special character
-    hasNumberOrSpecial.value = text.contains(RegExp(r'[0-9]')) || 
-                               text.contains(RegExp(r'[!@#\$&*~`%\^\(\)\-_=\+\[\{\]\}\|;:\x27",<\.>\/\?]'));
+    hasNumberOrSpecial.value =
+        text.contains(RegExp(r'[0-9]')) ||
+        text.contains(
+          RegExp(r'[!@#\$&*~`%\^\(\)\-_=\+\[\{\]\}\|;:\x27",<\.>\/\?]'),
+        );
   }
 
   void togglePasswordVisibility() {
@@ -60,19 +63,24 @@ class SetNewPassController extends GetxController {
   }
 
   Future<void> submitNewPassword() async {
-    if (newPasswordController.text.isEmpty || confirmPasswordController.text.isEmpty) {
+    if (newPasswordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
       Helpers.showCustomSnackBar('Please fill in both fields');
       return;
     }
-    
+
     if (newPasswordController.text != confirmPasswordController.text) {
       Helpers.showCustomSnackBar('Passwords do not match');
       return;
     }
 
     // Ensure it complies with rules before submitting
-    if (!hasMinLength.value || !hasUppercase.value || !hasNumberOrSpecial.value) {
-      Helpers.showCustomSnackBar('Please ensure all password requirements are met');
+    if (!hasMinLength.value ||
+        !hasUppercase.value ||
+        !hasNumberOrSpecial.value) {
+      Helpers.showCustomSnackBar(
+        'Please ensure all password requirements are met',
+      );
       return;
     }
 
@@ -82,9 +90,12 @@ class SetNewPassController extends GetxController {
         resetToken: resetToken,
         password: newPasswordController.text,
       );
-      
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Helpers.showCustomSnackBar('Password reset successfully', isError: false);
+        Helpers.showCustomSnackBar(
+          'Password reset successfully',
+          isError: false,
+        );
         Get.offAllNamed(AppRoutes.LOGIN);
       }
     } catch (e) {

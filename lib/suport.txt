@@ -1,80 +1,124 @@
 {
     "success": true,
-    "message": "Cart fetched successfully",
-    "data": {
-        "id": "cmnuzshvh0009tvi0exa13v29",
-        "userId": "cmnuzqv6x0004tvi0ci4hd20h",
-        "createdAt": "2026-04-11T23:55:05.213Z",
-        "updatedAt": "2026-04-13T22:02:58.037Z",
-        "items": [
-            {
-                "id": "cmnxq0yru000ztvuo8w1qz5ai",
-                "cartId": "cmnuzshvh0009tvi0exa13v29",
-                "storeId": "cmnuu01250004tvxsmgf99l7d",
-                "operatorId": "cmnutb2ab0007tvew8qk3ajso",
-                "storeServiceId": "cmnuu11iy0005tvxs3qmkb7ak",
-                "storeBundleId": null,
-                "quantity": 3,
-                "price": "200",
-                "createdAt": "2026-04-13T21:45:02.731Z",
-                "updatedAt": "2026-04-13T21:48:32.440Z",
-                "storeService": {
-                    "id": "cmnuu11iy0005tvxs3qmkb7ak",
-                    "storeId": "cmnuu01250004tvxsmgf99l7d",
-                    "serviceId": "cmnutxmvf0001tvxs9o9bwn06",
-                    "isActive": true,
-                    "createdAt": "2026-04-11T21:13:46.235Z",
-                    "updatedAt": "2026-04-11T21:13:46.235Z",
-                    "service": {
-                        "id": "cmnutxmvf0001tvxs9o9bwn06",
-                        "operatorId": "cmnutb2ab0007tvew8qk3ajso",
-                        "categoryId": "cmnuq925o0005tvjo474sn41l",
-                        "name": "Was and dry",
-                        "basePrice": "200",
-                        "description": "Wash and clean",
-                        "image": "http://10.10.7.111:5000/image/bien-arts-n4x0vqrqwkk-unsplash-1775941867254.jpg",
-                        "isActive": true,
-                        "createdAt": "2026-04-11T21:11:07.275Z",
-                        "updatedAt": "2026-04-12T22:58:28.980Z"
-                    }
-                },
-                "storeBundle": null,
-                "selectedAddons": []
+    "message": "Order issues fetched successfully",
+    "meta": {
+        "total": 25,
+        "totalPage": 3,
+        "page": 1,
+        "limit": 10
+    },
+    "data": [
+        {
+            "id": "cmnxtxa0u007ttvuoljf4dezs",
+            "orderId": "cmnxs0z0z006ttvuo2wa2g18w",
+            "userId": "cmnuzqv6x0004tvi0ci4hd20h",
+            "operatorId": "cmnutb2ab0007tvew8qk3ajso",
+            "issueTitle": "project damage",
+            "description": "bad service",
+            "images": [
+                "http://10.10.7.111:5000/image/1000005220-1776123243820.jpg"
+            ],
+            "status": "PENDING",
+            "refundAmount": null,
+            "operatorNote": null,
+            "adminNote": null,
+            "isEscalated": false,
+            "escalationNote": null,
+            "createdAt": "2026-04-13T23:34:09.150Z",
+            "updatedAt": "2026-04-13T23:34:09.150Z",
+            "order": {
+                "id": "cmnxs0z0z006ttvuo2wa2g18w",
+                "orderNumber": "ORD-1776120062289",
+                "userId": "cmnuzqv6x0004tvi0ci4hd20h",
+                "status": "PENDING",
+                "paymentStatus": "UNPAID",
+                "subtotal": "600",
+                "pickupAndDeliveryFee": "4.99",
+                "platformFee": "1200",
+                "fixedTransactionFee": "0",
+                "totalAmount": "604.99",
+                "actualPickupAndDeliveryFee": "4.99",
+                "isSubscription": false,
+                "scheduledDate": "2026-04-14T22:41:01.067Z",
+                "stripePaymentIntentId": "cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx",
+                "stripeTransferGroup": "TG-ORD-1776120062289",
+                "paymentUrl": "https://checkout.stripe.com/c/pay/cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0VTBvPUhMb0oyMzJ3VEtuUGJEQEA2f08zVV90Q2lfaHNvQ3M3M2ZyTWoxajJvT2FHdFFXY21UPWl%2FUjN1N0dtaHddVG9Xb11cdXYxdERCTnIwYkRAN1BkNTVoQHVja2FDMScpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+                "createdAt": "2026-04-13T22:41:02.291Z",
+                "updatedAt": "2026-04-13T22:41:04.158Z"
             },
-            {
-                "id": "cmnxqngc2001stvuom83nt2cf",
-                "cartId": "cmnuzshvh0009tvi0exa13v29",
-                "storeId": "cmnuu01250004tvxsmgf99l7d",
-                "operatorId": "cmnutb2ab0007tvew8qk3ajso",
-                "storeServiceId": null,
-                "storeBundleId": "cmnuua5c30002tvc8mx1wtbcf",
-                "quantity": 3,
-                "price": "249",
-                "createdAt": "2026-04-13T22:02:31.923Z",
-                "updatedAt": "2026-04-13T22:02:31.923Z",
-                "storeService": null,
-                "storeBundle": {
-                    "id": "cmnuua5c30002tvc8mx1wtbcf",
-                    "storeId": "cmnuu01250004tvxsmgf99l7d",
-                    "bundleId": "cmnuu7r400001tvc8vxz70xl9",
-                    "isActive": true,
-                    "createdAt": "2026-04-11T21:20:51.076Z",
-                    "updatedAt": "2026-04-11T21:20:51.076Z",
-                    "bundle": {
-                        "id": "cmnuu7r400001tvc8vxz70xl9",
-                        "operatorId": "cmnutb2ab0007tvew8qk3ajso",
-                        "name": "Premium Home Cleaning Bundle",
-                        "description": "Full house cleaning including kitchen, bathroom, and living room",
-                        "image": null,
-                        "bundlePrice": "249",
-                        "isActive": true,
-                        "createdAt": "2026-04-11T21:18:59.329Z",
-                        "updatedAt": "2026-04-12T22:53:11.316Z"
-                    }
-                },
-                "selectedAddons": []
+            "user": {
+                "name": "Md Bayzid Hosen ",
+                "email": "mdbayazid131@gmail.com"
             }
+        },
+
+    ]
+}
+
+
+
+{{baseUrl}}/order-issue/:issueId
+{
+    "success": true,
+    "message": "Order issue fetched successfully",
+    "data": {
+        "id": "cmnxtxa0u007ttvuoljf4dezs",
+        "orderId": "cmnxs0z0z006ttvuo2wa2g18w",
+        "userId": "cmnuzqv6x0004tvi0ci4hd20h",
+        "operatorId": "cmnutb2ab0007tvew8qk3ajso",
+        "issueTitle": "project damage",
+        "description": "bad service",
+        "images": [
+            "http://10.10.7.111:5000/image/1000005220-1776123243820.jpg"
         ],
-        "pickupAndDeliveryFee": "4.99"
+        "status": "PENDING",
+        "refundAmount": null,
+        "operatorNote": null,
+        "adminNote": null,
+        "isEscalated": false,
+        "escalationNote": null,
+        "createdAt": "2026-04-13T23:34:09.150Z",
+        "updatedAt": "2026-04-13T23:34:09.150Z",
+        "order": {
+            "id": "cmnxs0z0z006ttvuo2wa2g18w",
+            "orderNumber": "ORD-1776120062289",
+            "userId": "cmnuzqv6x0004tvi0ci4hd20h",
+            "status": "PENDING",
+            "paymentStatus": "UNPAID",
+            "subtotal": "600",
+            "pickupAndDeliveryFee": "4.99",
+            "platformFee": "1200",
+            "fixedTransactionFee": "0",
+            "totalAmount": "604.99",
+            "actualPickupAndDeliveryFee": "4.99",
+            "isSubscription": false,
+            "scheduledDate": "2026-04-14T22:41:01.067Z",
+            "stripePaymentIntentId": "cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx",
+            "stripeTransferGroup": "TG-ORD-1776120062289",
+            "paymentUrl": "https://checkout.stripe.com/c/pay/cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0VTBvPUhMb0oyMzJ3VEtuUGJEQEA2f08zVV90Q2lfaHNvQ3M3M2ZyTWoxajJvT2FHdFFXY21UPWl%2FUjN1N0dtaHddVG9Xb11cdXYxdERCTnIwYkRAN1BkNTVoQHVja2FDMScpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
+            "createdAt": "2026-04-13T22:41:02.291Z",
+            "updatedAt": "2026-04-13T22:41:04.158Z"
+        },
+        "user": {
+            "id": "cmnuzqv6x0004tvi0ci4hd20h",
+            "userId": "USER-356648",
+            "name": "Md Bayzid Hosen ",
+            "email": "mdbayazid131@gmail.com",
+            "phone": "01990641482",
+            "avatar": "http://10.10.7.111:5000/image/scaled_1000010255-1776114849648.jpg",
+            "password": "$2b$10$ml4hU6DlvICGIjgGIT1chOZrhoPdxSl2nH6baeyFHk6YoPCVZy3aW",
+            "role": "USER",
+            "isVerified": true,
+            "isDeleted": false,
+            "lat": null,
+            "lng": null,
+            "stripeCustomerId": "cus_UJozQ2h0T3YN2Z",
+            "isSubscribed": false,
+            "isTwoFactorEnabled": false,
+            "createdAt": "2026-04-11T23:53:49.160Z",
+            "updatedAt": "2026-04-13T22:20:53.667Z",
+            "status": "ACTIVE",
+            "createdById": null
+        }
     }
 }

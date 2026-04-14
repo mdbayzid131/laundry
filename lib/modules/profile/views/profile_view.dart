@@ -59,17 +59,17 @@ class _ProfileViewState extends State<ProfileView> {
                   'Order History',
                   () => Get.toNamed(AppRoutes.ORDER_HISTORY),
                 ),
-                SizedBox(height: 12.h),
-                _buildMenuItem(
-                  Icons.assignment_outlined,
-                  'Order Status',
-                  () => Get.toNamed(AppRoutes.ORDER_STATUS),
-                ),
+                // SizedBox(height: 12.h),
+                // _buildMenuItem(
+                //   Icons.assignment_outlined,
+                //   'Order Status',
+                //   () => Get.toNamed(AppRoutes.ORDER_STATUS),
+                // ),
                 SizedBox(height: 12.h),
                 _buildMenuItem(
                   Icons.report_problem_outlined,
                   'Order Issue',
-                  () => Get.toNamed(AppRoutes.ORDER_ISSUE),
+                  () => Get.toNamed(AppRoutes.MY_ISSUES),
                 ),
                 SizedBox(height: 24.h),
 
@@ -859,34 +859,102 @@ class _ProfileViewState extends State<ProfileView> {
     return GestureDetector(
       onTap: () {
         Get.dialog(
-          AlertDialog(
-            title: Text(
-              'Logout',
-              style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
-            ),
-            content: Text(
-              'Are you sure you want to logout?',
-              style: GoogleFonts.manrope(),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text(
-                  'No',
-                  style: GoogleFonts.manrope(color: Colors.grey),
-                ),
+          Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24.r),
               ),
-              TextButton(
-                onPressed: () {
-                  Get.back();
-                  controller.logout();
-                },
-                child: Text(
-                  'Yes',
-                  style: GoogleFonts.manrope(color: Colors.red),
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 65.w,
+                    height: 65.w,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFEBEE),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.logout_rounded,
+                      color: const Color(0xffE53935),
+                      size: 30.sp,
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  Text(
+                    'Come back soon!',
+                    style: GoogleFonts.manrope(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xff1A2530),
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Text(
+                    'Are you sure you want to log out of your account?',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.manrope(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black45,
+                    ),
+                  ),
+                  SizedBox(height: 30.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Get.back(),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            side: BorderSide(color: Colors.grey.shade200),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                            ),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black45,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.back();
+                            controller.logout();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            backgroundColor: const Color(0xffE53935),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                            ),
+                          ),
+                          child: Text(
+                            'Logout',
+                            style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
