@@ -1,124 +1,42 @@
-{
-    "success": true,
-    "message": "Order issues fetched successfully",
-    "meta": {
-        "total": 25,
-        "totalPage": 3,
-        "page": 1,
-        "limit": 10
-    },
-    "data": [
-        {
-            "id": "cmnxtxa0u007ttvuoljf4dezs",
-            "orderId": "cmnxs0z0z006ttvuo2wa2g18w",
-            "userId": "cmnuzqv6x0004tvi0ci4hd20h",
-            "operatorId": "cmnutb2ab0007tvew8qk3ajso",
-            "issueTitle": "project damage",
-            "description": "bad service",
-            "images": [
-                "http://10.10.7.111:5000/image/1000005220-1776123243820.jpg"
-            ],
-            "status": "PENDING",
-            "refundAmount": null,
-            "operatorNote": null,
-            "adminNote": null,
-            "isEscalated": false,
-            "escalationNote": null,
-            "createdAt": "2026-04-13T23:34:09.150Z",
-            "updatedAt": "2026-04-13T23:34:09.150Z",
-            "order": {
-                "id": "cmnxs0z0z006ttvuo2wa2g18w",
-                "orderNumber": "ORD-1776120062289",
-                "userId": "cmnuzqv6x0004tvi0ci4hd20h",
-                "status": "PENDING",
-                "paymentStatus": "UNPAID",
-                "subtotal": "600",
-                "pickupAndDeliveryFee": "4.99",
-                "platformFee": "1200",
-                "fixedTransactionFee": "0",
-                "totalAmount": "604.99",
-                "actualPickupAndDeliveryFee": "4.99",
-                "isSubscription": false,
-                "scheduledDate": "2026-04-14T22:41:01.067Z",
-                "stripePaymentIntentId": "cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx",
-                "stripeTransferGroup": "TG-ORD-1776120062289",
-                "paymentUrl": "https://checkout.stripe.com/c/pay/cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0VTBvPUhMb0oyMzJ3VEtuUGJEQEA2f08zVV90Q2lfaHNvQ3M3M2ZyTWoxajJvT2FHdFFXY21UPWl%2FUjN1N0dtaHddVG9Xb11cdXYxdERCTnIwYkRAN1BkNTVoQHVja2FDMScpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
-                "createdAt": "2026-04-13T22:41:02.291Z",
-                "updatedAt": "2026-04-13T22:41:04.158Z"
-            },
-            "user": {
-                "name": "Md Bayzid Hosen ",
-                "email": "mdbayazid131@gmail.com"
-            }
-        },
+Socket implementation Plan: Support tickets & Notifications
+This guide focuses on the technical integration of real-time Support Tickets and personalized Notifications.
 
-    ]
-}
+1. Prerequisites
+Library: socket.io-client
+Authentication: Token must be passed in the auth object during connection.
+Registration: You must emit register with the userId immediately after connecting to receive notifications.
+2. Support Ticket Chat Implementation
+Support tickets utilize a room-based chat architecture. When a ticket is created, it is associated with a unique roomId.
 
+A. Joining the Ticket Room
+When the user opens a support ticket detail screen:
 
+Fetch the ticket details via GET /api/v1/supportTicket/:id.
+Extract the chatRooms[0].id.
+Join the room via socket:
+B. Sending a Message
+Event: send-message
+Payload:
+C. Receiving Messages
+Event (Listener): new-message
+Response:
+3. Real-time Notifications Implementation
+Notifications are sent globally to the user's personal channel. You do not need to join any room to receive these, as long as you have "registered" the socket.
 
-{{baseUrl}}/order-issue/:issueId
-{
-    "success": true,
-    "message": "Order issue fetched successfully",
-    "data": {
-        "id": "cmnxtxa0u007ttvuoljf4dezs",
-        "orderId": "cmnxs0z0z006ttvuo2wa2g18w",
-        "userId": "cmnuzqv6x0004tvi0ci4hd20h",
-        "operatorId": "cmnutb2ab0007tvew8qk3ajso",
-        "issueTitle": "project damage",
-        "description": "bad service",
-        "images": [
-            "http://10.10.7.111:5000/image/1000005220-1776123243820.jpg"
-        ],
-        "status": "PENDING",
-        "refundAmount": null,
-        "operatorNote": null,
-        "adminNote": null,
-        "isEscalated": false,
-        "escalationNote": null,
-        "createdAt": "2026-04-13T23:34:09.150Z",
-        "updatedAt": "2026-04-13T23:34:09.150Z",
-        "order": {
-            "id": "cmnxs0z0z006ttvuo2wa2g18w",
-            "orderNumber": "ORD-1776120062289",
-            "userId": "cmnuzqv6x0004tvi0ci4hd20h",
-            "status": "PENDING",
-            "paymentStatus": "UNPAID",
-            "subtotal": "600",
-            "pickupAndDeliveryFee": "4.99",
-            "platformFee": "1200",
-            "fixedTransactionFee": "0",
-            "totalAmount": "604.99",
-            "actualPickupAndDeliveryFee": "4.99",
-            "isSubscription": false,
-            "scheduledDate": "2026-04-14T22:41:01.067Z",
-            "stripePaymentIntentId": "cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx",
-            "stripeTransferGroup": "TG-ORD-1776120062289",
-            "paymentUrl": "https://checkout.stripe.com/c/pay/cs_test_a1zGHVWdevpVntPCOSAMriknTbn0wFQx85OJQeZRkD21j1XI8z7U271eEx#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0VTBvPUhMb0oyMzJ3VEtuUGJEQEA2f08zVV90Q2lfaHNvQ3M3M2ZyTWoxajJvT2FHdFFXY21UPWl%2FUjN1N0dtaHddVG9Xb11cdXYxdERCTnIwYkRAN1BkNTVoQHVja2FDMScpJ2N3amhWYHdzYHcnP3F3cGApJ2dkZm5id2pwa2FGamlqdyc%2FJyZjY2NjY2MnKSdpZHxqcHFRfHVgJz8ndmxrYmlgWmxxYGgnKSdga2RnaWBVaWRmYG1qaWFgd3YnP3F3cGB4JSUl",
-            "createdAt": "2026-04-13T22:41:02.291Z",
-            "updatedAt": "2026-04-13T22:41:04.158Z"
-        },
-        "user": {
-            "id": "cmnuzqv6x0004tvi0ci4hd20h",
-            "userId": "USER-356648",
-            "name": "Md Bayzid Hosen ",
-            "email": "mdbayazid131@gmail.com",
-            "phone": "01990641482",
-            "avatar": "http://10.10.7.111:5000/image/scaled_1000010255-1776114849648.jpg",
-            "password": "$2b$10$ml4hU6DlvICGIjgGIT1chOZrhoPdxSl2nH6baeyFHk6YoPCVZy3aW",
-            "role": "USER",
-            "isVerified": true,
-            "isDeleted": false,
-            "lat": null,
-            "lng": null,
-            "stripeCustomerId": "cus_UJozQ2h0T3YN2Z",
-            "isSubscribed": false,
-            "isTwoFactorEnabled": false,
-            "createdAt": "2026-04-11T23:53:49.160Z",
-            "updatedAt": "2026-04-13T22:20:53.667Z",
-            "status": "ACTIVE",
-            "createdById": null
-        }
-    }
-}
+A. Listen for New Notifications
+Event (Listener): new-notification
+Response:
+B. Usage Scenarios
+Badge Updates: Update the notification bell count in the header.
+Push Alerts: Show an in-app toast or snackbar when a notification arrives.
+Navigation: If the notification has a specific type (e.g., ORDER_UPDATE), you can deep-link the user to the relevant screen.
+4. Troubleshooting Checklist
+Not receiving notifications? Ensure you emitted socket.emit("register", userId) after connection.
+Messages not appearing? Ensure you emitted socket.emit("join-room", roomId) when opening the ticket.
+Double messages? Ensure you remove the listener or avoid re-joining the room multiple times on component re-renders.
+json{  "id": "notif_456",  "title": "Order Status Updated",  "message": "Your order ORD-123 is now IN_PROGRESS.",  "type": "ORDER_UPDATE",  "isRead": false,  "createdAt": "2026-04-17T00:00:00Z"}
+json{  "id": "msg_123",  "content": "I have an issue with my order.",  "senderUserId": "user_id",  "createdAt": "2026-04-17T00:00:00Z"}
+json{  "roomId": "ticket_room_id",  "senderId": "current_user_id",  "content": "I have an issue with my order."}
+javascriptsocket.emit("join-room", roomId);
+
+ 

@@ -14,6 +14,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:laundry/data/models/past_order_model.dart';
 import 'package:laundry/modules/favorite/controllers/favorite_controller.dart';
 import 'package:laundry/data/models/favorites_model.dart';
+import 'package:laundry/data/models/active_order_model.dart';
 
 class LaundryHomeScreen extends StatefulWidget {
   const LaundryHomeScreen({super.key});
@@ -34,7 +35,12 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
         child: Column(
           children: [
             // Ongoing Order Banner
-            _buildOngoingOrderStatusBanner(),
+            Obx(() {
+              if (controller.activeOrders.isEmpty) {
+                return const SizedBox();
+              }
+              return _buildOngoingOrderStatusBanner(controller.activeOrders.first);
+            }),
 
             // Top Address Bar
             _buildAddressBar(),
@@ -142,10 +148,10 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
     );
   }
 
-  Widget _buildOngoingOrderStatusBanner() {
+  Widget _buildOngoingOrderStatusBanner(ActiveOrder order) {
     return GestureDetector(
       onTap: () {
-        Get.toNamed(AppRoutes.ORDER_TRACKING);
+        Get.toNamed(AppRoutes.ORDER_TRACKING, arguments: order.id);
       },
       child: Container(
         width: double.infinity,
@@ -160,7 +166,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '7:20 - 7:30 PM estimated arrival',
+                    order.activeOrderMetadata?.estimatedArrivalTime ?? '',
                     style: GoogleFonts.manrope(
                       fontSize: 15.sp,
                       color: Colors.white.withOpacity(0.9),
@@ -168,7 +174,7 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    'Your items are being cleaned',
+                    order.activeOrderMetadata?.statusMessage ?? 'Order is being processed',
                     style: GoogleFonts.manrope(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 import 'package:dio/dio.dart';
 import 'package:laundry/core/services/api_checker.dart';
+import 'package:laundry/core/services/socket_service.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/helpers.dart';
 
@@ -40,7 +41,13 @@ class LoginController extends GetxController {
       ApiChecker.checkWriteApi(response);
       if (response.statusCode == 200) {
         Helpers.showCustomSnackBar('Login successful', isError: false);
-        _authService.handleAuthResponse(response);
+        await _authService.handleAuthResponse(response);
+        // Connect socket after successful login
+        try {
+          Get.find<SocketService>().connect();
+        } catch (e) {
+          Helpers.showDebugLog('Socket connect error after login: $e');
+        }
         Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
       }
       if (response.statusCode == 403 &&

@@ -87,10 +87,10 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
                 // Support Options
                 _buildSupportCard(
-                  onTap: () => Get.toNamed(AppRoutes.LIVE_CHAT),
-                  icon: Icons.chat_bubble_outline,
-                  title: 'Live Chat',
-                  subtitle: 'Chat with our support team',
+                  onTap: () => Get.toNamed(AppRoutes.SUPPORT_TICKET),
+                  icon: Icons.confirmation_number_outlined,
+                  title: 'Support Tickets',
+                  subtitle: 'Create and track support requests',
                   hasIndicator: true,
                 ),
 

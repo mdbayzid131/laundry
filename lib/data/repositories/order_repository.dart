@@ -25,6 +25,18 @@ class OrderRepository {
     );
   }
 
+  Future<Response> getActiveOrders() async {
+    return await _apiClient.getData(
+      ApiConstants.activeOrders,
+    );
+  }
+
+  Future<Response> getOrderDetails(String orderId) async {
+    return await _apiClient.getData(
+      '${ApiConstants.orderDetail}$orderId',
+    );
+  }
+
   Future<Response> submitOrderIssue(String orderId, String issueTitle, String description, {String? imagePath}) async {
     final body = {
       'orderId': orderId,

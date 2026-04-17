@@ -43,9 +43,11 @@ class Helpers {
   // }
 
   //show bebug log
-  static void showDebugLog(String message) {
+  static void showDebugLog(String message, {bool isError = true}) {
     debugPrint(
-      "❌❌❌❌\n❌❌❌❌DEBUG LOG: $message\n❌❌❌❌",
+      isError
+          ? "⚠️⚠️⚠️\n⚠️⚠️⚠️DEBUG LOG: $message\n⚠️⚠️⚠️"
+          : "✅✅✅✅\n  ✅✅  DEBUG LOG: $message\n✅✅✅✅",
     );
   }
 

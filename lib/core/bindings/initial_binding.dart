@@ -6,6 +6,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:laundry/core/controllers/internet_controller.dart';
 import 'package:laundry/core/services/api_client.dart';
 import 'package:laundry/core/services/auth_service.dart';
+import 'package:laundry/core/services/socket_service.dart';
 import 'package:laundry/core/services/connectivity_service.dart';
 import 'package:laundry/core/services/storage_service.dart';
 import 'package:laundry/data/repositories/user_repository.dart';
@@ -17,6 +18,7 @@ import 'package:laundry/data/repositories/cart_repository.dart';
 import 'package:laundry/data/repositories/order_repository.dart';
 import 'package:laundry/data/repositories/store_repository.dart';
 import 'package:laundry/data/repositories/favorites_repository.dart';
+import 'package:laundry/data/repositories/support_ticket_repository.dart';
 import 'package:laundry/modules/favorite/controllers/favorite_controller.dart';
 
 class InitialBinding extends Bindings {
@@ -27,6 +29,7 @@ class InitialBinding extends Bindings {
     Get.put(StorageService(), permanent: true);
     Get.put(ApiClient(), permanent: true);
     Get.put(AuthService(), permanent: true);
+    Get.put(SocketService(), permanent: true);
 
     Get.put(UserRepository(), permanent: true);
     Get.put(CategoryRepository(), permanent: true);
@@ -37,6 +40,7 @@ class InitialBinding extends Bindings {
     Get.put(OrderRepository(), permanent: true);
     Get.put(StoreRepository(), permanent: true);
     Get.put(FavoritesRepository(), permanent: true);
+    Get.put(SupportTicketRepository(), permanent: true);
 
     // Global controllers
     Get.put(InternetController(), permanent: true);

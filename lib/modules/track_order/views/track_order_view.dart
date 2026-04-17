@@ -16,6 +16,9 @@ class TrackOrderView extends GetView<TrackOrderController> {
       backgroundColor: const Color(0xffF9F9F9),
       appBar: _buildAppBar(),
       body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
         final order = controller.order.value;
         if (order == null) {
           return const Center(child: Text('No order found'));

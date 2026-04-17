@@ -10,6 +10,7 @@ import 'package:laundry/data/repositories/banner_repository.dart';
 import 'package:laundry/data/repositories/service_repository.dart';
 import 'package:laundry/data/repositories/order_repository.dart';
 import 'package:laundry/data/models/past_order_model.dart';
+import 'package:laundry/data/models/active_order_model.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:laundry/core/services/storage_service.dart';
 import 'package:laundry/config/constants/storage_constants.dart';
@@ -36,6 +37,9 @@ class HomeController extends GetxController {
 
   RxBool isLoadingPastOrders = false.obs;
   RxList<MyOrderData> pastOrders = <MyOrderData>[].obs;
+
+  RxBool isLoadingActiveOrders = false.obs;
+  RxList<ActiveOrder> activeOrders = <ActiveOrder>[].obs;
 
   // New Variables for Location & Search
   RxDouble lat = 0.0.obs;
@@ -66,6 +70,7 @@ class HomeController extends GetxController {
         getStoreServices(),
         getAds(),
         getPastOrders(),
+        getActiveOrders(),
       ]);
     } catch (e) {
       Helpers.showDebugLog('Error loading initial data: $e');
@@ -151,6 +156,21 @@ class HomeController extends GetxController {
       Helpers.showDebugLog('Error fetching past orders: $e');
     } finally {
       isLoadingPastOrders.value = false;
+    }
+  }
+
+  Future<void> getActiveOrders() async {
+    isLoadingActiveOrders.value = true;
+    try {
+      final response = await _orderRepository.getActiveOrders();
+      if (response.statusCode == 200) {
+        final ordersResponse = ActiveOrdersResponse.fromJson(response.data);
+        activeOrders.value = ordersResponse.data ?? [];
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching active orders: $e');
+    } finally {
+      isLoadingActiveOrders.value = false;
     }
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:laundry/config/constants/storage_constants.dart';
 import 'package:laundry/core/services/api_checker.dart';
+import 'package:laundry/core/services/storage_service.dart';
 import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/notifecation_preferences_model.dart';
 import '../../../core/services/auth_service.dart';
@@ -50,6 +52,9 @@ class ProfileController extends GetxController {
           response.data,
         );
         userData.value = profileResponse.data;
+        if (userData.value?.id != null) {
+          StorageService.setString(StorageConstants.userId, userData.value!.id!);
+        }
       }
     } catch (e) {
       Helpers.showDebugLog(e.toString());

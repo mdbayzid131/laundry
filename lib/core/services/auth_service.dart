@@ -185,10 +185,15 @@ class AuthService extends GetxService {
 
     final String? accessToken = authData['accessToken'] ?? authData['token'];
     final String? refreshToken = authData['refreshToken'];
+    final String? userId = authData['id'] ?? authData['userId'];
 
     if (accessToken != null) {
       await StorageService.setString(StorageConstants.bearerToken, accessToken);
       isLoggedIn.value = true;
+    }
+
+    if (userId != null) {
+      await StorageService.setString(StorageConstants.userId, userId);
     }
 
     if (refreshToken != null) {

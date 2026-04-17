@@ -57,6 +57,9 @@ import 'package:laundry/modules/product_details/bindings/product_details_binding
 import 'package:laundry/modules/product_details/views/product_details_view.dart';
 import 'package:laundry/modules/change_password/bindings/change_password_binding.dart';
 import 'package:laundry/modules/change_password/views/change_password_view.dart';
+import 'package:laundry/modules/support_ticket/bindings/support_ticket_binding.dart';
+import 'package:laundry/modules/support_ticket/views/support_ticket_view.dart';
+import 'package:laundry/modules/support_ticket/views/support_ticket_chat_view.dart';
 
 import '../../modules/home/bindings/home_binding.dart';
 import '../../modules/home/views/home_view.dart';
@@ -118,6 +121,8 @@ class AppRoutes {
   static const String CHANGE_PASSWORD = '/change-password';
   static const String LOCK = '/lock';
   static const String TRACK_ORDER = '/track-order';
+  static const String SUPPORT_TICKET = '/support-ticket';
+  static const String SUPPORT_TICKET_CHAT = '/support-ticket-chat';
   static const String RATE_REVIEW = '/rate-review';
   static const String ALL_REVIEWS = '/all-reviews';
    static const String NOTIFICATION_DETAILS = '/notification-details';
@@ -350,6 +355,18 @@ final pages = [
     name: AppRoutes.TRACK_ORDER,
     page: () => const TrackOrderView(),
     binding: TrackOrderBinding(),
+  ),
+  GetPage(
+    name: AppRoutes.SUPPORT_TICKET,
+    page: () => const SupportTicketView(),
+    binding: SupportTicketBinding(),
+    middlewares: [AuthMiddleware()],
+  ),
+  GetPage(
+    name: AppRoutes.SUPPORT_TICKET_CHAT,
+    page: () => const SupportTicketChatView(),
+    binding: SupportTicketBinding(),
+    middlewares: [AuthMiddleware()],
   ),
   GetPage(
     name: AppRoutes.RATE_REVIEW,

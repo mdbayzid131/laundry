@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
+import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/order_model.dart';
+import 'package:laundry/data/repositories/order_repository.dart';
 
 class TrackOrderController extends GetxController {
+  final OrderRepository _orderRepository = Get.find<OrderRepository>();
   final order = Rxn<Order>();
   final currentStep = 0.obs;
+  final isLoading = false.obs;
 
   final isCancelled = false.obs;
   final isRefunded = false.obs;
@@ -14,6 +18,24 @@ class TrackOrderController extends GetxController {
     if (Get.arguments is Order) {
       order.value = Get.arguments;
       _calculateCurrentStep();
+    } else if (Get.arguments is String) {
+      getOrderDetails(Get.arguments);
+    }
+  }
+
+  Future<void> getOrderDetails(String orderId) async {
+    isLoading.value = true;
+    try {
+      final response = await _orderRepository.getOrderDetails(orderId);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data['data'];
+        order.value = Order.fromJson(data);
+        _calculateCurrentStep();
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error fetching order details: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 

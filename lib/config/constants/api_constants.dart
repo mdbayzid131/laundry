@@ -41,6 +41,8 @@ class ApiConstants {
 
   // Order Endpoints
   static const String myOrders = '/order/my-orders';
+  static const String activeOrders = '/order/my-active-orders';
+  static const String orderDetail = '/order/';
   static const String checkout = '/order/checkout';
   static const String orderIssue = '/order-issue';
 
@@ -57,6 +59,8 @@ class ApiConstants {
   static const String emailSupport = '/email-support';
   static const String phoneSupport = '/support-phone';
   static const String faq = '/faq';
+  static const String supportTicket = '/supportticket';
+  static const String chatRoomMessages = '/chatroom/:roomId/messages';
 
   // Favorite Endpoints
   static const String myFavorites = '/favouriteservice/my-favourites';
