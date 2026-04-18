@@ -110,17 +110,18 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   icon: Icons.phone_outlined,
                   title: 'Phone Support',
                   subtitle: 'Mon-Fri, 8AM-8PM EST',
+                  showSubtitle: false,
                 ),
 
                 SizedBox(height: 12.h),
 
-                _buildSupportCard(
-                  onTap: () => Get.toNamed(AppRoutes.ORDER_ISSUE),
-                  icon: Icons.report_problem_outlined,
-                  title: 'Order Issue',
-                  subtitle: '',
-                  showSubtitle: false,
-                ),
+                // _buildSupportCard(
+                //   onTap: () => Get.toNamed(AppRoutes.ORDER_ISSUE),
+                //   icon: Icons.report_problem_outlined,
+                //   title: 'Order Issue',
+                //   subtitle: '',
+                //   showSubtitle: false,
+                // ),
 
                 SizedBox(height: 40.h),
 

@@ -3,6 +3,7 @@ import '../../../core/utils/helpers.dart';
 import '../../../data/repositories/order_repository.dart';
 import '../../../data/models/check_out_model.dart';
 import '../../../config/routes/app_pages.dart';
+import '../../payment_method/controllers/payment_method_controller.dart';
 
 class OrderAcknowledgmentController extends GetxController {
   final OrderRepository _orderRepository = Get.find<OrderRepository>();
@@ -76,11 +77,17 @@ class OrderAcknowledgmentController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final checkoutResponse = CheckoutResponseModel.fromJson(response.data);
         Helpers.showCustomSnackBar('Order initiated successfully', isError: false);
-        // Navigate with order details if needed, for now as per user request to PAYMENT_METHOD
-        Get.toNamed(AppRoutes.PAYMENT_METHOD, arguments: {
-          'orderId': checkoutResponse.data?.orderId,
-          'paymentUrl': checkoutResponse.data?.paymentUrl,
-        });
+        
+        // Skip PaymentMethodView and call payNow directly
+        final paymentController = Get.put(PaymentMethodController(), permanent: true);
+        paymentController.orderId = checkoutResponse.data?.orderId;
+        paymentController.paymentUrl = checkoutResponse.data?.paymentUrl;
+        
+        // Navigate to BOTTOM_NAV_BAR before launching payment so when user returns they are at home
+        Get.offAllNamed(AppRoutes.BOTTOM_NAV_BAR);
+        
+        // Launch the payment
+        paymentController.payNow();
       }
     } catch (e) {
       Helpers.showDebugLog('Checkout Error: $e');

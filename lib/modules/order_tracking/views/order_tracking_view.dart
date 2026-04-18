@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:laundry/config/routes/app_pages.dart';
 
 import 'package:laundry/modules/order_tracking/controllers/order_tracking_controller.dart';
@@ -357,7 +358,19 @@ class OrderTrackingView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // _buildActionPill('Add tip', icon: null),
-              _buildActionPill('Call', icon: Icons.call),
+              _buildActionPill(
+                'Call ${driver.phone ?? ''}',
+                icon: Icons.call,
+                onTap: () async {
+                  if (driver.phone != null && driver.phone!.isNotEmpty) {
+                    final Uri launchUri = Uri(
+                      scheme: 'tel',
+                      path: driver.phone,
+                    );
+                    await launchUrl(launchUri);
+                  }
+                },
+              ),
               // _buildActionPill('Chat', icon: Icons.chat_bubble_outline),
             ],
           ),
@@ -366,38 +379,40 @@ class OrderTrackingView extends StatelessWidget {
     );
   }
 
-  Widget _buildActionPill(String text, {IconData? icon}) {
-    return Container(
-      
-      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 16.sp, color: Colors.black87),
-            SizedBox(width: 6.w),
-          ],
-          Text(
-            text,
-            style: GoogleFonts.manrope(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+  Widget _buildActionPill(String text, {IconData? icon, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 16.sp, color: Colors.black87),
+              SizedBox(width: 6.w),
+            ],
+            Text(
+              text,
+              style: GoogleFonts.manrope(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

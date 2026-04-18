@@ -7,6 +7,7 @@ import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/data/models/user_model.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../home/controllers/home_controller.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends StatefulWidget {
@@ -48,12 +49,25 @@ class _ProfileViewState extends State<ProfileView> {
                 SizedBox(height: 20.h),
 
                 // Menu Items
-                _buildMenuItem(
-                  Icons.local_shipping_outlined,
-                  'Track Active Order',
-                  () => Get.toNamed(AppRoutes.ORDER_TRACKING),
-                ),
-                SizedBox(height: 12.h),
+                Obx(() {
+                  final homeController = Get.find<HomeController>();
+                  if (homeController.activeOrders.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Column(
+                    children: [
+                      _buildMenuItem(
+                        Icons.local_shipping_outlined,
+                        'Track Active Order',
+                        () {
+                          Get.toNamed(AppRoutes.ORDER_TRACKING,
+                              arguments: homeController.activeOrders.first.id);
+                        },
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
+                  );
+                }),
                 _buildMenuItem(
                   Icons.history,
                   'Order History',
