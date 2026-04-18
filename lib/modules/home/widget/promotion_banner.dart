@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/config/routes/app_pages.dart';
 import 'package:laundry/config/themes/app_theme.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
 import 'package:laundry/data/models/banner_model.dart';
@@ -134,24 +135,34 @@ class _PromotionalBannerCarouselState extends State<PromotionalBannerCarousel> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.w,
-                    vertical: 10.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Text(
-                    banner.buttonText ?? 'Schedule Now',
-                    style: GoogleFonts.manrope(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                GestureDetector(
+                  onTap: () {
+                    if (banner.bannerType == "MEMBERSHIP") {
+                      Get.toNamed(AppRoutes.MEMBERSHIP);
+                    } else {
+                      
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 10.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Text(
+                      banner.buttonText ?? 'Schedule Now',
+                      style: GoogleFonts.manrope(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
                     ),
                   ),
                 ),
+              
               ],
             ),
           ),

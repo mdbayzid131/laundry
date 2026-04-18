@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:laundry/config/themes/app_theme.dart';
 import '../../../config/constants/image_paths.dart';
 import '../../../config/routes/app_pages.dart';
 import '../../../data/models/cart_model.dart';
@@ -39,7 +40,7 @@ class CartScreen extends GetView<CartController> {
         if (items.isEmpty) {
           return RefreshIndicator(
             onRefresh: () => controller.getCart(),
-            color: Theme.of(context).primaryColor,
+            color: AppTheme.primaryColor,
             backgroundColor: Colors.white,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -74,7 +75,7 @@ class CartScreen extends GetView<CartController> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () => controller.getCart(),
-                color: Theme.of(context).primaryColor,
+                color: AppTheme.primaryColor,
                 backgroundColor: Colors.white,
                 child: ListView.separated(
                   padding: EdgeInsets.symmetric(

@@ -10,6 +10,7 @@ import 'package:laundry/modules/home/widget/promotion_banner.dart';
 import 'package:laundry/modules/home/controllers/home_controller.dart';
 import 'package:laundry/data/models/storage_services_model.dart';
 import 'package:laundry/data/models/category_model.dart';
+import 'package:laundry/modules/notifications/controllers/notifications_controller.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:laundry/data/models/past_order_model.dart';
 import 'package:laundry/modules/favorite/controllers/favorite_controller.dart';
@@ -37,7 +38,9 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             // Ongoing Order Banner
             Obx(() {
               if (controller.activeOrders.isEmpty) {
-                return const SizedBox();
+                return const SizedBox(
+                  height: 22,
+                );
               }
               return _buildOngoingOrderStatusBanner(controller.activeOrders.first);
             }),
@@ -51,7 +54,9 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             // Scrollable Content
             Expanded(
               child: RefreshIndicator(
+                color: AppTheme.primaryColor,
                 onRefresh: () => controller.loadInitialData(),
+                backgroundColor: Colors.white,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
@@ -234,32 +239,68 @@ class _LaundryHomeScreenState extends State<LaundryHomeScreen> {
             onTap: () => Get.toNamed(AppRoutes.FAVORITE),
           ),
           SizedBox(width: 12.w),
-          _buildIconButton(
-            Icons.notifications_none,
-            onTap: () => Get.toNamed(AppRoutes.NOTIFICATIONS),
-          ),
+          Obx(() {
+            final NotificationsController notifController =
+                Get.find<NotificationsController>();
+            return _buildIconButton(
+              Icons.notifications_none,
+              onTap: () => Get.toNamed(AppRoutes.NOTIFICATIONS),
+              badgeCount: notifController.unreadCount.value,
+            );
+          }),
         ],
       ),
     );
   }
 
-  Widget _buildIconButton(IconData icon, {VoidCallback? onTap}) {
+  Widget _buildIconButton(IconData icon, {VoidCallback? onTap, int? badgeCount}) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(8.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Icon(icon, size: 22.sp, color: Colors.black87),
+            child: Icon(icon, size: 22.sp, color: Colors.black87),
+          ),
+          if (badgeCount != null && badgeCount > 0)
+            Positioned(
+              right: -2.w,
+              top: -2.h,
+              child: Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 16.w,
+                  minHeight: 16.w,
+                ),
+                child: Center(
+                  child: Text(
+                    badgeCount > 9 ? '9+' : badgeCount.toString(),
+                    style: GoogleFonts.manrope(
+                      color: Colors.white,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

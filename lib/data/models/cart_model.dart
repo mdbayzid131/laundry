@@ -35,6 +35,24 @@ class CartData {
     this.pickupAndDeliveryFee,
   });
 
+  CartData copyWith({
+    String? id,
+    String? userId,
+    String? createdAt,
+    String? updatedAt,
+    List<CartItemModel>? items,
+    String? pickupAndDeliveryFee,
+  }) {
+    return CartData(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      items: items ?? this.items,
+      pickupAndDeliveryFee: pickupAndDeliveryFee ?? this.pickupAndDeliveryFee,
+    );
+  }
+
   factory CartData.fromJson(Map<String, dynamic> json) {
     return CartData(
       id: json['id'],
@@ -91,6 +109,38 @@ class CartItemModel {
     this.storeBundle,
     this.selectedAddons,
   });
+
+  CartItemModel copyWith({
+    String? id,
+    String? cartId,
+    String? storeId,
+    String? operatorId,
+    String? storeServiceId,
+    String? storeBundleId,
+    int? quantity,
+    String? price,
+    String? createdAt,
+    String? updatedAt,
+    CartStoreServiceModel? storeService,
+    CartStoreBundleModel? storeBundle,
+    List<SelectedAddonModel>? selectedAddons,
+  }) {
+    return CartItemModel(
+      id: id ?? this.id,
+      cartId: cartId ?? this.cartId,
+      storeId: storeId ?? this.storeId,
+      operatorId: operatorId ?? this.operatorId,
+      storeServiceId: storeServiceId ?? this.storeServiceId,
+      storeBundleId: storeBundleId ?? this.storeBundleId,
+      quantity: quantity ?? this.quantity,
+      price: price ?? this.price,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      storeService: storeService ?? this.storeService,
+      storeBundle: storeBundle ?? this.storeBundle,
+      selectedAddons: selectedAddons ?? this.selectedAddons,
+    );
+  }
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(

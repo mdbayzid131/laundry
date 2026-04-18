@@ -3,6 +3,7 @@ import 'package:laundry/config/constants/api_constants.dart';
 import 'package:laundry/config/constants/storage_constants.dart';
 import 'package:laundry/core/services/storage_service.dart';
 import 'package:laundry/core/utils/helpers.dart';
+import 'package:laundry/modules/notifications/controllers/notifications_controller.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService extends GetxService {
@@ -49,6 +50,16 @@ class SocketService extends GetxService {
 
     _socket?.on('new-notification', (data) {
       Helpers.showDebugLog('🔔 New notification received: $data', isError: false);
+      
+      // Update notifications list and unread count in real-time
+      try {
+        if (Get.isRegistered<NotificationsController>()) {
+          Get.find<NotificationsController>().addNewNotification(data);
+        }
+      } catch (e) {
+        Helpers.showDebugLog('Error adding to notifications list: $e');
+      }
+
       Helpers.showCustomSnackBar(
         data['message'] ?? 'You have a new notification',
         isError: false,

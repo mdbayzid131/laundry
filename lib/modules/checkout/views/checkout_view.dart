@@ -213,11 +213,13 @@ class CheckoutView extends GetView<CheckoutController> {
                   image = item.storeBundle?.bundle?.image ?? '';
                 }
 
+                double itemTotalPrice = (double.tryParse(item.price ?? '0') ?? 0) * (item.quantity ?? 1);
+
                 return _buildSummaryItem(
                   image.isNotEmpty ? image : ImagePaths.shirtIcon,
                   name,
                   subtitle,
-                  '\$${item.price}',
+                  '\$${itemTotalPrice.toStringAsFixed(2)}',
                   isUrl: image.isNotEmpty,
                 );
               },

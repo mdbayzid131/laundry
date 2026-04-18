@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:laundry/config/routes/app_pages.dart';
-import 'package:dio/dio.dart';
 import 'package:laundry/core/services/api_checker.dart';
 import 'package:laundry/core/services/socket_service.dart';
 import '../../../core/services/auth_service.dart';
@@ -18,9 +17,15 @@ class LoginController extends GetxController {
   final isPasswordVisible = false.obs;
 
   @override
+  void onInit() {
+    super.onInit();
+    // Initialize controllers if they were disposed
+  }
+
+  @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
+    // emailController.dispose();
+    // passwordController.dispose();
     super.onClose();
   }
 

@@ -19,7 +19,9 @@ import 'package:laundry/data/repositories/order_repository.dart';
 import 'package:laundry/data/repositories/store_repository.dart';
 import 'package:laundry/data/repositories/favorites_repository.dart';
 import 'package:laundry/data/repositories/support_ticket_repository.dart';
+import 'package:laundry/data/repositories/notifications_repository.dart';
 import 'package:laundry/modules/favorite/controllers/favorite_controller.dart';
+import 'package:laundry/modules/notifications/controllers/notifications_controller.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -41,10 +43,12 @@ class InitialBinding extends Bindings {
     Get.put(StoreRepository(), permanent: true);
     Get.put(FavoritesRepository(), permanent: true);
     Get.put(SupportTicketRepository(), permanent: true);
+    Get.put(NotificationsRepository(), permanent: true);
 
     // Global controllers
     Get.put(InternetController(), permanent: true);
     Get.lazyPut(() => FavoriteController(), fenix: true);
+    Get.put(NotificationsController(), permanent: true);
 
     // Services init
     ConnectivityService.init();

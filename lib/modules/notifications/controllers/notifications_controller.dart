@@ -14,6 +14,7 @@ class NotificationsController extends GetxController {
   final RxBool isLoadingMore = false.obs;
   final RxBool hasMoreData = true.obs;
   final RxInt currentPage = 1.obs;
+  final RxInt unreadCount = 0.obs;
   final int limit = 10;
 
   @override
@@ -52,6 +53,7 @@ class NotificationsController extends GetxController {
         }
 
         notifications.addAll(newItems);
+        _updateUnreadCount();
       }
     } catch (e) {
       Helpers.showDebugLog(e.toString());
@@ -100,10 +102,39 @@ class NotificationsController extends GetxController {
             isRead: true,
             createdAt: item.createdAt,
           );
+          _updateUnreadCount();
         }
       } 
     } catch (e) {
       Helpers.showDebugLog(e.toString());
+    }
+  }
+
+  void _updateUnreadCount() {
+    unreadCount.value =
+        notifications.where((element) => element.isRead == false).length;
+  }
+
+  void addNewNotification(Map<String, dynamic> data) {
+    try {
+      final NotificationItem newItem = NotificationItem.fromJson(data);
+      // Check if it's already in the list to avoid duplicates
+      if (!notifications.any((element) => element.id == newItem.id)) {
+        notifications.insert(0, newItem);
+        _updateUnreadCount();
+      }
+    } catch (e) {
+      // Fallback if data is not a full NotificationItem object
+      final newItem = NotificationItem(
+        id: data['id'] ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        title: data['title'] ?? 'New Notification',
+        message: data['message'] ?? '',
+        type: data['type'] ?? 'UPDATE',
+        createdAt: data['createdAt'] ?? DateTime.now().toIso8601String(),
+        isRead: false,
+      );
+      notifications.insert(0, newItem);
+      _updateUnreadCount();
     }
   }
 }

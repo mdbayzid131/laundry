@@ -34,12 +34,14 @@ class CartController extends GetxController {
     if (newQuantity < 1) return;
 
     // Optimistic update
-    final items = cartData.value?.items ?? [];
-    final index = items.indexWhere((element) => element.id == cartItemId);
-    if (index != -1) {
-      final oldQuantity = items[index].quantity;
-      // We don't update the UI immediately because price calculation on server might change
-      // But we can show a loading or something if needed.
+    if (cartData.value != null) {
+      final items = List<CartItemModel>.from(cartData.value!.items ?? []);
+      final index = items.indexWhere((element) => element.id == cartItemId);
+      if (index != -1) {
+        items[index] = items[index].copyWith(quantity: newQuantity);
+        cartData.value = cartData.value!.copyWith(items: items);
+        cartData.refresh(); // Force UI update
+      }
     }
 
     try {
@@ -48,12 +50,14 @@ class CartController extends GetxController {
         quantity: newQuantity,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Refresh cart to get updated prices
+        // Refresh cart to get updated prices from server
         await getCart();
       }
     } catch (e) {
       Helpers.showDebugLog('Error updating quantity: $e');
       Helpers.showCustomSnackBar('Could not update quantity');
+      // Rollback if needed (though getCart will fix it)
+      await getCart();
     }
   }
 
@@ -74,7 +78,9 @@ class CartController extends GetxController {
     double total = 0;
     final items = cartData.value?.items ?? [];
     for (var item in items) {
-      total += double.tryParse(item.price ?? '0') ?? 0;
+      double price = double.tryParse(item.price ?? '0') ?? 0;
+      int quantity = item.quantity ?? 1;
+      total += price * quantity;
     }
     return total;
   }

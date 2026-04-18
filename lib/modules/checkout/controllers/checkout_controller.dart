@@ -49,7 +49,9 @@ class CheckoutController extends GetxController {
     double total = 0;
     final items = cartData.value?.items ?? [];
     for (var item in items) {
-      total += double.tryParse(item.price ?? '0') ?? 0;
+      double price = double.tryParse(item.price ?? '0') ?? 0;
+      int quantity = item.quantity ?? 1;
+      total += price * quantity;
     }
     return total;
   }
