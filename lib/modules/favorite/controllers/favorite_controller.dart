@@ -2,13 +2,16 @@ import 'package:get/get.dart';
 import 'package:laundry/core/services/api_checker.dart';
 import 'package:laundry/core/utils/helpers.dart';
 import 'package:laundry/data/models/favorites_model.dart';
+import 'package:laundry/data/repositories/cart_repository.dart';
 import 'package:laundry/data/repositories/favorites_repository.dart';
 
 class FavoriteController extends GetxController {
   final FavoritesRepository _repository = Get.find<FavoritesRepository>();
+  final CartRepository _cartRepository = Get.find<CartRepository>();
 
   final RxList<FavoriteItem> favoriteItems = <FavoriteItem>[].obs;
   final RxBool isLoading = false.obs;
+  final RxBool isAddingToCart = false.obs;
 
   @override
   void onInit() {
@@ -31,6 +34,33 @@ class FavoriteController extends GetxController {
       Helpers.showDebugLog(e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> addToCart(FavoriteItem item) async {
+    if (isAddingToCart.value) return;
+
+    isAddingToCart.value = true;
+
+    try {
+      final response = await _cartRepository.addToCart(
+        storeServiceId: item.storeServiceId,
+        storeBundleId: item.storeBundleId,
+        quantity: 1,
+        addonIds: [],
+      );
+
+      ApiChecker.checkWriteApi(response);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Helpers.showCustomSnackBar(
+          response.data['message'] ?? 'Added to cart successfully',
+          isError: false,
+        );
+      }
+    } catch (e) {
+      Helpers.showDebugLog('Error adding to cart from favorites: $e');
+    } finally {
+      isAddingToCart.value = false;
     }
   }
 

@@ -114,145 +114,267 @@ class CartScreen extends GetView<CartController> {
       description = item.storeBundle?.bundle?.description ?? '';
     }
 
-    return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image Placeholder
-          Container(
-            width: 75.w,
-            height: 75.w,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEEEEEE),
-              borderRadius: BorderRadius.circular(12.r),
-              image: image.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(image),
-                      fit: BoxFit.cover,
-                    )
+    return GestureDetector(
+      onTap: () {
+        if (item.storeServiceId != null) {
+          Get.toNamed(
+            AppRoutes.PRODUCT_DETAILS,
+            arguments: {
+              'serviceId': item.storeServiceId,
+              'categoryId': item.storeService?.service?.categoryId,
+            },
+          );
+        } else if (item.storeId != null) {
+          Get.toNamed(
+            AppRoutes.LAUNDRY_DETAILS,
+            arguments: {
+              'storeId': item.storeId,
+              'operatorId': item.operatorId,
+            },
+          );
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image Placeholder
+            Container(
+              width: 75.w,
+              height: 75.w,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEEEEEE),
+                borderRadius: BorderRadius.circular(12.r),
+                image: image.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(image),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: image.isEmpty
+                  ? Icon(Icons.image_outlined, color: Colors.grey, size: 30.sp)
                   : null,
             ),
-            child: image.isEmpty
-                ? Icon(Icons.image_outlined, color: Colors.grey, size: 30.sp)
-                : null,
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: GoogleFonts.manrope(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xff1A2530),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => controller.deleteCartItem(item.id!),
-                      child: Container(
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: SvgPicture.asset(
-                          ImagePaths.deleteIcon,
-                          width: 14.w,
-                          height: 14.w,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                if (item.selectedAddons?.isNotEmpty ?? false) ...[
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Addons: ${item.selectedAddons!.map((e) => e.addon?.name).join(', ')}',
-                    style: GoogleFonts.manrope(
-                      fontSize: 11.sp,
-                      color: const Color(0xff579796),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-                SizedBox(height: 12.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '\$$price',
-                      style: GoogleFonts.manrope(
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        _buildQtyBtn(
-                          icon: Icons.remove,
-                          onTap: () => controller.updateQuantity(
-                            item.id!,
-                            (item.quantity ?? 0) - 1,
-                          ),
-                          isBlue: false,
-                        ),
-                        SizedBox(width: 12.w),
-                        Text(
-                          '${item.quantity ?? 0}',
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
                           style: GoogleFonts.manrope(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: const Color(0xff1A2530),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Get.dialog(
+                            Dialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24.r),
+                              ),
+                              child: Container(
+                                padding: EdgeInsets.all(24.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(24.r),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(16.w),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red[50],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.delete_outline_rounded,
+                                        color: Colors.redAccent,
+                                        size: 32.sp,
+                                      ),
+                                    ),
+                                    SizedBox(height: 20.h),
+                                    Text(
+                                      'Remove Item?',
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.w800,
+                                        color: const Color(0xff1A2530),
+                                      ),
+                                    ),
+                                    SizedBox(height: 12.h),
+                                    Text(
+                                      'Are you sure you want to remove this service from your cart?',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.manrope(
+                                        fontSize: 14.sp,
+                                        color: Colors.black54,
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                    SizedBox(height: 28.h),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: OutlinedButton(
+                                            onPressed: () => Get.back(),
+                                            style: OutlinedButton.styleFrom(
+                                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                                              side: BorderSide(color: Colors.grey[300]!),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(14.r),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'Cancel',
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 15.sp,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 12.w),
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              controller.deleteCartItem(item.id!);
+                                              Get.back();
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                                              backgroundColor: Colors.redAccent,
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(14.r),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'Remove',
+                                              style: GoogleFonts.manrope(
+                                                fontSize: 15.sp,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: SvgPicture.asset(
+                            ImagePaths.deleteIcon,
+                            width: 14.w,
+                            height: 14.w,
                           ),
                         ),
-                        SizedBox(width: 12.w),
-                        _buildQtyBtn(
-                          icon: Icons.add,
-                          onTap: () => controller.updateQuantity(
-                            item.id!,
-                            (item.quantity ?? 0) + 1,
-                          ),
-                          isBlue: true,
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  if (item.selectedAddons?.isNotEmpty ?? false) ...[
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Addons: ${item.selectedAddons!.map((e) => e.addon?.name).join(', ')}',
+                      style: GoogleFonts.manrope(
+                        fontSize: 11.sp,
+                        color: const Color(0xff579796),
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ),
-              ],
+                  SizedBox(height: 12.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '\$$price',
+                        style: GoogleFonts.manrope(
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          _buildQtyBtn(
+                            icon: Icons.remove,
+                            onTap: () => controller.updateQuantity(
+                              item.id!,
+                              (item.quantity ?? 0) - 1,
+                            ),
+                            isBlue: false,
+                          ),
+                          SizedBox(width: 12.w),
+                          Text(
+                            '${item.quantity ?? 0}',
+                            style: GoogleFonts.manrope(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          _buildQtyBtn(
+                            icon: Icons.add,
+                            onTap: () => controller.updateQuantity(
+                              item.id!,
+                              (item.quantity ?? 0) + 1,
+                            ),
+                            isBlue: true,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
