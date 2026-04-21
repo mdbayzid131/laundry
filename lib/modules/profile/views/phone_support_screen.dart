@@ -154,7 +154,7 @@ class PhoneSupportScreen extends GetView<PhoneSupportController> {
 
                 // Availability Info
                 Text(
-                  "Available ${phoneSupport?.availableTime ?? '9 AM - 9 PM EST'}",
+                  "Available ${phoneSupport?.availableTime ?? 'N/A'}",
                   style: GoogleFonts.manrope(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
@@ -163,7 +163,7 @@ class PhoneSupportScreen extends GetView<PhoneSupportController> {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Average wait time: ${phoneSupport?.avgWaitTime ?? '<2 min'}',
+                  'Average wait time: ${phoneSupport?.avgWaitTime ?? 'N/A'}',
                   style: GoogleFonts.manrope(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w400,
